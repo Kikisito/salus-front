@@ -1,10 +1,41 @@
-import type { RouteRecordRaw } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
   {
+    name: 'main',
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/IndexPage.vue') }],
+    children: [
+      {
+        path: '',
+        redirect: { name: 'home' },
+      },
+      {
+        name: 'home',
+        path: 'home',
+        component: () => import('pages/HomePage.vue'),
+      },
+      {
+        name: 'appointments',
+        path: 'appointments',
+        component: () => import('pages/AppointmentsPage.vue'),
+      },
+      {
+        name: 'appointment',
+        path: 'appointment/:id',
+        component: () => import('pages/AppointmentDetailsPage.vue'),
+      },
+    ],
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/auth',
+    component: () => import('layouts/AuthLayout.vue'),
+    children: [
+      { path: '', redirect: { name: 'login' } },
+      { name: 'login', path: 'login', component: () => import('pages/LoginPage.vue') },
+    ],
+    meta: { requiresGuest: true },
   },
 
   // Always leave this as last one,
@@ -13,6 +44,6 @@ const routes: RouteRecordRaw[] = [
     path: '/:catchAll(.*)*',
     component: () => import('pages/ErrorNotFound.vue'),
   },
-];
+]
 
-export default routes;
+export default routes

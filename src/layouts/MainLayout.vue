@@ -1,42 +1,38 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hHh lpR fFf">
     <q-header elevated>
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
-
-        <q-toolbar-title>
-          Quasar App
-        </q-toolbar-title>
-
+        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleDrawer" />
+        <q-toolbar-title> Project Salus </q-toolbar-title>
         <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
 
     <q-drawer
-      v-model="leftDrawerOpen"
+      v-model="drawer"
       show-if-above
-      bordered
+      :mini="miniState"
+      @mouseenter="miniState = false"
+      @mouseleave="miniState = true"
+      mini-to-overlay
+      elevated
     >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
+      <q-scroll-area class="fit">
+        <q-list padding>
+          <template v-for="(item, index) in menuItems" :key="item.label">
+            <q-item clickable v-ripple :to="item.path">
+              <q-item-section avatar>
+                <q-icon :name="item.icon" />
+              </q-item-section>
 
-        <EssentialLink
-          v-for="link in linksList"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
+              <q-item-section>
+                <q-item-label>{{ item.label }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-separator :key="'sep' + index" v-if="item.separator" />
+          </template>
+        </q-list>
+      </q-scroll-area>
     </q-drawer>
 
     <q-page-container>
@@ -46,57 +42,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
+import { ref } from 'vue'
 
-const linksList: EssentialLinkProps[] = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-];
+const drawer = ref(false)
+const miniState = ref(true)
 
-const leftDrawerOpen = ref(false);
-
-function toggleLeftDrawer () {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
+function toggleDrawer() {
+  drawer.value = !drawer.value
 }
+
+const menuItems = [
+  { label: 'Inicio', icon: 'home', path: '/home' },
+  { label: 'Mis citas', icon: 'view_agenda', path: '/appointments' },
+  { label: 'Mensajería', icon: 'chat', path: '/chats' },
+  { label: 'Informes', icon: 'description', path: '/reports' },
+  { label: 'Recetas', icon: 'receipt', path: '/recipes' },
+  { label: 'Pruebas', icon: 'science', path: '/tests' },
+  { label: 'Tratamientos', icon: 'medical_services', path: '/treatments', separator: true },
+  { label: 'Mi perfil', icon: 'person', path: '/profile' },
+  { label: 'Ajustes', icon: 'settings', path: '/settings' },
+  { label: 'Cerrar sesión', icon: 'logout', path: '/logout' },
+]
 </script>

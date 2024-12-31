@@ -1,0 +1,13 @@
+{
+  "name": "salus-front",
+  "version": "0.0.1",
+  "description": "Gestión de clínicas",
+  "author": "Kyllian Edouard Boucir <kebb2@alu.ua.es>",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  }
+}
