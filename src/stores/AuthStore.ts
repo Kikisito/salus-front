@@ -28,10 +28,14 @@ export const useAuthStore = defineStore('authStore', {
 
         this.token = data.jwt
 
-        this.router.push({ name: 'main' })
+        this.router.push({ name: 'home' })
       } catch (error) {
         if (error instanceof AxiosError) {
+          if(error.code === 'ERR_NETWORK') {
+            this.error = 'No se ha podido establecer conexión con el servidor'
+          } else {
           this.error = 'Los datos introducidos no coinciden con ningún usuario'
+          }
         } else {
           this.error = 'Ha ocurrido un error inesperado'
           console.error(error)

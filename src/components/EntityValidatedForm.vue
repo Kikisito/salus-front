@@ -1,0 +1,76 @@
+<script lang="ts" setup>
+import { ref, watch } from 'vue'
+import { useField, useForm } from 'vee-validate'
+
+const props = defineProps(['entity', 'entityValidationConfig', 'readOnly'])
+const emit = defineEmits(['form:validated'])
+
+const { validationSchema, initialValues, formFieldsConfig } = props.entityValidationConfig
+
+const { handleSubmit } = useForm({
+  validationSchema: validationSchema,
+  initialValues: initialValues,
+})
+
+/*
+    formFields = ref({
+        field1: { ...formFieldsConfig.field1, model: useField('field1') },
+        field2: { ...formFieldsConfig.field2, model: useField('field2') },
+        ...
+    })
+*/
+const formFields = ref(
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  Object.keys(formFieldsConfig).reduce((acc: any, key: string) => {
+    acc[key] = { ...formFieldsConfig[key], model: useField(key) }
+    return acc
+  }, {}),
+)
+
+// Actualizamos la entidad cuando es actualizada en la lista del componente padre
+watch(
+  () => props.entity,
+  (newValue) => {
+    if (newValue) {
+      Object.keys(formFields.value).forEach((key: string) => {
+        formFields.value[key].model.value = newValue[key]
+      })
+    }
+  },
+  { deep: true },
+)
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const doSubmit = handleSubmit(async (values: any) => {
+  console.log('doSubmit', values)
+  emit('form:validated', values)
+})
+</script>
+
+<template>
+  <q-form @submit.prevent="doSubmit">
+    <template v-for="field in formFields" :key="field">
+      <q-input
+        v-model="field.model.value"
+        :type="field.type"
+        :step="field.type === 'number' ? field.step : undefined"
+        :label="field.label"
+        :placeholder="field.placeholder"
+        :hint="field.hint"
+        :error-message="field.model.errorMessage"
+        :autocomplete="field.autocomplete"
+        :readonly="readOnly"
+        filled
+      />
+    </template>
+
+    <slot name="extraFields" />
+    <slot name="submitButton" />
+  </q-form>
+</template>
+
+<style lang="css" scoped>
+.q-form > :not(:last-child) {
+  margin-bottom: 1rem;
+}
+</style>
