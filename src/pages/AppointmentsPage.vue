@@ -52,9 +52,9 @@ const citas = [
 
         <q-card-section>
           <EntityValidatedForm :entityValidationConfig="getCitaValidatedFormConfig()">
-              <template #submitButton>
-                <q-btn color="primary" label="Añadir" />
-              </template>
+            <template #submitButton>
+              <q-btn color="primary" label="Añadir" />
+            </template>
           </EntityValidatedForm>
         </q-card-section>
       </q-card>
