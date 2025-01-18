@@ -18,7 +18,7 @@ const showDialog = defineModel({ default: false, type: Boolean })
         <EntityValidatedForm :entityValidationConfig="getCitaValidatedFormConfig()">
           <template #submitButton>
             <q-btn color="primary" flat label="Cancelar" @click="$emit('form:cancel')" />
-            <q-btn color="primary" label="Añadir" @click="$emit('form:submit')" />
+            <q-btn color="primary" label="Añadir" @click="$emit('form:submit', $event)" />
           </template>
         </EntityValidatedForm>
       </q-card-section>
