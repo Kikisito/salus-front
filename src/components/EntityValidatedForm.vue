@@ -65,12 +65,20 @@ const doSubmit = handleSubmit(async (values: any) => {
     </template>
 
     <slot name="extraFields" />
-    <slot name="submitButton" />
+
+    <div class="actions">
+      <slot name="submitButton" />
+    </div>
   </q-form>
 </template>
 
 <style lang="css" scoped>
 .q-form > :not(:last-child) {
   margin-bottom: 1rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
 }
 </style>

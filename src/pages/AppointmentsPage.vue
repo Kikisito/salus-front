@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import { HeFilledAllergies, HeFilledRunning } from '@kalimahapps/vue-icons'
-import EntityValidatedForm from 'src/components/EntityValidatedForm.vue'
+import NewAppointmentModal from 'src/components/NewAppointmentModal.vue'
 import PreviaCita from 'src/components/PreviaCita.vue'
-import { getCitaValidatedFormConfig } from 'src/config/CitaValidatedFormConfig'
 import { h, ref } from 'vue'
 
-const showDialog = ref(false)
+const showModal = ref()
 
 const citas = [
   {
@@ -40,24 +39,10 @@ const citas = [
         fab
         icon="add"
         style="background-color: #f1f4f8; color: #65558f"
-        @click="showDialog = true"
+        @click="showModal = true"
       />
     </q-page-sticky>
 
-    <q-dialog v-model="showDialog" persistent>
-      <q-card style="width: 700px; max-width: 80vw">
-        <q-card-section>
-          <div class="text-h6">Creando una nueva cita</div>
-        </q-card-section>
-
-        <q-card-section>
-          <EntityValidatedForm :entityValidationConfig="getCitaValidatedFormConfig()">
-            <template #submitButton>
-              <q-btn color="primary" label="Añadir" />
-            </template>
-          </EntityValidatedForm>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
+    <NewAppointmentModal v-model:show="showModal" />
   </q-page>
 </template>
