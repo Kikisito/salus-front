@@ -17,14 +17,34 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/HomePage.vue'),
       },
       {
-        name: 'appointments',
         path: 'appointments',
-        component: () => import('pages/AppointmentsPage.vue'),
-      },
-      {
-        name: 'appointment',
-        path: 'appointment/:id',
-        component: () => import('pages/AppointmentDetailsPage.vue'),
+        children: [
+          {
+            name: 'appointments',
+            path: '',
+            component: () => import('pages/AppointmentsPage.vue'),
+          },
+          {
+            path: ':id',
+            children: [
+              {
+                name: 'appointment',
+                path: '',
+                component: () => import('pages/AppointmentDetailsPage.vue'),
+              },
+              {
+                name: 'appointment-edit',
+                path: 'edit',
+                component: () => import('pages/AppointmentEditPage.vue'),
+              },
+              {
+                name: 'appointment-delete',
+                path: 'delete',
+                component: () => import('pages/AppointmentDeletePage.vue'),
+              },
+            ],
+          },
+        ],
       },
     ],
     meta: { requiresAuth: true },
