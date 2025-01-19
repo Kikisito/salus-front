@@ -57,6 +57,7 @@ const doSubmit = handleSubmit(async (values: any) => {
         :label="field.label"
         :placeholder="field.placeholder"
         :hint="field.hint"
+        :error="field.model.errors.length != 0"
         :error-message="field.model.errorMessage"
         :autocomplete="field.autocomplete"
         :readonly="readOnly"
