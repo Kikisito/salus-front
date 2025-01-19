@@ -2,6 +2,7 @@
 //const route = useRoute()
 //const appointmentId = route.params.id
 import AppointmentModal from 'src/components/AppointmentModal.vue'
+import DeleteModal from 'src/components/DeleteModal.vue'
 import { ref } from 'vue'
 
 const cita = {
@@ -15,6 +16,7 @@ const cita = {
 }
 
 const editModal = ref(false)
+const deleteModal = ref(false)
 
 // Fab
 const fab = ref(false)
@@ -186,12 +188,13 @@ const rotation = ref(0)
         vertical-actions-align="right"
         direction="up"
       >
-        <q-fab-action color="red" icon="delete" label="Eliminar" />
+        <q-fab-action color="red" icon="delete" label="Eliminar" @click="deleteModal = true" />
         <q-fab-action color="primary" icon="edit" label="Editar" @click="editModal = true" />
       </q-fab>
     </q-page-sticky>
 
     <AppointmentModal :appointment="cita" v-model:show="editModal" />
+    <DeleteModal v-model:show="deleteModal" />
   </q-page>
 </template>
 

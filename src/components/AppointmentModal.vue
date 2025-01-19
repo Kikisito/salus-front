@@ -19,17 +19,23 @@ const showModal = defineModel('show', { default: false, type: Boolean })
   <q-dialog v-model="showModal" persistent>
     <q-card style="width: 700px; max-width: 80vw">
       <q-card-section>
-        <div class="text-h6">Creando una nueva cita</div>
+        <div class="text-h6">
+          {{ appointment === null ? 'Solicitando nueva cita' : 'Editando cita' }}
+        </div>
       </q-card-section>
 
       <q-card-section>
         <EntityValidatedForm
-          :entityValidationConfig="getCitaValidatedFormConfig(appointment || null)"
+          :entityValidationConfig="getCitaValidatedFormConfig(appointment)"
           @form:validated="$emit('form:submit')"
         >
           <template #submitButton>
             <q-btn color="primary" flat label="Cancelar" @click="showModal = false" />
-            <q-btn type="submit" color="primary" label="Añadir" />
+            <q-btn
+              type="submit"
+              color="primary"
+              :label="appointment === null ? 'Crear' : 'Actualizar'"
+            />
           </template>
         </EntityValidatedForm>
       </q-card-section>
