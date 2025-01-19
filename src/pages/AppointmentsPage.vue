@@ -4,7 +4,7 @@ import NewAppointmentModal from 'src/components/NewAppointmentModal.vue'
 import PreviaCita from 'src/components/PreviaCita.vue'
 import { h, ref } from 'vue'
 
-const showModal = ref()
+const showModal = ref(false)
 
 const citas = [
   {
@@ -33,6 +33,7 @@ const citas = [
     </div>
 
     <PreviaCita v-for="cita in citas" :key="cita.id" :cita="cita" />
+    <NewAppointmentModal v-model:show="showModal" @form:cancel="showModal = false" />
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn
@@ -42,7 +43,5 @@ const citas = [
         @click="showModal = true"
       />
     </q-page-sticky>
-
-    <NewAppointmentModal v-model:show="showModal" />
   </q-page>
 </template>

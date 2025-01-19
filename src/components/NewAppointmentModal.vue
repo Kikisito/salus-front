@@ -4,11 +4,11 @@ import EntityValidatedForm from './EntityValidatedForm.vue'
 
 defineEmits(['form:submit', 'form:cancel'])
 
-const showDialog = defineModel({ default: false, type: Boolean })
+const showModal = defineModel('show', { default: false, type: Boolean })
 </script>
 
 <template>
-  <q-dialog v-model="showDialog" persistent>
+  <q-dialog v-model="showModal" persistent>
     <q-card style="width: 700px; max-width: 80vw">
       <q-card-section>
         <div class="text-h6">Creando una nueva cita</div>
