@@ -25,24 +25,9 @@ const routes: RouteRecordRaw[] = [
             component: () => import('pages/AppointmentsPage.vue'),
           },
           {
+            name: 'appointment',
             path: ':id',
-            children: [
-              {
-                name: 'appointment',
-                path: '',
-                component: () => import('pages/AppointmentDetailsPage.vue'),
-              },
-              {
-                name: 'appointment-edit',
-                path: 'edit',
-                component: () => import('pages/AppointmentEditPage.vue'),
-              },
-              {
-                name: 'appointment-delete',
-                path: 'delete',
-                component: () => import('pages/AppointmentDeletePage.vue'),
-              },
-            ],
+            component: () => import('pages/AppointmentDetailsPage.vue'),
           },
         ],
       },

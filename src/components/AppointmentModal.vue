@@ -2,7 +2,15 @@
 import { getCitaValidatedFormConfig } from 'src/config/CitaValidatedFormConfig'
 import EntityValidatedForm from './EntityValidatedForm.vue'
 
-defineEmits(['form:submit', 'form:cancel'])
+defineProps({
+  appointment: {
+    type: Object,
+    required: false,
+    default: null,
+  },
+})
+
+defineEmits(['form:submit'])
 
 const showModal = defineModel('show', { default: false, type: Boolean })
 </script>
@@ -15,9 +23,12 @@ const showModal = defineModel('show', { default: false, type: Boolean })
       </q-card-section>
 
       <q-card-section>
-        <EntityValidatedForm :entityValidationConfig="getCitaValidatedFormConfig()">
+        <EntityValidatedForm
+          :entityValidationConfig="getCitaValidatedFormConfig(appointment || null)"
+          @form:validated="$emit('form:submit')"
+        >
           <template #submitButton>
-            <q-btn color="primary" flat label="Cancelar" @click="$emit('form:cancel')" />
+            <q-btn color="primary" flat label="Cancelar" @click="showModal = false" />
             <q-btn type="submit" color="primary" label="Añadir" />
           </template>
         </EntityValidatedForm>

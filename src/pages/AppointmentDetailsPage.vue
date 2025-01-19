@@ -1,8 +1,25 @@
 <script lang="ts" setup>
 //const route = useRoute()
 //const appointmentId = route.params.id
+import AppointmentModal from 'src/components/AppointmentModal.vue'
 import { ref } from 'vue'
 
+const cita = {
+  especialidad: 'Fisiología',
+  centro_medico: 'Hospital General de Alicante',
+  fecha: '2024-12-10',
+  hora: '13:15',
+  ubicacion: 'Avda. Conde de Lumiares, 37, 03010 Alicante',
+  doctor: 'Dr. Juan Martínez',
+  tipo: 'Presencial',
+}
+
+const editModal = ref(false)
+
+// Fab
+const fab = ref(false)
+
+// Map
 const center = ref([40, 40])
 const projection = ref('EPSG:4326')
 const zoom = ref(8)
@@ -160,8 +177,21 @@ const rotation = ref(0)
     </div>
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
-      <q-btn fab icon="edit" style="background-color: #f1f4f8; color: #65558f" />
+      <q-fab
+        v-model="fab"
+        label="Acciones"
+        label-position="left"
+        color="blue"
+        icon="keyboard_arrow_up"
+        vertical-actions-align="right"
+        direction="up"
+      >
+        <q-fab-action color="red" icon="delete" label="Eliminar" />
+        <q-fab-action color="primary" icon="edit" label="Editar" @click="editModal = true" />
+      </q-fab>
     </q-page-sticky>
+
+    <AppointmentModal :appointment="cita" v-model:show="editModal" />
   </q-page>
 </template>
 

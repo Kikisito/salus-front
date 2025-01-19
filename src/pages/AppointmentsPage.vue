@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { HeFilledAllergies, HeFilledRunning } from '@kalimahapps/vue-icons'
-import NewAppointmentModal from 'src/components/NewAppointmentModal.vue'
+import AppointmentModal from 'src/components/AppointmentModal.vue'
 import PreviaCita from 'src/components/PreviaCita.vue'
 import { h, ref } from 'vue'
 
@@ -33,7 +33,7 @@ const citas = [
     </div>
 
     <PreviaCita v-for="cita in citas" :key="cita.id" :cita="cita" />
-    <NewAppointmentModal v-model:show="showModal" @form:cancel="showModal = false" />
+    <AppointmentModal v-model:show="showModal" />
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn

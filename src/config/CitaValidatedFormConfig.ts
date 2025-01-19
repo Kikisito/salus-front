@@ -27,7 +27,7 @@ const validationSchema = {
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const initialValues = (entity?: any) => ({
-  entity: entity ? entity.especialidad : '',
+  especialidad: entity ? entity.especialidad : '',
   tipo: entity ? entity.tipo : '',
   centro_medico: entity ? entity.centro_medico : '',
   doctor: entity ? entity.doctor : '',
@@ -65,7 +65,7 @@ const formFieldsConfig = {
     label: 'Hora',
     type: 'time',
     hint: 'Hora de la cita',
-  }
+  },
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

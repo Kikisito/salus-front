@@ -42,7 +42,6 @@ watch(
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const doSubmit = handleSubmit(async (values: any) => {
-  console.log('doSubmit', values)
   emit('form:validated', values)
 })
 </script>
