@@ -36,12 +36,7 @@ const citas = [
     <AppointmentModal v-model:show="showModal" />
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
-      <q-btn
-        fab
-        icon="add"
-        style="background-color: #f1f4f8; color: #65558f"
-        @click="showModal = true"
-      />
+      <q-btn fab icon="add" class="bg-primary text-white" @click="showModal = true" />
     </q-page-sticky>
   </q-page>
 </template>
