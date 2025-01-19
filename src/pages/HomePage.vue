@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { HeFilledAllergies, HeFilledRunning } from '@kalimahapps/vue-icons'
-import PreviaCita from 'src/components/PreviaCita.vue';
-import PreviaMensaje from 'src/components/PreviaMensaje.vue';
+import PreviaCita from 'src/components/PreviaCita.vue'
+import PreviaMensaje from 'src/components/PreviaMensaje.vue'
 import { h } from 'vue'
 
 const citas = [
@@ -54,9 +54,14 @@ const mensajes = [
           <div class="text-subtitle">Conversaciones con tus médicos</div>
         </div>
 
-       <PreviaCita v-for="cita in citas" :key="cita.id" :cita="cita" />
+        <PreviaCita v-for="cita in citas" :key="cita.id" :cita="cita" />
 
-        <q-btn label="Ver todas mis citas" flat bordered />
+        <q-btn
+          label="Ver todas mis citas"
+          flat
+          bordered
+          @click="$router.push({ name: 'appointments' })"
+        />
       </div>
 
       <div class="col-12 col-md-6">
