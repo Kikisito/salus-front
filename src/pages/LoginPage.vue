@@ -46,7 +46,7 @@ const login = async () => {
           style="background-color: #272e3e; color: white"
           class="q-mt-md"
           label="No soy usuario, quiero registrarme"
-          @click="authStore.error = '¡Ups! Esta funcionalidad aún no está disponible.'"
+          @click="$router.push({ name: 'register' })"
         />
         <q-btn
           flat

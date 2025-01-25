@@ -40,6 +40,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', redirect: { name: 'login' } },
       { name: 'login', path: 'login', component: () => import('pages/LoginPage.vue') },
+      { name: 'register', path: 'register', component: () => import('pages/RegisterPage.vue') },
     ],
     meta: { requiresGuest: true },
   },

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 import { useField, useForm } from 'vee-validate'
+import SelectWithOtherOption from 'src/components/SelectWithOtherOption.vue'
 
 const props = defineProps(['entity', 'entityValidationConfig', 'readOnly'])
 const emit = defineEmits(['form:validated'])
@@ -25,6 +26,7 @@ const formFields = ref(
     acc[key] = { ...formFieldsConfig[key], model: useField(key) }
     return acc
   }, {}),
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 )
 
 // Actualizamos la entidad cuando es actualizada en la lista del componente padre
@@ -49,7 +51,32 @@ const doSubmit = handleSubmit(async (values: any) => {
 <template>
   <q-form @submit.prevent="doSubmit">
     <template v-for="field in formFields" :key="field">
+      <SelectWithOtherOption
+        v-if="field.type === 'select-with-other'"
+        v-model="field.model.value"
+        :label="field.label"
+        :hint="field.hint"
+        :options="field.options"
+        :errors="field.model.errors"
+        :errorMessage="field.model.errorMessage"
+        :clearable="field.clearable"
+        :disable="readOnly"
+        filled
+      />
+
+      <q-select
+        v-else-if="field.type === 'select'"
+        v-model="field.model.value"
+        :label="field.label"
+        :hint="field.hint"
+        :options="field.options"
+        :clearable="field.clearable"
+        :disable="readOnly"
+        filled
+      ></q-select>
+
       <q-input
+        v-else
         v-model="field.model.value"
         :type="field.type"
         :step="field.type === 'number' ? field.step : undefined"
