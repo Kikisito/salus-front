@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 
-defineProps({
+const props = defineProps({
   options: {
     type: Array,
     required: true,
@@ -26,9 +26,17 @@ const selectedOption = defineModel({
 })
 
 // Variables internas para manejar el campo adicional
-const internalValue = ref(null as string | null)
-const otherFieldValue = ref(null as string | null)
-const showAdditionalField = ref(false)
+const internalValue = ref(
+  props.options.includes(selectedOption.value)
+    ? selectedOption.value
+    : selectedOption.value.length > 0
+      ? 'Otro'
+      : '',
+)
+const otherFieldValue = ref<string | null>(selectedOption.value ?? null)
+const showAdditionalField = ref(
+  !props.options.includes(selectedOption.value) && selectedOption.value.length > 0,
+)
 
 const handleOptionChange = (value: string) => {
   // Mostrar/ocultar campo adicional según la selección
