@@ -7,27 +7,32 @@ import { ref } from 'vue'
 import { getDireccionValidatedFormConfig } from 'src/config/DireccionFormConfig'
 import type { Direccion } from 'src/interfaces/Direccion'
 import { getPasswordValidatedFormConfig } from 'src/config/PasswordFormConfig'
+import type { User } from 'src/interfaces/User'
 
 const authStore = useAuthStore()
 
 const step = ref(1)
 
-/*const user = ref({
-  nombre: '',
-  apellidos: '',
-  nif: '',
-  email: '',
-  telefono: '',
-  sexo: '',
-  direccion: {
-    linea1: '',
-    linea2: '',
-    cp: '',
-    provincia: '',
-    localidad: '',
-  },
-  password: '',
-})*/
+const submitForm = async (userBasicData: UserBasicData, direccion: Direccion, password: string) => {
+  const user = {
+    nombre: userBasicData.nombre,
+    apellidos: userBasicData.apellidos,
+    nif: userBasicData.nif,
+    email: userBasicData.email,
+    telefono: userBasicData.telefono,
+    sexo: userBasicData.sexo,
+    direccion: {
+      lineaDireccion1: direccion.lineaDireccion1,
+      lineaDireccion2: direccion.lineaDireccion2,
+      codigoPostal: direccion.codigoPostal,
+      provincia: direccion.provincia,
+      localidad: direccion.localidad,
+    },
+    password: password,
+  } as User
+
+  console.log(authStore.register(user))
+}
 
 const userBasicData = ref(null as UserBasicData | null)
 const handleBasicDataForm = (data: UserBasicData) => {
@@ -43,14 +48,12 @@ const handleDireccionForm = (data: Direccion) => {
 
 const password = ref('')
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const handlePasswordForm = (data: any) => {
+const handlePasswordForm = async (data: any) => {
   password.value = data.password
   step.value = 3
 
-  console.log(userBasicData.value)
-  console.log(direccion.value)
-  console.log(password.value)
-  // handle
+  // finally, handle form
+  await submitForm(userBasicData.value!, direccion.value!, password.value)
 }
 </script>
 

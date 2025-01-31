@@ -2,6 +2,7 @@ import { AxiosError } from 'axios'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { Cookies } from 'quasar'
 import { api } from 'src/boot/axios'
+import type { User } from 'src/interfaces/User'
 
 // Configuración de cookies de autenticación
 const COOKIE_NAME = 'auth-token'
@@ -59,6 +60,10 @@ export const useAuthStore = defineStore('authStore', {
       this.token = null
       Cookies.remove(COOKIE_NAME, { path: '/' })
       this.router.push({ name: 'login' })
+    },
+
+    async register(user: User) {
+      console.log(user)
     },
   },
 })
