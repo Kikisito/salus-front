@@ -1,11 +1,20 @@
 import { AxiosError } from 'axios'
 import { defineStore, acceptHMRUpdate } from 'pinia'
-import type { PersistenceOptions } from 'pinia-plugin-persistedstate'
+import { Cookies } from 'quasar'
 import { api } from 'src/boot/axios'
+
+// Configuración de cookies de autenticación
+const COOKIE_NAME = 'auth-token'
+const COOKIE_OPTIONS = {
+  expires: 7,
+  secure: true,
+  sameSite: 'Strict' as const,
+  path: '/',
+}
 
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
-    token: null as string | null,
+    token: Cookies.get(COOKIE_NAME) || (null as string | null),
     loading: false as boolean,
     error: null as string | null,
   }),
@@ -27,14 +36,15 @@ export const useAuthStore = defineStore('authStore', {
         const data = await response.data
 
         this.token = data.jwt
+        Cookies.set(COOKIE_NAME, this.token, COOKIE_OPTIONS)
 
         this.router.push({ name: 'home' })
       } catch (error) {
         if (error instanceof AxiosError) {
-          if(error.code === 'ERR_NETWORK') {
+          if (error.code === 'ERR_NETWORK') {
             this.error = 'No se ha podido establecer conexión con el servidor'
           } else {
-          this.error = 'Los datos introducidos no coinciden con ningún usuario'
+            this.error = 'Los datos introducidos no coinciden con ningún usuario'
           }
         } else {
           this.error = 'Ha ocurrido un error inesperado'
@@ -44,14 +54,13 @@ export const useAuthStore = defineStore('authStore', {
         this.loading = false
       }
     },
-  },
 
-  persist: {
-    /* Encriptar esto podría ser interesante */
-    key: 'auth-store',
-    storage: localStorage,
-    pick: ['token'],
-  } as PersistenceOptions,
+    async logout() {
+      this.token = null
+      Cookies.remove(COOKIE_NAME, { path: '/' })
+      this.router.push({ name: 'login' })
+    },
+  },
 })
 
 if (import.meta.hot) {
