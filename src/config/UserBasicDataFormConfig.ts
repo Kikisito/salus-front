@@ -43,6 +43,18 @@ const validationSchema = {
     }
     return true
   },
+  fechaNacimiento(value: string) {
+    if (!value) {
+      return 'La fecha de nacimiento es obligatoria'
+    }
+    return true
+  },
+  sexo(value: string) {
+    if (!value) {
+      return 'El sexo es obligatorio'
+    }
+    return true
+  },
   email(value: string) {
     if (!value) {
       return 'El email es obligatorio'
@@ -67,12 +79,6 @@ const validationSchema = {
     }
     return true
   },
-  sexo(value: string) {
-    if (!value) {
-      return 'El sexo es obligatorio'
-    }
-    return true
-  },
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -80,9 +86,10 @@ const initialValues = (entity?: any) => ({
   nombre: entity ? entity.nombre : '',
   apellidos: entity ? entity.apellidos : '',
   nif: entity ? entity.nif : '',
+  fechaNacimiento: entity ? entity.fechaNacimiento : '',
+  sexo: entity ? entity.sexo : '',
   email: entity ? entity.email : '',
   telefono: entity ? entity.telefono : '',
-  sexo: entity ? entity.sexo : '',
 })
 
 const formFieldsConfig = {
@@ -101,6 +108,17 @@ const formFieldsConfig = {
     type: 'text',
     hint: 'Tu número de identificación fiscal',
   },
+  fechaNacimiento: {
+    label: 'Fecha de nacimiento',
+    type: 'date',
+    hint: 'Tu fecha de nacimiento',
+  },
+  sexo: {
+    label: 'Sexo',
+    type: 'select-with-other',
+    hint: 'Tu sexo',
+    options: ['Hombre', 'Mujer', 'Otro'],
+  },
   email: {
     label: 'Email',
     type: 'email',
@@ -110,12 +128,6 @@ const formFieldsConfig = {
     label: 'Teléfono',
     type: 'text',
     hint: 'Tu número de teléfono',
-  },
-  sexo: {
-    label: 'Sexo',
-    type: 'select-with-other',
-    hint: 'Tu sexo',
-    options: ['Hombre', 'Mujer', 'Otro'],
   },
 }
 

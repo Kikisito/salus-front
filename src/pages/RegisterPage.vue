@@ -18,9 +18,10 @@ const submitForm = async (userBasicData: UserBasicData, direccion: Direccion, pa
     nombre: userBasicData.nombre,
     apellidos: userBasicData.apellidos,
     nif: userBasicData.nif,
+    fechaNacimiento: userBasicData.fechaNacimiento,
+    sexo: userBasicData.sexo,
     email: userBasicData.email,
     telefono: userBasicData.telefono,
-    sexo: userBasicData.sexo,
     direccion: {
       lineaDireccion1: direccion.lineaDireccion1,
       lineaDireccion2: direccion.lineaDireccion2,

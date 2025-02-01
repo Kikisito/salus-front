@@ -16,8 +16,6 @@ const COOKIE_OPTIONS = {
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
     token: Cookies.get(COOKIE_NAME) || (null as string | null),
-    loading: false as boolean,
-    error: null as string | null,
   }),
 
   getters: {
@@ -26,7 +24,6 @@ export const useAuthStore = defineStore('authStore', {
 
   actions: {
     async login(username: string, password: string) {
-      this.loading = true
       this.error = null
 
       try {
@@ -51,8 +48,6 @@ export const useAuthStore = defineStore('authStore', {
           this.error = 'Ha ocurrido un error inesperado'
           console.error(error)
         }
-      } finally {
-        this.loading = false
       }
     },
 
@@ -63,7 +58,7 @@ export const useAuthStore = defineStore('authStore', {
     },
 
     async register(user: User) {
-      console.log(user)
+      // todo
     },
   },
 })
