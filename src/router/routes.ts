@@ -41,6 +41,21 @@ const routes: RouteRecordRaw[] = [
       { path: '', redirect: { name: 'login' } },
       { name: 'login', path: 'login', component: () => import('pages/LoginPage.vue') },
       { name: 'register', path: 'register', component: () => import('pages/RegisterPage.vue') },
+      {
+        path: 'forgot-password',
+        children: [
+          {
+            path: '',
+            name: 'forgot-password',
+            component: () => import('pages/ForgotPasswordPage.vue'),
+          },
+          {
+            name: 'reset-password-recover',
+            path: ':token',
+            component: () => import('pages/ForgotPasswordRecoverPage.vue'),
+          },
+        ],
+      },
     ],
     meta: { requiresGuest: true },
   },

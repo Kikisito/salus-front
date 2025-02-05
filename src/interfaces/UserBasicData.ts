@@ -4,6 +4,4 @@ export interface UserBasicData {
   nif: string
   fechaNacimiento: string
   sexo: string
-  email: string
-  telefono: string
 }

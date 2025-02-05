@@ -56,6 +56,7 @@ const doSubmit = handleSubmit(async (values: any) => {
         v-model="field.model.value"
         :label="field.label"
         :hint="field.hint"
+        :dense="field.dense"
         :options="field.options"
         :errors="field.model.errors"
         :errorMessage="field.model.errorMessage"
@@ -69,6 +70,7 @@ const doSubmit = handleSubmit(async (values: any) => {
         v-model="field.model.value"
         :label="field.label"
         :hint="field.hint"
+        :dense="field.dense"
         :options="field.options"
         :errors="field.model.errors"
         :error="field.model.errors.length != 0"
@@ -86,11 +88,15 @@ const doSubmit = handleSubmit(async (values: any) => {
         :label="field.label"
         :placeholder="field.placeholder"
         :hint="field.hint"
+        :dense="field.dense"
         :error="field.model.errors.length != 0"
         :error-message="field.model.errorMessage"
         :autocomplete="field.autocomplete"
         :readonly="readOnly"
         filled
+        @update:model-value="
+          field.onChange != null ? (field.model.value = field.onChange($event)) : null
+        "
       />
     </template>
 
@@ -103,10 +109,6 @@ const doSubmit = handleSubmit(async (values: any) => {
 </template>
 
 <style lang="css" scoped>
-.q-form > :not(:last-child) {
-  margin-bottom: 1rem;
-}
-
 .actions {
   display: flex;
   justify-content: space-between;

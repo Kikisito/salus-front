@@ -1,28 +1,4 @@
 const validationSchema = {
-  nombre(value: string) {
-    if (!value) {
-      return 'El nombre es obligatorio'
-    }
-    if (value.length < 2) {
-      return 'El nombre debe tener al menos 2 caracteres'
-    }
-    if (value.length > 50) {
-      return 'El nombre debe tener como máximo 50 caracteres'
-    }
-    return true
-  },
-  apellidos(value: string) {
-    if (!value) {
-      return 'Los apellidos son obligatorios'
-    }
-    if (value.length < 2) {
-      return 'Los apellidos deben tener al menos 2 caracteres'
-    }
-    if (value.length > 100) {
-      return 'Los apellidos deben tener como máximo 100 caracteres'
-    }
-    return true
-  },
   nif(value: string) {
     if (!value) {
       return 'El NIF es obligatorio'
@@ -43,15 +19,15 @@ const validationSchema = {
     }
     return true
   },
-  fechaNacimiento(value: string) {
+  email(value: string) {
     if (!value) {
-      return 'La fecha de nacimiento es obligatoria'
+      return 'El email es obligatorio'
     }
-    return true
-  },
-  sexo(value: string) {
-    if (!value) {
-      return 'El sexo es obligatorio'
+    if (value.length > 100) {
+      return 'El email debe tener como máximo 100 caracteres'
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      return 'El email no es válido'
     }
     return true
   },
@@ -59,42 +35,22 @@ const validationSchema = {
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const initialValues = (entity?: any) => ({
-  nombre: entity ? entity.nombre : '',
-  apellidos: entity ? entity.apellidos : '',
   nif: entity ? entity.nif : '',
-  fechaNacimiento: entity ? entity.fechaNacimiento : '',
-  sexo: entity ? entity.sexo : '',
+  email: entity ? entity.email : '',
 })
 
 const formFieldsConfig = {
-  nombre: {
-    label: 'Nombre',
-    type: 'text',
-    hint: 'Tu nombre, sin apellidos',
-  },
-  apellidos: {
-    label: 'Apellidos',
-    type: 'text',
-    hint: 'Tus apellidos',
-  },
   nif: {
     label: 'DNI/NIE/NIF',
     type: 'text',
-    hint: 'Tu número de identificación fiscal',
+    autocomplete: 'username',
     onChange: (value: string) => {
       return value.toUpperCase()
     },
   },
-  fechaNacimiento: {
-    label: 'Fecha de nacimiento',
-    type: 'date',
-    hint: 'Tu fecha de nacimiento',
-  },
-  sexo: {
-    label: 'Sexo',
-    type: 'select-with-other',
-    hint: 'Tu sexo',
-    options: ['Hombre', 'Mujer', 'Otro'],
+  email: {
+    label: 'Email',
+    type: 'email',
   },
 }
 
@@ -122,7 +78,7 @@ function verifyNie(nif: string) {
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export function getUserBasicDataValidatedFormConfig(entity?: any) {
+export function getForgotPasswordValidatedFormConfig(entity?: any) {
   return {
     validationSchema: validationSchema,
     initialValues: initialValues(entity),

@@ -10,6 +10,14 @@ const props = defineProps({
     type: String,
     default: 'Selecciona una opción',
   },
+  hint: {
+    type: String,
+    default: null,
+  },
+  dense: {
+    type: Boolean,
+    default: false,
+  },
   errors: {
     type: Array,
     default: () => [],
@@ -60,6 +68,8 @@ const handleOtherFieldValueChange = (value: string | number | null) => {
       v-model="internalValue"
       :options="options"
       :label="label"
+      :hint="hint"
+      :dense="dense"
       :error="errors.length > 0"
       :error-message="errorMessage"
       filled
@@ -71,16 +81,9 @@ const handleOtherFieldValueChange = (value: string | number | null) => {
       v-if="showAdditionalField"
       v-model="otherFieldValue"
       label="Especifica tu opción"
-      class="q-mt-md"
-      outlined
+      class="q-mt-sm"
+      filled
       @update:model-value="handleOtherFieldValueChange"
     />
   </div>
 </template>
-
-<style scoped>
-/* Estilos opcionales para mejorar la apariencia */
-.q-mt-md {
-  margin-top: 16px;
-}
-</style>

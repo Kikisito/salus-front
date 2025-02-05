@@ -1,49 +1,19 @@
 import Provincias from 'src/assets/provincias'
 
 const validationSchema = {
-  lineaDireccion1(value: string) {
-    if (!value) {
-      return 'La línea de dirección 1 es obligatoria'
-    }
-    if (value.length < 2) {
-      return 'La línea de dirección 1 debe tener al menos 2 caracteres'
-    }
-    if (value.length > 100) {
-      return 'La línea de dirección 1 debe tener como máximo 100 caracteres'
-    }
+  lineaDireccion1() {
     return true
   },
   lineaDireccion2() {
     return true
   },
-  codigoPostal(value: string) {
-    if (!value) {
-      return 'El código postal es obligatorio'
-    }
-    if (value.length != 5) {
-      return 'El código postal debe tener 5 dígitos'
-    }
-    if (!/^\d{5}$/.test(value)) {
-      return 'El código postal no es válido'
-    }
+  codigoPostal() {
     return true
   },
-  provincia(value: string) {
-    if (!value) {
-      return 'La provincia es obligatoria'
-    }
-    if (value.length > 50) {
-      return 'La provincia debe tener como máximo 50 caracteres'
-    }
+  provincia() {
     return true
   },
-  localidad(value: string) {
-    if (!value) {
-      return 'La localidad es obligatoria'
-    }
-    if (value.length > 50) {
-      return 'La localidad debe tener como máximo 50 caracteres'
-    }
+  localidad() {
     return true
   },
 }

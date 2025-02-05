@@ -3,8 +3,7 @@
     <q-header elevated>
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleDrawer" />
-        <q-toolbar-title> Project Salus </q-toolbar-title>
-        <div>Quasar v{{ $q.version }}</div>
+        <q-toolbar-title>Project Salus</q-toolbar-title>
       </q-toolbar>
     </q-header>
 
@@ -20,7 +19,12 @@
       <q-scroll-area class="fit">
         <q-list padding>
           <template v-for="(item, index) in menuItems" :key="item.label">
-            <q-item clickable v-ripple :to="item.path">
+            <q-item
+              clickable
+              v-ripple
+              :to="item.path || undefined"
+              @click="item.action ? item.action() : null"
+            >
               <q-item-section avatar>
                 <q-icon :name="item.icon" />
               </q-item-section>
@@ -43,6 +47,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useAuthStore } from 'src/stores/AuthStore'
+
+const authStore = useAuthStore()
 
 const drawer = ref(false)
 const miniState = ref(true)
@@ -61,6 +68,6 @@ const menuItems = [
   { label: 'Tratamientos', icon: 'medical_services', path: '/treatments', separator: true },
   { label: 'Mi perfil', icon: 'person', path: '/profile' },
   { label: 'Ajustes', icon: 'settings', path: '/settings' },
-  { label: 'Cerrar sesión', icon: 'logout', path: '/logout' },
+  { label: 'Cerrar sesión', icon: 'logout', action: () => authStore.logout() },
 ]
 </script>

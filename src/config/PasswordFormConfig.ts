@@ -23,6 +23,7 @@ const formFieldsConfig = {
   password: {
     label: 'Contraseña',
     type: 'password',
+    hint: 'Tu contraseña servirá para acceder a tu cuenta',
   },
   passwordConfirmation: {
     label: 'Confirmar contraseña',

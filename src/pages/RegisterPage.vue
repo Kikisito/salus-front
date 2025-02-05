@@ -1,137 +1,278 @@
 <script lang="ts" setup>
-import type { UserBasicData } from 'src/interfaces/UserBasicData'
-import EntityValidatedForm from 'src/components/EntityValidatedForm.vue'
 import { getUserBasicDataValidatedFormConfig } from 'src/config/UserBasicDataFormConfig'
-import { useAuthStore } from 'src/stores/AuthStore'
-import { ref } from 'vue'
 import { getDireccionValidatedFormConfig } from 'src/config/DireccionFormConfig'
-import type { Direccion } from 'src/interfaces/Direccion'
 import { getPasswordValidatedFormConfig } from 'src/config/PasswordFormConfig'
+import { getUserContactDataValidatedFormConfig } from 'src/config/UserContactDataFormConfig'
+
+import type { UserBasicData } from 'src/interfaces/UserBasicData'
+import type { UserContactData } from 'src/interfaces/UserContactData'
+import type { Direccion } from 'src/interfaces/Direccion'
 import type { User } from 'src/interfaces/User'
 
+import { useAuthStore } from 'src/stores/AuthStore'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { Loading, Notify } from 'quasar'
+
+import EntityValidatedForm from 'src/components/EntityValidatedForm.vue'
+
+const router = useRouter()
 const authStore = useAuthStore()
 
 const step = ref(1)
 
-const submitForm = async (userBasicData: UserBasicData, direccion: Direccion, password: string) => {
+const submitForm = async (
+  userBasicData: UserBasicData,
+  userContactData: UserContactData,
+  direccion: Direccion,
+  password: string,
+) => {
+  Loading.show({
+    message: 'Registrando cuenta...',
+  })
+
   const user = {
     nombre: userBasicData.nombre,
     apellidos: userBasicData.apellidos,
     nif: userBasicData.nif,
     fechaNacimiento: userBasicData.fechaNacimiento,
     sexo: userBasicData.sexo,
-    email: userBasicData.email,
-    telefono: userBasicData.telefono,
-    direccion: {
-      lineaDireccion1: direccion.lineaDireccion1,
-      lineaDireccion2: direccion.lineaDireccion2,
-      codigoPostal: direccion.codigoPostal,
-      provincia: direccion.provincia,
-      localidad: direccion.localidad,
-    },
+    email: userContactData.email,
+    telefono: userContactData.telefono,
+    ...(direccion &&
+    direccion.lineaDireccion1 &&
+    direccion.lineaDireccion2 &&
+    direccion.codigoPostal &&
+    direccion.provincia &&
+    direccion.localidad
+      ? {
+          direccion: {
+            lineaDireccion1: direccion.lineaDireccion1,
+            lineaDireccion2: direccion.lineaDireccion2,
+            codigoPostal: direccion.codigoPostal,
+            provincia: direccion.provincia,
+            localidad: direccion.localidad,
+          },
+        }
+      : {}),
     password: password,
   } as User
 
-  console.log(authStore.register(user))
+  const registerResult = await authStore.register(user)
+  if (registerResult.success) {
+    router.push({ name: 'home' })
+  } else {
+    Notify.create({
+      icon: 'report_problem',
+      message: registerResult.error,
+      color: 'negative',
+    })
+  }
+
+  Loading.hide()
 }
 
 const userBasicData = ref(null as UserBasicData | null)
-const handleBasicDataForm = (data: UserBasicData) => {
+const handleBasicDataForm = async (data: UserBasicData) => {
+  // Mostramos un mensaje de carga
+  Loading.show({
+    message: 'Validando datos...',
+  })
+
+  try {
+    // Comprobamos si el NIF ya está en uso
+    const nifAvailableRequest = await authStore.checkNif(data.nif)
+
+    if (!nifAvailableRequest.success) {
+      // Si la petición no ha tenido éxito, mostramos el mensaje de error
+      Notify.create({
+        icon: 'report_problem',
+        message: nifAvailableRequest.error,
+        color: 'negative',
+      })
+      return
+    }
+  } finally {
+    // Ocultamos el mensaje de carga
+    Loading.hide()
+  }
+
+  // En este punto, el NIF ha sido validado y no está en uso
   userBasicData.value = data
   step.value = 2
+}
+
+const userContactData = ref(null as UserContactData | null)
+const handleContactDataForm = async (data: UserContactData) => {
+  // Mostramos un mensaje de carga
+  Loading.show({
+    message: 'Validando datos...',
+  })
+
+  try {
+    // Comprobamos si el NIF ya está en uso
+    const emailAvailableRequest = await authStore.checkEmail(data.email)
+
+    if (!emailAvailableRequest.success) {
+      // Si la petición no ha tenido éxito, mostramos el mensaje de error
+      Notify.create({
+        icon: 'report_problem',
+        message: emailAvailableRequest.error,
+        color: 'negative',
+      })
+      return
+    }
+  } finally {
+    // Ocultamos el mensaje de carga
+    Loading.hide()
+  }
+
+  // En este punto, el email ha sido validado y no está en uso
+  userContactData.value = data
+  step.value = 3
 }
 
 const direccion = ref(null as Direccion | null)
 const handleDireccionForm = (data: Direccion) => {
   direccion.value = data
-  step.value = 3
+  step.value = 4
 }
 
 const password = ref('')
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handlePasswordForm = async (data: any) => {
   password.value = data.password
-  step.value = 3
 
   // finally, handle form
-  await submitForm(userBasicData.value!, direccion.value!, password.value)
+  await submitForm(userBasicData.value!, userContactData.value!, direccion.value!, password.value)
 }
 </script>
 
 <template>
-  <q-page padding class="full-height">
-    <div class="q-pa-sm text-center">
-      <div class="flex flex-center q-mb-md">
-        <q-img src="~assets/logo.svg" style="width: 50px" alt="Logo" />
-        <div class="q-ml-sm text-h5">Project Salus</div>
-      </div>
-
-      <q-banner inline-actions class="bg-red text-white" v-if="authStore.error">
-        <span>{{ authStore.error }}</span>
-        <template v-slot:action>
-          <q-btn flat label="OK" color="white" @click="authStore.error = ''" />
-        </template>
-      </q-banner>
+  <q-page class="flex flex-center">
+    <div class="q-pa-sm">
+      <q-page-sticky position="top">
+        <div class="flex flex-center q-mt-xl">
+          <q-img src="~assets/logo.svg" style="width: 50px" alt="Logo" />
+          <div class="q-ml-sm text-h5">Project Salus</div>
+        </div>
+      </q-page-sticky>
 
       <!-- Primer paso -->
-      <EntityValidatedForm
-        v-if="step === 1"
-        :entity-validation-config="getUserBasicDataValidatedFormConfig(userBasicData)"
-        @form:validated="handleBasicDataForm"
-      >
-        <template #submitButton>
-          <div class="full-width text-center">
-            <q-btn label="Siguiente" color="primary" type="submit" />
-          </div>
-        </template>
-      </EntityValidatedForm>
+      <div v-if="step === 1">
+        <span class="register-header">¡Vamos a conocernos!</span>
+
+        <EntityValidatedForm
+          class="entity-validated-form"
+          :entity-validation-config="getUserBasicDataValidatedFormConfig(userBasicData)"
+          @form:validated="handleBasicDataForm"
+        >
+          <template #submitButton>
+            <div class="full-width text-center">
+              <q-btn label="Siguiente" color="primary" type="submit" />
+            </div>
+          </template>
+        </EntityValidatedForm>
+      </div>
 
       <!-- Segundo paso -->
-      <EntityValidatedForm
-        v-if="step === 2"
-        :entity-validation-config="getDireccionValidatedFormConfig(direccion)"
-        @form:validated="handleDireccionForm"
-      >
-        <template #submitButton>
-          <div class="full-width text-center">
-            <q-btn label="Volver" color="primary" outline @click="step = 1" />
-          </div>
-          <div class="full-width text-center">
-            <q-btn label="Siguiente" color="primary" type="submit" />
-          </div>
-        </template>
-      </EntityValidatedForm>
+      <div v-if="step === 2" class="step-2">
+        <span class="register-header">¿Cómo podemos contactarte?</span>
+
+        <EntityValidatedForm
+          class="entity-validated-form"
+          :entity-validation-config="getUserContactDataValidatedFormConfig(userContactData)"
+          @form:validated="handleContactDataForm"
+        >
+          <template #submitButton>
+            <div class="full-width text-center">
+              <q-btn label="Volver" color="primary" outline @click="step = 1" />
+            </div>
+            <div class="full-width text-center">
+              <q-btn label="Siguiente" color="primary" type="submit" />
+            </div>
+          </template>
+        </EntityValidatedForm>
+      </div>
 
       <!-- Tercer paso -->
-      <EntityValidatedForm
-        v-if="step === 3"
-        :entity-validation-config="getPasswordValidatedFormConfig(password)"
-        @form:validated="handlePasswordForm"
-      >
-        <template #submitButton>
-          <div class="full-width text-center">
-            <q-btn label="Volver" color="primary" outline @click="step = 2" />
-          </div>
-          <div class="full-width text-center">
-            <q-btn label="Siguiente" color="primary" type="submit" />
-          </div>
-        </template>
-      </EntityValidatedForm>
+      <div v-if="step === 3">
+        <span class="register-header">Indícanos tu dirección</span>
 
-      <div class="q-mt-xl column">
-        <q-btn
-          v-if="step === 1"
-          style="background-color: #272e3e; color: white"
-          class="q-mt-md"
-          label="Ya soy usuario, quiero iniciar sesión"
-          @click="$router.push({ name: 'login' })"
-        />
+        <EntityValidatedForm
+          class="entity-validated-form"
+          :entity-validation-config="getDireccionValidatedFormConfig(direccion)"
+          @form:validated="handleDireccionForm"
+        >
+          <template #submitButton>
+            <div class="full-width text-center">
+              <q-btn label="Volver" color="primary" outline @click="step = 2" />
+            </div>
+            <div class="full-width text-center">
+              <q-btn label="Siguiente" color="primary" type="submit" />
+            </div>
+          </template>
+        </EntityValidatedForm>
       </div>
+
+      <!-- Cuarto paso -->
+      <div v-if="step === 4" class="step-4">
+        <span class="register-header">Protejamos tu cuenta</span>
+
+        <EntityValidatedForm
+          class="entity-validated-form"
+          :entity-validation-config="getPasswordValidatedFormConfig(password)"
+          @form:validated="handlePasswordForm"
+        >
+          <template #submitButton>
+            <div class="full-width text-center">
+              <q-btn label="Volver" color="primary" outline @click="step = 3" />
+            </div>
+            <div class="full-width text-center">
+              <q-btn label="Siguiente" color="primary" type="submit" />
+            </div>
+          </template>
+        </EntityValidatedForm>
+      </div>
+
+      <q-page-sticky position="bottom" class="q-mb-md" v-if="step === 1">
+        <div class="column items-center full-width">
+          <q-btn
+            v-if="step === 1"
+            style="background-color: #272e3e; color: white"
+            class="q-mt-md"
+            label="Ya soy usuario, quiero iniciar sesión"
+            @click="$router.push({ name: 'login' })"
+          />
+        </div>
+      </q-page-sticky>
     </div>
   </q-page>
 </template>
 
+}
 <style lang="css" scoped>
+.entity-validated-form:deep(.actions) {
+  padding-top: 1rem;
+}
+
+.step-2 .entity-validated-form:deep(.q-input + .q-input) {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.step-4 .entity-validated-form:deep(.q-input:has(div[role='alert'])) {
+  display: block;
+  margin-bottom: 2.2rem;
+}
+
+.register-header {
+  display: block;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
 .q-form > *:not(:first-child) {
   margin-top: 0.5rem;
 }

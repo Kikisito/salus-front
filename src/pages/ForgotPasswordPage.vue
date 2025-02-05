@@ -1,34 +1,39 @@
 <script lang="ts" setup>
-import { getLoginValidatedFormConfig } from 'src/config/LoginFormConfig'
-import type { LoginRequest } from 'src/interfaces/LoginRequest'
+import type { ForgotPasswordRequest } from 'src/interfaces/ForgotPasswordRequest'
 
 import EntityValidatedForm from 'src/components/EntityValidatedForm.vue'
 
 import { Loading, Notify } from 'quasar'
 import { useAuthStore } from 'src/stores/AuthStore'
 import { useRouter } from 'vue-router'
+import { getForgotPasswordValidatedFormConfig } from 'src/config/ForgotPasswordFormConfig'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
-const login = async (data: LoginRequest) => {
+const submit = async (data: ForgotPasswordRequest) => {
   Loading.show({
-    message: 'Iniciando sesión...',
+    message: 'Enviando solicitud...',
   })
 
-  const { nif, password } = data
+  const { nif, email } = data
 
-  const loginResult = await authStore.login(nif, password)
+  const response = await authStore.requestPasswordReset(email, nif)
 
   try {
-    if (loginResult.success) {
-      // Si el login es correcto, redirigimos al usuario a la página de inicio
-      router.push({ name: 'home' })
+    if (response.success) {
+      Notify.create({
+        icon: 'check',
+        message:
+          'Si los datos introducidos son correctos, recibirás un correo electrónico con las instrucciones para recuperar tu contraseña',
+        color: 'positive',
+      })
+
+      router.push({ name: 'login' })
     } else {
-      // Si el login es incorrecto, mostramos el mensaje de error
       Notify.create({
         icon: 'report_problem',
-        message: loginResult.error,
+        message: response.error,
         color: 'negative',
       })
     }
@@ -44,32 +49,25 @@ const login = async (data: LoginRequest) => {
       <q-img src="~assets/logo.svg" style="width: 150px" alt="Logo" />
 
       <div class="q-mt-lg text-h4">Project Salus</div>
-      <div class="q-mt-none q-mb-lg">¿Ya eres usuario? ¡Inicia sesión!</div>
+      <div class="q-mt-none q-mb-lg">Vamos a recuperar tu cuenta</div>
 
       <EntityValidatedForm
         class="entity-validated-form"
-        :entity-validation-config="getLoginValidatedFormConfig()"
-        @form:validated="login"
+        :entity-validation-config="getForgotPasswordValidatedFormConfig()"
+        @form:validated="submit"
       >
         <template #submitButton>
-          <q-btn label="Acceder" color="primary" type="submit" />
+          <q-btn label="Recuperar contraseña" color="primary" type="submit" />
         </template>
       </EntityValidatedForm>
 
       <div class="column items-center">
         <q-btn
-          style="background-color: #272e3e; color: white"
-          class="q-mt-md"
-          label="No soy usuario, quiero registrarme"
-          @click="$router.push({ name: 'register' })"
-        />
-        <q-btn
-          flat
-          dense
+          outline
           size="sm"
           class="q-mt-md"
-          label="He olvidado mi contraseña"
-          @click="$router.push({ name: 'forgot-password' })"
+          label="He recordado mi contraseña"
+          @click="$router.push({ name: 'login' })"
         />
       </div>
     </div>
