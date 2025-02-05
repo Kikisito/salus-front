@@ -7,7 +7,7 @@ const props = defineProps(['mensaje'])
     <q-item>
       <q-item-section avatar>
         <q-avatar>
-          <img :src="props.mensaje.avatar" />
+          <q-img :src="props.mensaje.avatar" />
         </q-avatar>
       </q-item-section>
 

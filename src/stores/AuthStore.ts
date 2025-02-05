@@ -14,7 +14,7 @@ const COOKIE_NAME = 'AUTH-TOKEN'
 const COOKIE_OPTIONS = {
   expires: 7,
   secure: true,
-  sameSite: 'Strict' as const,
+  sameSite: 'Lax' as const,
   path: '/',
 }
 
@@ -84,7 +84,7 @@ export const useAuthStore = defineStore('authStore', {
     async logout() {
       try {
         const response = await api.post('/auth/logout')
-        const result = await response.status
+        const result = response.status
 
         if (result !== 200) {
           Notify.create({
