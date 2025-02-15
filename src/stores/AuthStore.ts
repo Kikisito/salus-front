@@ -89,13 +89,18 @@ export const useAuthStore = defineStore('authStore', {
     },
 
     async getCurrentProfile(): Promise<ServiceAnswer<User>> {
-      return handleRequest(async () => {
-        const response = await api.get('/user/@me')
-        const data = await response.data
-        this.user = data
+      return handleRequest(
+        async () => {
+          const response = await api.get('/user/@me')
+          const data = await response.data
+          this.user = data
 
-        return data
-      })
+          return data
+        },
+        (error) => {
+          throw error
+        },
+      )
     },
 
     async requestPasswordReset(email: string, nif: string): Promise<ServiceAnswer<number>> {
