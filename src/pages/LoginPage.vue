@@ -43,8 +43,11 @@ const login = async (data: LoginRequest) => {
     <div class="q-pa-sm text-center">
       <q-img src="~assets/logo.svg" style="width: 150px" alt="Logo" />
 
-      <div class="q-mt-lg text-h4">Project Salus</div>
-      <div class="q-mt-none q-mb-lg">¿Ya eres usuario? ¡Inicia sesión!</div>
+      <div>
+        <div class="q-mt-lg text-h4">Centro Especializado</div>
+        <div class="q-mt-none text-h4">Ergofisio Alicante</div>
+      </div>
+      <div class="q-mt-sm q-mb-lg">¿Ya eres usuario? ¡Inicia sesión!</div>
 
       <EntityValidatedForm
         class="entity-validated-form"
@@ -77,6 +80,11 @@ const login = async (data: LoginRequest) => {
 </template>
 
 <style scoped>
+.q-form {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
 .entity-validated-form:deep(.q-input:has(div[role='alert']) + .q-input) {
   margin-top: 1rem;
 }

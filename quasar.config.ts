@@ -113,6 +113,7 @@ export default defineConfig((ctx) => {
           timeout: 5000,
           progress: true,
         },
+        dark: true,
       },
 
       // iconSet: 'material-icons', // Quasar icon set

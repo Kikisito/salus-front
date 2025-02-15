@@ -154,7 +154,10 @@ const handlePasswordForm = async (data: any) => {
       <q-page-sticky position="top">
         <div class="flex flex-center q-mt-xl">
           <q-img src="~assets/logo.svg" style="width: 50px" alt="Logo" />
-          <div class="q-ml-sm text-h5">Project Salus</div>
+          <div class="text-center">
+            <div class="q-ml-sm text-h5">Centro Especializado</div>
+            <div class="q-ml-sm text-h5">Ergofisio Alicante</div>
+          </div>
         </div>
       </q-page-sticky>
 

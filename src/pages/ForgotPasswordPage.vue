@@ -48,7 +48,10 @@ const submit = async (data: ForgotPasswordRequest) => {
     <div class="q-pa-sm text-center">
       <q-img src="~assets/logo.svg" style="width: 150px" alt="Logo" />
 
-      <div class="q-mt-lg text-h4">Project Salus</div>
+      <div>
+        <div class="q-mt-lg text-h4">Centro Especializado</div>
+        <div class="q-mt-none text-h4">Ergofisio Alicante</div>
+      </div>
       <div class="q-mt-none q-mb-lg">Vamos a recuperar tu cuenta</div>
 
       <EntityValidatedForm
