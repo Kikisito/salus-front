@@ -31,6 +31,21 @@ const routes: RouteRecordRaw[] = [
           },
         ],
       },
+      {
+        path: 'chats',
+        children: [
+          {
+            name: 'chats',
+            path: '',
+            component: () => import('pages/ChatsPage.vue'),
+          },
+          {
+            name: 'chat',
+            path: ':id',
+            component: () => import('pages/ChatPage.vue'),
+          },
+        ],
+      },
     ],
     meta: { requiresAuth: true },
   },
