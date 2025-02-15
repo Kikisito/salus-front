@@ -47,6 +47,22 @@ const validationSchema = {
     if (!value) {
       return 'La fecha de nacimiento es obligatoria'
     }
+
+    const dob = new Date(value)
+    if (isNaN(dob.getTime())) {
+      return 'La fecha de nacimiento no es válida'
+    }
+
+    const today = new Date()
+    let age = today.getFullYear() - dob.getFullYear()
+    const monthDiff = today.getMonth() - dob.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--
+    }
+    if (age < 18) {
+      return 'Debes ser mayor de edad'
+    }
+
     return true
   },
   sexo(value: string) {
