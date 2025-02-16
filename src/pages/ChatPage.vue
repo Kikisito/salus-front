@@ -70,10 +70,12 @@ const handleFile = (fileName: string) => {
   <q-page padding>
     <div class="row justify-evenly">
       <div class="col-12 col-md-6">
-        <div class="section-header">
-          hola
-          <div class="text-h6">Mensajes</div>
-          <div class="text-subtitle">Mensajes con Dr. Juan Martínez (Fisiología)</div>
+        <div class="section-header row items-center">
+          <q-btn flat round icon="arrow_back" @click="$router.back()" />
+          <div>
+            <div class="text-h6">Mensajes</div>
+            <div class="text-subtitle">Dr. Juan Martínez (Fisiología)</div>
+          </div>
         </div>
 
         <q-scroll-area>
@@ -128,6 +130,10 @@ const handleFile = (fileName: string) => {
 </template>
 
 <style scoped>
+.section-header .q-btn {
+  margin-right: 10px;
+}
+
 @media (max-width: 320px) {
   .q-scrollarea {
     height: calc(100vh - 200px);
