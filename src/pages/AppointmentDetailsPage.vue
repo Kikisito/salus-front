@@ -145,7 +145,7 @@ const rotation = ref(0)
           <q-item>
             <q-item-section>
               <q-item-label>Correo electrónico</q-item-label>
-              <q-item-label caption> </q-item-label>
+              <q-item-label caption>doctor@salus.es</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
@@ -203,9 +203,6 @@ const rotation = ref(0)
   margin: 0.5rem;
   padding: 0.25rem;
   border-radius: 0.5rem;
-}
-
-.q-list--light {
   background-color: #f7fbff;
   border: 1px solid #e4e7eb;
 }
