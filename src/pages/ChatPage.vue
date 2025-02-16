@@ -71,6 +71,7 @@ const handleFile = (fileName: string) => {
     <div class="row justify-evenly">
       <div class="col-12 col-md-6">
         <div class="section-header">
+          hola
           <div class="text-h6">Mensajes</div>
           <div class="text-subtitle">Mensajes con Dr. Juan Martínez (Fisiología)</div>
         </div>
