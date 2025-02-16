@@ -1,24 +1,20 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
-import { Cookies, Notify } from 'quasar'
+import { Notify } from 'quasar'
 import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
 import type { User } from 'src/interfaces/User'
 
-// Configuración de cookies de autenticación
-const COOKIE_NAME = 'AUTH-TOKEN'
-const COOKIE_OPTIONS = {
-  expires: 7,
-  secure: true,
-  sameSite: 'Lax' as const,
-  path: '/',
-}
-
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
-    token: Cookies.get(COOKIE_NAME) || (null as string | null),
+    token: null as string | null,
     user: null as User | null,
   }),
+
+  persist: {
+    storage: localStorage,
+    pick: ['token'],
+  },
 
   getters: {
     isAuthenticated: (state) => !!state.token,
@@ -35,7 +31,6 @@ export const useAuthStore = defineStore('authStore', {
           const data = await response.data
 
           this.token = data.jwt
-          Cookies.set(COOKIE_NAME, this.token, COOKIE_OPTIONS)
 
           return data.jwt
         },
@@ -54,7 +49,6 @@ export const useAuthStore = defineStore('authStore', {
 
           const data = await response.data
           this.token = data.jwt
-          Cookies.set(COOKIE_NAME, this.token, COOKIE_OPTIONS)
 
           return data
         },
@@ -82,7 +76,6 @@ export const useAuthStore = defineStore('authStore', {
           }
         } finally {
           this.token = null
-          Cookies.remove(COOKIE_NAME, { path: '/' })
           this.router.push({ name: 'login' })
         }
       })
