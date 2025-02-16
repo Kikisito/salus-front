@@ -197,3 +197,21 @@ const rotation = ref(0)
     <DeleteModal v-model:show="deleteModal" />
   </q-page>
 </template>
+
+<style scoped>
+.q-list {
+  margin: 0.5rem;
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+}
+
+.q-list--light {
+  background-color: #f7fbff;
+  border: 1px solid #e4e7eb;
+}
+
+.q-list--dark {
+  background-color: #1a202c;
+  border: 1px solid #2d3748;
+}
+</style>
