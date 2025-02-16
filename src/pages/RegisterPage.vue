@@ -158,82 +158,77 @@ const handlePasswordForm = async (data: any) => {
         </div>
       </q-page-sticky>
 
-      <!-- Primer paso -->
-      <div v-if="step === 1">
-        <span class="register-header">¡Vamos a conocernos!</span>
+      <q-stepper v-model="step" contracted flat done-color="green" animated>
+        <q-step :name="1" title="Datos básicos" icon="person" :done="step > 1">
+          <span class="register-header">¡Vamos a conocernos!</span>
 
-        <EntityValidatedForm
-          class="entity-validated-form"
-          :entity-validation-config="getUserBasicDataValidatedFormConfig(userBasicData)"
-          @form:validated="handleBasicDataForm"
-        >
-          <template #submitButton>
-            <div class="full-width text-center">
-              <q-btn label="Siguiente" color="primary" type="submit" />
-            </div>
-          </template>
-        </EntityValidatedForm>
-      </div>
+          <EntityValidatedForm
+            class="entity-validated-form"
+            :entity-validation-config="getUserBasicDataValidatedFormConfig(userBasicData)"
+            @form:validated="handleBasicDataForm"
+          >
+            <template #submitButton>
+              <div class="full-width text-center">
+                <q-btn label="Siguiente" color="primary" type="submit" />
+              </div>
+            </template>
+          </EntityValidatedForm>
+        </q-step>
+        <q-step :name="2" title="Datos de contacto" icon="call" :done="step > 2" class="step-2">
+          <span class="register-header">¿Cómo podemos contactarte?</span>
 
-      <!-- Segundo paso -->
-      <div v-if="step === 2" class="step-2">
-        <span class="register-header">¿Cómo podemos contactarte?</span>
+          <EntityValidatedForm
+            class="entity-validated-form"
+            :entity-validation-config="getUserContactDataValidatedFormConfig(userContactData)"
+            @form:validated="handleContactDataForm"
+          >
+            <template #submitButton>
+              <div class="full-width text-center">
+                <q-btn label="Volver" color="primary" outline @click="step = 1" />
+              </div>
+              <div class="full-width text-center">
+                <q-btn label="Siguiente" color="primary" type="submit" />
+              </div>
+            </template>
+          </EntityValidatedForm>
+        </q-step>
+        <q-step :name="3" title="Dirección" icon="home" :done="step > 3">
+          <span class="register-header">Indícanos tu dirección</span>
 
-        <EntityValidatedForm
-          class="entity-validated-form"
-          :entity-validation-config="getUserContactDataValidatedFormConfig(userContactData)"
-          @form:validated="handleContactDataForm"
-        >
-          <template #submitButton>
-            <div class="full-width text-center">
-              <q-btn label="Volver" color="primary" outline @click="step = 1" />
-            </div>
-            <div class="full-width text-center">
-              <q-btn label="Siguiente" color="primary" type="submit" />
-            </div>
-          </template>
-        </EntityValidatedForm>
-      </div>
+          <EntityValidatedForm
+            class="entity-validated-form"
+            :entity-validation-config="getDireccionValidatedFormConfig(direccion)"
+            @form:validated="handleDireccionForm"
+          >
+            <template #submitButton>
+              <div class="full-width text-center">
+                <q-btn label="Volver" color="primary" outline @click="step = 2" />
+              </div>
+              <div class="full-width text-center">
+                <q-btn label="Siguiente" color="primary" type="submit" />
+              </div>
+            </template>
+          </EntityValidatedForm>
+        </q-step>
+        <q-step :name="4" title="Contraseña" icon="lock" :done="step > 4" class="step-4">
+          <span class="register-header">Protejamos tu cuenta</span>
 
-      <!-- Tercer paso -->
-      <div v-if="step === 3">
-        <span class="register-header">Indícanos tu dirección</span>
-
-        <EntityValidatedForm
-          class="entity-validated-form"
-          :entity-validation-config="getDireccionValidatedFormConfig(direccion)"
-          @form:validated="handleDireccionForm"
-        >
-          <template #submitButton>
-            <div class="full-width text-center">
-              <q-btn label="Volver" color="primary" outline @click="step = 2" />
-            </div>
-            <div class="full-width text-center">
-              <q-btn label="Siguiente" color="primary" type="submit" />
-            </div>
-          </template>
-        </EntityValidatedForm>
-      </div>
-
-      <!-- Cuarto paso -->
-      <div v-if="step === 4" class="step-4">
-        <span class="register-header">Protejamos tu cuenta</span>
-
-        <EntityValidatedForm
-          class="entity-validated-form"
-          :entity-validation-config="getPasswordValidatedFormConfig(password)"
-          @form:validated="handlePasswordForm"
-        >
-          <template #submitButton>
-            <div class="full-width text-center">
-              <q-btn label="Volver" color="primary" outline @click="step = 3" />
-            </div>
-            <div class="full-width text-center">
-              <q-btn label="Siguiente" color="primary" type="submit" />
-            </div>
-          </template>
-        </EntityValidatedForm>
-      </div>
+          <EntityValidatedForm
+            class="entity-validated-form"
+            :entity-validation-config="getPasswordValidatedFormConfig(password)"
+            @form:validated="handlePasswordForm"
+          >
+            <template #submitButton>
+              <div class="full-width text-center">
+                <q-btn label="Volver" color="primary" outline @click="step = 3" />
+              </div>
+              <div class="full-width text-center">
+                <q-btn label="Siguiente" color="primary" type="submit" />
+              </div>
+            </template>
+          </EntityValidatedForm>
+        </q-step>
+      </q-stepper>
 
       <q-page-sticky position="bottom" class="q-mb-md" v-if="step === 1">
         <div class="column items-center full-width">
