@@ -7,6 +7,8 @@
   min-width: 300px;
 }
 
+/* Q-Card */
+
 .q-card {
   margin: 0.5rem;
 }
@@ -21,4 +23,12 @@
 
 .q-card--light:hover {
   background-color: #e4e7eb;
+}
+
+.q-card--dark {
+  background-color: #1a202c;
+}
+
+.q-card--dark:hover {
+  background-color: #2d3748;
 }
