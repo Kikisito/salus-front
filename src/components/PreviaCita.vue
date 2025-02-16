@@ -3,7 +3,13 @@ const props = defineProps(['cita'])
 </script>
 
 <template>
-  <q-card v-ripple flat bordered class="cursor-pointer" @click="$router.push({ name: 'appointment', params: { id: props.cita.id } })">
+  <q-card
+    v-ripple
+    flat
+    bordered
+    class="cursor-pointer"
+    @click="$router.push({ name: 'appointment', params: { id: props.cita.id } })"
+  >
     <q-item>
       <q-item-section>
         <q-item-label>{{ props.cita.especialidad }}</q-item-label>
@@ -19,15 +25,3 @@ const props = defineProps(['cita'])
     </q-item>
   </q-card>
 </template>
-
-<style lang="css" scoped>
-.q-card {
-  background-color: #f1f4f8;
-  margin: 0.5rem;
-}
-
-.q-card:hover {
-  transition: background-color 0.3s;
-  background-color: #e4e7eb;
-}
-</style>
