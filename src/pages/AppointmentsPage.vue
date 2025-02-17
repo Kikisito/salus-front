@@ -36,6 +36,15 @@ const citas = [
         </div>
 
         <PreviaCita v-for="cita in citas" :key="cita.id" :cita="cita" />
+
+        <div class="text-caption text-center">
+          <q-btn
+            color="primary"
+            flat
+            label="Ver citas antiguas"
+            @click="console.log('Pendiente. todo')"
+          />
+        </div>
       </div>
     </div>
 
