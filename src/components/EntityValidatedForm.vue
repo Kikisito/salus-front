@@ -113,4 +113,8 @@ const doSubmit = handleSubmit(async (values: any) => {
   display: flex;
   justify-content: space-between;
 }
+
+.q-input:has(.q-field__messages) {
+  margin-bottom: 0.5rem;
+}
 </style>
