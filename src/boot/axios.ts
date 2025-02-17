@@ -17,6 +17,7 @@ declare module 'vue' {
 // for each client)
 const api = axios.create({ baseURL: 'http://192.168.1.3:8080/api/v1' })
 
+// Interceptor para añadir el token de auth a las peticiones
 api.interceptors.request.use(
   (config) => {
     const authStore = useAuthStore()
@@ -25,6 +26,21 @@ api.interceptors.request.use(
     }
 
     return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  },
+)
+
+// Interceptor para actualizar el token de auth en el store
+api.interceptors.response.use(
+  (response) => {
+    const newToken = response.headers['authorization']
+    if (newToken) {
+      const authStore = useAuthStore()
+      authStore.setToken(newToken.replace('Bearer ', ''))
+    }
+    return response
   },
   (error) => {
     return Promise.reject(error)

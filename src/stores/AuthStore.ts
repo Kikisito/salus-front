@@ -81,14 +81,18 @@ export const useAuthStore = defineStore('authStore', {
       })
     },
 
-    async getCurrentProfile(): Promise<ServiceAnswer<User>> {
+    async getCurrentProfile(): Promise<ServiceAnswer<User | null>> {
       return handleRequest(
         async () => {
           const response = await api.get('/user/@me')
           const data = await response.data
           this.user = data
 
-          return data
+          if (this.user) {
+            this.user.fechaNacimiento = new Date(this.user?.fechaNacimiento)
+          }
+
+          return this.user
         },
         (error) => {
           throw error
@@ -149,6 +153,10 @@ export const useAuthStore = defineStore('authStore', {
           }
         },
       )
+    },
+
+    async setToken(token: string) {
+      this.token = token
     },
   },
 })
