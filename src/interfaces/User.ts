@@ -4,6 +4,7 @@ export interface User {
   nombre: string
   apellidos: string
   nif: string
+  fechaNacimiento: Date
   email: string
   telefono: string
   sexo: string
