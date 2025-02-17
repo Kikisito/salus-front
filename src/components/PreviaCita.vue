@@ -7,7 +7,7 @@ const props = defineProps(['cita'])
     v-ripple
     flat
     bordered
-    class="cursor-pointer"
+    class="cursor-pointer q-card-selectable"
     @click="$router.push({ name: 'appointment', params: { id: props.cita.id } })"
   >
     <q-item>

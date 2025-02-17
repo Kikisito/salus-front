@@ -14,7 +14,7 @@
   margin: 0.5rem;
 }
 
-.q-card:hover {
+.q-card-selectable:hover {
   background-color: #e4e7eb;
   transition: background-color 0.3s;
 }
@@ -23,6 +23,6 @@
   background-color: #1a202c;
 }
 
-.q-card--dark:hover {
+.q-card-selectable--dark:hover {
   background-color: #2d3748;
 }
