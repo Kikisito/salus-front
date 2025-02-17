@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { HeFilledMedicines } from '@kalimahapps/vue-icons'
+import { formattedDate } from 'src/helpers/formattedDate'
 import { computed, ref } from 'vue'
 
 const props = defineProps(['receta'])
@@ -17,14 +18,6 @@ const estadoMedicamento = (medicamento: unknown) => {
   // @ts-expect-error Especificar el tipo de medicamento en el futuro
   const fechaFin = new Date(medicamento.fecha_fin)
   return hoy <= fechaFin ? 'Activo' : 'Caducado'
-}
-
-const formattedDate = (date: Date) => {
-  return date.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
 }
 </script>
 
