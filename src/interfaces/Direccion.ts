@@ -5,4 +5,5 @@ export interface Direccion {
   provincia: string
   municipio: string
   localidad: string
+  pais: string
 }

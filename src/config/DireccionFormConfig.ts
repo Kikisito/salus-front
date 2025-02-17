@@ -19,6 +19,9 @@ const validationSchema = {
   localidad() {
     return true
   },
+  pais() {
+    return true
+  },
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -29,6 +32,7 @@ const initialValues = (entity?: any) => ({
   provincia: entity ? entity.provincia : '',
   municipio: entity ? entity.municipio : '',
   localidad: entity ? entity.localidad : '',
+  pais: entity ? entity.pais : '',
 })
 
 const formFieldsConfig = {
@@ -62,6 +66,11 @@ const formFieldsConfig = {
     label: 'Localidad',
     type: 'text',
     hint: 'Tu localidad',
+  },
+  pais: {
+    label: 'País',
+    type: 'text',
+    hint: 'Tu país',
   },
 }
 
