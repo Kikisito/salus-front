@@ -52,7 +52,7 @@ const formattedDate = (date: Date) => {
       </template>
 
       <q-card-section>
-        <div class="text-subtitle1">Medicamentos:</div>
+        <div class="text-body1">Medicamentos:</div>
         <q-list bordered>
           <template v-for="(medicamento, index) in props.receta.medicamentos" :key="index">
             <q-item>
