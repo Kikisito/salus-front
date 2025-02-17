@@ -7,6 +7,7 @@ const informes = [
     especialidad: 'Fisiología',
     doctor: 'Dr. Juan Martínez',
     fecha: '16 de febrero de 2025, 10:00',
+    texto: 'El paciente presenta una leve alergia al polen.',
   },
 ]
 </script>
