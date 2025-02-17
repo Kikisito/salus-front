@@ -13,6 +13,9 @@ const validationSchema = {
   provincia() {
     return true
   },
+  municipio() {
+    return true
+  },
   localidad() {
     return true
   },
@@ -24,6 +27,7 @@ const initialValues = (entity?: any) => ({
   lineaDireccion2: entity ? entity.lineaDireccion2 : '',
   codigoPostal: entity ? entity.codigoPostal : '',
   provincia: entity ? entity.provincia : '',
+  municipio: entity ? entity.municipio : '',
   localidad: entity ? entity.localidad : '',
 })
 
@@ -48,6 +52,11 @@ const formFieldsConfig = {
     type: 'select',
     hint: 'Tu provincia',
     options: Provincias,
+  },
+  municipio: {
+    label: 'Municipio',
+    type: 'text',
+    hint: 'Tu municipio',
   },
   localidad: {
     label: 'Localidad',

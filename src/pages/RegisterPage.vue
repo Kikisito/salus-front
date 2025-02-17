@@ -31,7 +31,7 @@ const submitForm = async (
     message: 'Registrando cuenta...',
   })
 
-  const user = {
+  const user: User = {
     nombre: userBasicData.nombre,
     apellidos: userBasicData.apellidos,
     nif: userBasicData.nif,
@@ -39,22 +39,14 @@ const submitForm = async (
     sexo: userBasicData.sexo,
     email: userContactData.email,
     telefono: userContactData.telefono,
-    ...(direccion &&
-    direccion.lineaDireccion1 &&
-    direccion.lineaDireccion2 &&
-    direccion.codigoPostal &&
-    direccion.provincia &&
-    direccion.localidad
-      ? {
-          direccion: {
-            lineaDireccion1: direccion.lineaDireccion1,
-            lineaDireccion2: direccion.lineaDireccion2,
-            codigoPostal: direccion.codigoPostal,
-            provincia: direccion.provincia,
-            localidad: direccion.localidad,
-          },
-        }
-      : {}),
+    direccion: {
+      lineaDireccion1: direccion.lineaDireccion1.length > 0 ? direccion.lineaDireccion1 : null,
+      lineaDireccion2: direccion.lineaDireccion2.length > 0 ? direccion.lineaDireccion2 : null,
+      codigoPostal: direccion.codigoPostal.length > 0 ? direccion.codigoPostal : null,
+      provincia: direccion.provincia.length > 0 ? direccion.provincia : null,
+      municipio: direccion.municipio.length > 0 ? direccion.municipio : null,
+      localidad: direccion.localidad.length > 0 ? direccion.localidad : null,
+    },
     password: password,
   } as User
 
