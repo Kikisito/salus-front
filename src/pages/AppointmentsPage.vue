@@ -28,13 +28,18 @@ const citas = [
 
 <template>
   <q-page padding>
-    <div class="section-header">
-      <div class="text-h6">Tus próximas citas</div>
+    <div class="row justify-evenly">
+      <div class="col-12 col-md-6">
+        <div class="section-header">
+          <div class="text-h6">Tus próximas citas</div>
+          <div class="text-subtitle">Consulta tus próximas citas</div>
+        </div>
+
+        <PreviaCita v-for="cita in citas" :key="cita.id" :cita="cita" />
+      </div>
     </div>
 
-    <PreviaCita v-for="cita in citas" :key="cita.id" :cita="cita" />
     <AppointmentModal v-model:show="showModal" />
-
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn fab icon="add" class="bg-primary text-white" @click="showModal = true" />
     </q-page-sticky>
