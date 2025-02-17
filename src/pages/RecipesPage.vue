@@ -6,8 +6,46 @@ const recetas = [
     id: 1,
     especialidad: 'Fisiología',
     doctor: 'Dr. Juan Martínez',
-    fecha_receta: '16 de febrero de 2025',
-    fechas: '16 de febrero de 2025 hasta 16 de marzo de 2025',
+    fecha_receta: new Date('2025-02-16'),
+    fecha_inicio: new Date('2025-02-16'),
+    fecha_fin: new Date('2025-03-16'),
+    medicamentos: [
+      {
+        nombre: 'Paracetamol',
+        pauta: '1 comprimido cada 8 horas',
+        fecha_fin: new Date('2025-03-16'),
+      },
+      {
+        nombre: 'Ibuprofeno',
+        pauta: '1 comprimido cada 12 horas',
+        fecha_fin: new Date('2025-03-01'),
+      },
+      {
+        nombre: 'Omeprazol',
+        pauta: '1 comprimido cada 24 horas',
+        fecha_fin: new Date('2025-02-16'),
+      },
+    ],
+  },
+  {
+    id: 2,
+    especialidad: 'Cardiología',
+    doctor: 'Dra. María Pérez',
+    fecha_receta: new Date('2025-02-10'),
+    fecha_inicio: new Date('2025-02-10'),
+    fecha_fin: new Date('2025-02-16'),
+    medicamentos: [
+      {
+        nombre: 'Aspirina',
+        pauta: '1 comprimido cada 24 horas',
+        fecha_fin: new Date('2025-02-16'),
+      },
+      {
+        nombre: 'Enalapril',
+        pauta: '1 comprimido cada 12 horas',
+        fecha_fin: new Date('2025-02-01'),
+      },
+    ],
   },
 ]
 </script>
