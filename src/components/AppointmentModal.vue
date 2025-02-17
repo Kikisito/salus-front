@@ -17,7 +17,7 @@ const showModal = defineModel('show', { default: false, type: Boolean })
 
 <template>
   <q-dialog v-model="showModal" persistent>
-    <q-card style="width: 700px; max-width: 80vw">
+    <q-card style="width: 700px; max-width: 90vw">
       <q-card-section>
         <div class="text-h6">
           {{ appointment === null ? 'Solicitando nueva cita' : 'Editando cita' }}

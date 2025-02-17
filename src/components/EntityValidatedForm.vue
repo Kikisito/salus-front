@@ -61,7 +61,7 @@ const doSubmit = handleSubmit(async (values: any) => {
         :errors="field.model.errors"
         :errorMessage="field.model.errorMessage"
         :clearable="field.clearable"
-        :disable="readOnly"
+        :disable="readOnly || field.readOnly"
         filled
       />
 
@@ -72,11 +72,13 @@ const doSubmit = handleSubmit(async (values: any) => {
         :hint="field.hint"
         :dense="field.dense"
         :options="field.options"
+        :option-label="field.options.label"
+        :option-value="field.options.value"
         :errors="field.model.errors"
         :error="field.model.errors.length != 0"
         :error-message="field.model.errorMessage"
         :clearable="field.clearable"
-        :disable="readOnly"
+        :disable="readOnly || field.readOnly"
         filled
       ></q-select>
 
@@ -92,10 +94,10 @@ const doSubmit = handleSubmit(async (values: any) => {
         :error="field.model.errors.length != 0"
         :error-message="field.model.errorMessage"
         :autocomplete="field.autocomplete"
-        :readonly="readOnly"
+        :readonly="readOnly || field.readOnly"
         filled
         @update:model-value="
-          field.onChange != null ? (field.model.value = field.onChange($event)) : null
+          field.onChange != null ? (field.model.value = field.onChange($event)) : null // sirve para actualizarse a sí mismo (por ejemplo, el capitalize del DNI)
         "
       />
     </template>
