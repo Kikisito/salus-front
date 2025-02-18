@@ -2,7 +2,7 @@
   "name": "salus-front",
   "version": "0.0.1",
   "description": "Gestión de clínicas",
-  "author": "Kyllian Edouard Boucir <kebb2@alu.ua.es>",
+  "author": "Kyllian Edouard Boucir <bekikisito@gmail.com>",
   "private": true,
   "dependencies": {
     "@capacitor/android": "^6.2.0",

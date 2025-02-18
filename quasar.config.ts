@@ -6,6 +6,10 @@ import { fileURLToPath } from 'node:url'
 
 export default defineConfig((ctx) => {
   return {
+    bin: {
+      linuxAndroidStudio:
+        '/home/kyllian/.local/share/JetBrains/Toolbox/apps/android-studio/bin/studio.sh',
+    },
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
 

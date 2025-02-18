@@ -3,5 +3,7 @@ export interface Direccion {
   lineaDireccion2: string
   codigoPostal: string
   provincia: string
+  municipio: string
   localidad: string
+  pais: string
 }

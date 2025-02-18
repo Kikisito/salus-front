@@ -64,7 +64,7 @@ const menuItems = [
   { label: 'Mensajería', icon: 'chat', path: '/chats' },
   { label: 'Informes', icon: 'description', path: '/reports' },
   { label: 'Recetas', icon: 'receipt', path: '/recipes' },
-  { label: 'Pruebas', icon: 'science', path: '/tests' },
+  { label: 'Pruebas y Analíticas', icon: 'science', path: '/tests' },
   { label: 'Tratamientos', icon: 'medical_services', path: '/treatments', separator: true },
   { label: 'Mi perfil', icon: 'person', path: '/profile' },
   { label: 'Ajustes', icon: 'settings', path: '/settings' },

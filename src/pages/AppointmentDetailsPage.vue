@@ -145,7 +145,7 @@ const rotation = ref(0)
           <q-item>
             <q-item-section>
               <q-item-label>Correo electrónico</q-item-label>
-              <q-item-label caption> </q-item-label>
+              <q-item-label caption>doctor@salus.es</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
@@ -198,12 +198,17 @@ const rotation = ref(0)
   </q-page>
 </template>
 
-<style lang="css" scoped>
+<style scoped>
 .q-list {
   margin: 0.5rem;
-  background-color: #f7fbff;
   padding: 0.25rem;
   border-radius: 0.5rem;
+  background-color: #f7fbff;
   border: 1px solid #e4e7eb;
+}
+
+.q-list--dark {
+  background-color: #1a202c;
+  border: 1px solid #2d3748;
 }
 </style>

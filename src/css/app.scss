@@ -6,3 +6,23 @@
 .entity-validated-form {
   min-width: 300px;
 }
+
+/* Q-Card */
+
+.q-card {
+  background-color: #f1f4f8;
+  margin: 0.5rem;
+}
+
+.q-card-selectable:hover {
+  background-color: #e4e7eb;
+  transition: background-color 0.3s;
+}
+
+.q-card--dark {
+  background-color: #1a202c;
+}
+
+.q-card-selectable--dark:hover {
+  background-color: #2d3748;
+}

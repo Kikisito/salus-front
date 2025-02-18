@@ -1,10 +1,12 @@
 <script lang="ts" setup>
-import { getCitaValidatedFormConfig } from 'src/config/CitaValidatedFormConfig'
+import type { PropType } from 'vue'
+import type { Direccion } from 'src/interfaces/Direccion'
 import EntityValidatedForm from './EntityValidatedForm.vue'
+import { getDireccionValidatedFormConfig } from 'src/config/DireccionFormConfig'
 
 defineProps({
-  appointment: {
-    type: Object,
+  direccion: {
+    type: [Object, undefined] as PropType<Direccion | undefined>,
     required: false,
     default: null,
   },
@@ -20,21 +22,21 @@ const showModal = defineModel('show', { default: false, type: Boolean })
     <q-card style="width: 700px; max-width: 90vw">
       <q-card-section>
         <div class="text-h6">
-          {{ appointment === null ? 'Solicitando nueva cita' : 'Editando cita' }}
+          {{ direccion === null ? 'Nueva dirección' : 'Editando dirección' }}
         </div>
       </q-card-section>
 
       <q-card-section>
         <EntityValidatedForm
-          :entityValidationConfig="getCitaValidatedFormConfig(appointment)"
-          @form:validated="$emit('form:submit')"
+          :entityValidationConfig="getDireccionValidatedFormConfig(direccion)"
+          @form:validated="$emit('form:submit', $event)"
         >
           <template #submitButton>
             <q-btn color="primary" flat label="Cancelar" @click="showModal = false" />
             <q-btn
               type="submit"
               color="primary"
-              :label="appointment === null ? 'Crear' : 'Actualizar'"
+              :label="direccion === null ? 'Crear' : 'Actualizar'"
             />
           </template>
         </EntityValidatedForm>

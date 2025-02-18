@@ -7,7 +7,7 @@ const props = defineProps(['mensaje'])
     v-ripple
     flat
     bordered
-    class="cursor-pointer"
+    class="cursor-pointer q-card-selectable"
     @click="$router.push({ name: 'chat', params: { id: props.mensaje.id } })"
   >
     <q-item>
@@ -27,15 +27,3 @@ const props = defineProps(['mensaje'])
     </q-item>
   </q-card>
 </template>
-
-<style lang="css" scoped>
-.q-card {
-  background-color: #f1f4f8;
-  margin: 0.5rem;
-}
-
-.q-card:hover {
-  transition: background-color 0.3s;
-  background-color: #e4e7eb;
-}
-</style>
