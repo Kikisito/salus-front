@@ -113,11 +113,7 @@ const showDireccionModal = ref(false)
       </div>
     </div>
 
-    <DireccionModal
-      v-if="user?.direccion"
-      v-model:show="showDireccionModal"
-      :direccion="user.direccion"
-    />
+    <DireccionModal v-model:show="showDireccionModal" :direccion="user?.direccion" />
   </q-page>
 </template>
 

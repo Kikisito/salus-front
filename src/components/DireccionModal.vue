@@ -1,10 +1,12 @@
 <script lang="ts" setup>
+import type { PropType } from 'vue'
+import type { Direccion } from 'src/interfaces/Direccion'
 import EntityValidatedForm from './EntityValidatedForm.vue'
 import { getDireccionValidatedFormConfig } from 'src/config/DireccionFormConfig'
 
 defineProps({
   direccion: {
-    type: Object,
+    type: [Object, undefined] as PropType<Direccion | undefined>,
     required: false,
     default: null,
   },
