@@ -1,15 +1,35 @@
 <script setup lang="ts">
+import type { Direccion } from 'src/interfaces/Direccion'
 import { storeToRefs } from 'pinia'
+import { formattedDate } from 'src/helpers/formattedDate'
+import { useUserStore } from 'src/stores/UserStore'
+import { ref } from 'vue'
 import DireccionDetails from 'src/components/DireccionDetails.vue'
 import DireccionModal from 'src/components/DireccionModal.vue'
-import { formattedDate } from 'src/helpers/formattedDate'
-import { useAuthStore } from 'src/stores/AuthStore'
-import { ref } from 'vue'
+import { Notify } from 'quasar'
 
-const authStore = useAuthStore()
-const { user } = storeToRefs(authStore)
+const userStore = useUserStore()
+const { user } = storeToRefs(userStore)
 
 const showDireccionModal = ref(false)
+
+const setDireccion = async (direccion: Direccion) => {
+  const response = await userStore.setAddress(direccion)
+  if (response.success) {
+    Notify.create({
+      message: 'Dirección actualizada correctamente',
+      color: 'positive',
+      icon: 'check',
+    })
+    showDireccionModal.value = false
+  } else {
+    Notify.create({
+      message: response.error,
+      color: 'negative',
+      icon: 'error',
+    })
+  }
+}
 </script>
 
 <template>
@@ -113,7 +133,11 @@ const showDireccionModal = ref(false)
       </div>
     </div>
 
-    <DireccionModal v-model:show="showDireccionModal" :direccion="user?.direccion" />
+    <DireccionModal
+      v-model:show="showDireccionModal"
+      :direccion="user?.direccion"
+      @form:submit="setDireccion($event)"
+    />
   </q-page>
 </template>
 

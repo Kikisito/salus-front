@@ -1,6 +1,7 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
+import type { Direccion } from 'src/interfaces/Direccion'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
 import type { User } from 'src/interfaces/User'
 
@@ -29,6 +30,23 @@ export const useUserStore = defineStore('userStore', {
         },
         (error) => {
           throw error
+        },
+      )
+    },
+
+    async setAddress(address: Direccion): Promise<ServiceAnswer<User | null>> {
+      return handleRequest(
+        async () => {
+          const response = await api.post('/user/@me/address', address)
+          const data = await response.data
+          this.user = data
+          console.log(this.user)
+          return this.user
+        },
+        (error) => {
+          if (error.status === 404) {
+            return 'No se ha encontrado el usuario actual'
+          }
         },
       )
     },
