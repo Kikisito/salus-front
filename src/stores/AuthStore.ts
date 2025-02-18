@@ -4,11 +4,11 @@ import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
 import type { User } from 'src/interfaces/User'
+import { useUserStore } from './UserStore'
 
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
     token: null as string | null,
-    user: null as User | null,
   }),
 
   persist: {
@@ -75,29 +75,12 @@ export const useAuthStore = defineStore('authStore', {
             })
           }
         } finally {
+          const userStore = useUserStore()
           this.token = null
+          userStore.setUserProfile(null)
           this.router.push({ name: 'login' })
         }
       })
-    },
-
-    async getCurrentProfile(): Promise<ServiceAnswer<User | null>> {
-      return handleRequest(
-        async () => {
-          const response = await api.get('/user/@me')
-          const data = await response.data
-          this.user = data
-
-          if (this.user) {
-            this.user.fechaNacimiento = new Date(this.user?.fechaNacimiento)
-          }
-
-          return this.user
-        },
-        (error) => {
-          throw error
-        },
-      )
     },
 
     async requestPasswordReset(email: string, nif: string): Promise<ServiceAnswer<number>> {
