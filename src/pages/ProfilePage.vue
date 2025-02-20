@@ -1,17 +1,41 @@
 <script setup lang="ts">
-import type { Direccion } from 'src/interfaces/Direccion'
+import { Notify } from 'quasar'
 import { storeToRefs } from 'pinia'
-import { formattedDate } from 'src/helpers/formattedDate'
-import { useUserStore } from 'src/stores/UserStore'
 import { ref } from 'vue'
+
 import DireccionDetails from 'src/components/DireccionDetails.vue'
 import DireccionModal from 'src/components/DireccionModal.vue'
-import { Notify } from 'quasar'
+import ProfileChangeUserDataModal from 'src/components/ProfileChangeUserDataModal.vue'
+import UserDetails from 'src/components/UserDetails.vue'
+import { useUserStore } from 'src/stores/UserStore'
+
+import type { Direccion } from 'src/interfaces/Direccion'
+import type { User } from 'src/interfaces/User'
 
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 
+const showUserDataModal = ref(false)
 const showDireccionModal = ref(false)
+
+const updateProfile = async (user: User) => {
+  const response = await userStore.updateProfile(user)
+
+  if (response.success) {
+    Notify.create({
+      message: 'Perfil actualizado correctamente',
+      color: 'positive',
+      icon: 'check',
+    })
+    showUserDataModal.value = false
+  } else {
+    Notify.create({
+      message: response.error,
+      color: 'negative',
+      icon: 'error',
+    })
+  }
+}
 
 const setDireccion = async (direccion: Direccion) => {
   const response = await userStore.setAddress(direccion)
@@ -45,6 +69,8 @@ const setDireccion = async (direccion: Direccion) => {
             text-color="white"
             label="Editar perfil"
             icon="edit"
+            clickable
+            @click="showUserDataModal = true"
           />
         </div>
 
@@ -64,41 +90,7 @@ const setDireccion = async (direccion: Direccion) => {
             </q-item>
 
             <q-card-section>
-              <q-list>
-                <q-item>
-                  <q-item-section>
-                    <q-item-label caption>DNI</q-item-label>
-                    <q-item-label>{{ user?.nif ?? 'No se ha especificado' }}</q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item>
-                  <q-item-section>
-                    <q-item-label caption>Correo electrónico</q-item-label>
-                    <q-item-label>{{ user?.email ?? 'No se ha especificado' }}</q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item>
-                  <q-item-section>
-                    <q-item-label caption>Teléfono</q-item-label>
-                    <q-item-label>{{ user?.telefono ?? 'No se ha especificado' }}</q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item>
-                  <q-item-section>
-                    <q-item-label caption>Fecha de nacimiento</q-item-label>
-                    <q-item-label>
-                      {{
-                        user?.fechaNacimiento
-                          ? formattedDate(new Date(user?.fechaNacimiento))
-                          : 'No se ha especificado'
-                      }}
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
+              <UserDetails :user="user" />
             </q-card-section>
           </q-card>
 
@@ -132,6 +124,12 @@ const setDireccion = async (direccion: Direccion) => {
         </q-card>
       </div>
     </div>
+
+    <ProfileChangeUserDataModal
+      v-model:show="showUserDataModal"
+      :user="user"
+      @form:submit="updateProfile($event)"
+    />
 
     <DireccionModal
       v-model:show="showDireccionModal"

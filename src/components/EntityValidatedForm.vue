@@ -13,7 +13,7 @@ const { handleSubmit } = useForm({
   initialValues: initialValues,
 })
 
-/*
+/* Esto esquivale a...
     formFields = ref({
         field1: { ...formFieldsConfig.field1, model: useField('field1') },
         field2: { ...formFieldsConfig.field2, model: useField('field2') },
@@ -42,7 +42,12 @@ watch(
   { deep: true },
 )
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const handleFieldChange = (field: any, value: any) => {
+  field.model.value = field.onChange ? field.onChange(value) : value
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const doSubmit = handleSubmit(async (values: any) => {
   emit('form:validated', values)
 })
@@ -80,7 +85,7 @@ const doSubmit = handleSubmit(async (values: any) => {
         :clearable="field.clearable"
         :disable="readOnly || field.readOnly"
         filled
-      ></q-select>
+      />
 
       <q-input
         v-else
@@ -96,9 +101,7 @@ const doSubmit = handleSubmit(async (values: any) => {
         :autocomplete="field.autocomplete"
         :readonly="readOnly || field.readOnly"
         filled
-        @update:model-value="
-          field.onChange != null ? (field.model.value = field.onChange($event)) : null // sirve para actualizarse a sí mismo (por ejemplo, el capitalize del DNI)
-        "
+        @update:model-value="handleFieldChange(field, $event)"
       />
     </template>
 
@@ -114,6 +117,10 @@ const doSubmit = handleSubmit(async (values: any) => {
 .actions {
   display: flex;
   justify-content: space-between;
+}
+
+.q-field:has(.q-field__messages) {
+  margin-bottom: 0.5rem;
 }
 
 .q-input:has(.q-field__messages) {
