@@ -75,7 +75,7 @@ const setDireccion = async (direccion: Direccion) => {
         </div>
 
         <template v-if="user">
-          <q-card>
+          <q-card flat bordered>
             <q-item>
               <q-item-section avatar>
                 <q-avatar text-color="white" style="background-color: #26a69a">
@@ -107,7 +107,7 @@ const setDireccion = async (direccion: Direccion) => {
             />
           </div>
 
-          <q-card>
+          <q-card flat bordered>
             <q-card-section>
               <DireccionDetails :direccion="user.direccion" />
             </q-card-section>
