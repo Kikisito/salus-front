@@ -6,6 +6,7 @@ export interface User {
   nif: string
   fechaNacimiento: Date
   email: string
+  lastPasswordChange: Date
   telefono: string
   sexo: string
   direccion: Direccion

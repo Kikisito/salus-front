@@ -14,27 +14,29 @@ const validationSchema = {
   },
 }
 
-const initialValues = (entity?: any) => ({
-  password: entity ? entity.password : '',
-  passwordConfirmation: entity ? entity.passwordConfirmation : '',
-})
+const initialValues = {
+  password: '',
+  passwordConfirmation: '',
+}
 
 const formFieldsConfig = {
   password: {
     label: 'Contraseña',
     type: 'password',
     hint: 'Tu contraseña servirá para acceder a tu cuenta',
+    autocomplete: 'new-password',
   },
   passwordConfirmation: {
     label: 'Confirmar contraseña',
     type: 'password',
+    autocomplete: 'new-password',
   },
 }
 
-export function getPasswordValidatedFormConfig(entity?: any) {
+export function getPasswordValidatedFormConfig() {
   return {
     validationSchema: validationSchema,
-    initialValues: initialValues(entity),
+    initialValues: initialValues,
     formFieldsConfig: formFieldsConfig,
   }
 }

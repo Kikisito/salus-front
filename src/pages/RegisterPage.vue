@@ -206,7 +206,7 @@ const handlePasswordForm = async (data: any) => {
 
             <EntityValidatedForm
               class="entity-validated-form"
-              :entity-validation-config="getPasswordValidatedFormConfig(password)"
+              :entity-validation-config="getPasswordValidatedFormConfig()"
               @form:validated="handlePasswordForm"
             >
               <template #submitButton>

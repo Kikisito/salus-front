@@ -17,6 +17,8 @@
   "dependencies": {
     "@kalimahapps/vue-icons": "^1.7.1",
     "@quasar/extras": "^1.16.4",
+    "@vueuse/components": "^12.7.0",
+    "@vueuse/core": "^12.7.0",
     "axios": "^1.2.1",
     "electron-context-menu": "^4.0.4",
     "ol": "^10.3.1",

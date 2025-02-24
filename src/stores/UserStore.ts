@@ -3,8 +3,10 @@ import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
 import type { ApiError } from 'src/interfaces/ApiError'
 import type { Direccion } from 'src/interfaces/Direccion'
+import type { PasswordChangeRequest } from 'src/interfaces/PasswordChangeRequest'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
 import type { User } from 'src/interfaces/User'
+import { useAuthStore } from './AuthStore'
 
 export const useUserStore = defineStore('userStore', {
   state: () => ({
@@ -61,6 +63,35 @@ export const useUserStore = defineStore('userStore', {
         (error) => {
           if (error.status === 404) {
             return 'No se ha encontrado el usuario actual'
+          }
+        },
+      )
+    },
+
+    async changePassword(request: PasswordChangeRequest): Promise<ServiceAnswer<boolean>> {
+      return handleRequest(
+        async () => {
+          const response = await api.put('/user/@me/password', request)
+          const jwtToken = response.data.jwt
+
+          // Actualizamos el token en el store de autenticación
+          const authStore = useAuthStore()
+          authStore.setToken(jwtToken)
+
+          // Actualizamos en el usuario local la fecha del último cambio de contraseña
+          this.user!.lastPasswordChange = new Date()
+
+          return true
+        },
+        (error) => {
+          if (error.status === 404) {
+            return 'No se ha encontrado el usuario actual'
+          }
+          if (error.status === 400 && error.response) {
+            const response: ApiError = error.response.data as ApiError
+            if (response && response.errors && response.errors[0]) {
+              return 'La contraseña actual no coincide con la introducida'
+            }
           }
         },
       )
