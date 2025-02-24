@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Notify } from 'quasar'
 import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 import DireccionDetails from 'src/components/DireccionDetails.vue'
 import DireccionModal from 'src/components/DireccionModal.vue'
@@ -17,6 +17,12 @@ const { user } = storeToRefs(userStore)
 
 const showUserDataModal = ref(false)
 const showDireccionModal = ref(false)
+
+onMounted(async () => {
+  // Actualizamos los datos del usuario cada vez que se carga la página
+  // Así, si se cambian los datos desde otro sitio, se reflejarán
+  await userStore.getCurrentProfile()
+})
 
 const updateProfile = async (user: User) => {
   const response = await userStore.updateProfile(user)

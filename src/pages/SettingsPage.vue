@@ -6,8 +6,15 @@ import { useUserStore } from 'src/stores/UserStore'
 
 import type { PasswordChangeRequest } from 'src/interfaces/PasswordChangeRequest'
 import formatLocaleTimeAgo from 'src/helpers/formatLocaleTimeAgo'
+import { onMounted } from 'vue'
 
 const userStore = useUserStore()
+
+onMounted(async () => {
+  // Actualizamos los datos del usuario cada vez que se carga la página
+  // Así, si se cambian los datos desde otro sitio, se reflejarán
+  await userStore.getCurrentProfile()
+})
 
 const changePassword = async (values: PasswordChangeRequest) => {
   Loading.show({
