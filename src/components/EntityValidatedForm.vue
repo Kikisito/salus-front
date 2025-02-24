@@ -8,7 +8,7 @@ const emit = defineEmits(['form:validated'])
 
 const { validationSchema, initialValues, formFieldsConfig } = props.entityValidationConfig
 
-const { handleSubmit } = useForm({
+const { handleSubmit, handleReset } = useForm({
   validationSchema: validationSchema,
   initialValues: initialValues,
 })
@@ -50,6 +50,10 @@ const handleFieldChange = (field: any, value: any) => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const doSubmit = handleSubmit(async (values: any) => {
   emit('form:validated', values)
+})
+
+defineExpose({
+  handleReset,
 })
 </script>
 
