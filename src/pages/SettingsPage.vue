@@ -72,6 +72,17 @@ const changePassword = async (values: PasswordChangeRequest) => {
 
             <q-card>
               <q-card-section>
+                <q-banner inline-actions class="text-white bg-red q-mb-md">
+                  <template v-slot:avatar>
+                    <q-icon name="warning" color="yellow" />
+                  </template>
+                  <span>
+                    Por seguridad, al cambiar tu contraseña se cerrarán todas tus sesiones activas.
+                    Deberás volver a iniciar sesión en todos tus dispositivos con la nueva
+                    contraseña. El dispositivo actual no se verá afectado.
+                  </span>
+                </q-banner>
+
                 <ChangePassword @form:validated="changePassword($event)" />
               </q-card-section>
             </q-card>
