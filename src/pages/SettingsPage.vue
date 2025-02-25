@@ -74,7 +74,7 @@ const changePassword = async (values: PasswordChangeRequest) => {
               <q-card-section>
                 <q-banner inline-actions class="text-white bg-red q-mb-md">
                   <template v-slot:avatar>
-                    <q-icon name="warning" color="yellow" />
+                    <q-icon name="warning" color="white" />
                   </template>
                   <span>
                     Por seguridad, al cambiar tu contraseña se cerrarán todas tus sesiones activas.
