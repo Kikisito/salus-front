@@ -7,7 +7,9 @@ import { useUserStore } from 'src/stores/UserStore'
 import type { PasswordChangeRequest } from 'src/interfaces/PasswordChangeRequest'
 import formatLocaleTimeAgo from 'src/helpers/formatLocaleTimeAgo'
 import { onMounted } from 'vue'
+import { useAuthStore } from 'src/stores/AuthStore'
 
+const authStore = useAuthStore()
 const userStore = useUserStore()
 
 onMounted(async () => {
@@ -32,6 +34,31 @@ const changePassword = async (values: PasswordChangeRequest) => {
     Notify.create({
       icon: 'report_problem',
       message: changePasswordResult.error,
+      color: 'negative',
+    })
+  }
+
+  Loading.hide()
+}
+
+const closeAllSessions = async () => {
+  Loading.show({
+    message: 'Cerrando todas las sesiones...',
+  })
+
+  const closeSessionsResult = await userStore.closeAllSessions()
+  if (closeSessionsResult.success) {
+    Notify.create({
+      icon: 'check',
+      message: 'Todas las sesiones han sido cerradas correctamente',
+      color: 'positive',
+    })
+
+    await authStore.logout()
+  } else {
+    Notify.create({
+      icon: 'report_problem',
+      message: closeSessionsResult.error,
       color: 'negative',
     })
   }
@@ -95,9 +122,21 @@ const changePassword = async (values: PasswordChangeRequest) => {
           >
             <q-card>
               <q-card-section>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem, eius reprehenderit
-                eos corrupti commodi magni quaerat ex numquam, dolorum officiis modi facere maiores
-                architecto suscipit iste eveniet doloribus ullam aliquid.
+                <span>
+                  Cierra todas las sesiones activas de tu cuenta. Esto cerrará la sesión en todos
+                  los dispositivos en los que hayas iniciado sesión,
+                  <b>incluyendo el dispositivo actual</b>.
+                </span>
+
+                <div class="full-width text-center">
+                  <q-btn
+                    label="Cerrar todas las sesiones"
+                    color="red"
+                    icon="logout"
+                    class="q-mt-md"
+                    @click="closeAllSessions()"
+                  />
+                </div>
               </q-card-section>
             </q-card>
           </q-expansion-item>

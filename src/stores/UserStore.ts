@@ -96,6 +96,13 @@ export const useUserStore = defineStore('userStore', {
         },
       )
     },
+
+    async closeAllSessions(): Promise<ServiceAnswer<boolean>> {
+      return handleRequest(async () => {
+        await api.delete('/user/@me/sessions')
+        return true
+      })
+    },
   },
 })
 
