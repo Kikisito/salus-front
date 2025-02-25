@@ -76,11 +76,7 @@ const closeAllSessions = async () => {
         </div>
 
         <q-list v-if="userStore.user" separator bordered class="rounded-borders">
-          <q-expansion-item
-            icon="password"
-            label="Tu contraseña"
-            :caption="'Cambiaste tu contraseña por última vez'"
-          >
+          <q-expansion-item icon="password">
             <template #header>
               <q-item-section avatar>
                 <q-icon name="password" />
@@ -89,10 +85,11 @@ const closeAllSessions = async () => {
               <q-item-section>
                 <q-item-label>Contraseña</q-item-label>
                 <q-item-label caption>
-                  <span>
+                  <span v-if="userStore.user?.lastPasswordChange">
                     El último cambio de contraseña fue
                     {{ formatLocaleTimeAgo(userStore.user?.lastPasswordChange) }}
                   </span>
+                  <span v-else> Nunca has cambiado tu contraseña </span>
                 </q-item-label>
               </q-item-section>
             </template>
