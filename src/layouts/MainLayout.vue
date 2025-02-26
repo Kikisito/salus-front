@@ -18,22 +18,24 @@
     >
       <q-scroll-area class="fit">
         <q-list padding>
-          <template v-for="(item, index) in menuItems" :key="item.label">
-            <q-item
-              clickable
-              v-ripple
-              :to="item.path || undefined"
-              @click="item.action ? item.action() : null"
-            >
-              <q-item-section avatar>
-                <q-icon :name="item.icon" />
-              </q-item-section>
+          <template v-for="(item, index) in menuItems" :key="index">
+            <template v-if="item.show">
+              <q-item
+                clickable
+                v-ripple
+                :to="item.path || undefined"
+                @click="item.action ? item.action() : null"
+              >
+                <q-item-section avatar>
+                  <q-icon :name="item.icon" />
+                </q-item-section>
 
-              <q-item-section>
-                <q-item-label>{{ item.label }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-separator :key="'sep' + index" v-if="item.separator" />
+                <q-item-section>
+                  <q-item-label>{{ item.label }}</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-separator :key="'sep' + index" v-if="item.separator" />
+            </template>
           </template>
         </q-list>
       </q-scroll-area>
@@ -48,8 +50,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuthStore } from 'src/stores/AuthStore'
+import { useUserStore } from 'src/stores/UserStore'
 
 const authStore = useAuthStore()
+const userStore = useUserStore()
 
 const drawer = ref(false)
 const miniState = ref(true)
@@ -59,15 +63,33 @@ function toggleDrawer() {
 }
 
 const menuItems = [
-  { label: 'Inicio', icon: 'home', path: '/home' },
-  { label: 'Mis citas', icon: 'view_agenda', path: '/appointments' },
-  { label: 'Mensajería', icon: 'chat', path: '/chats' },
-  { label: 'Informes', icon: 'description', path: '/reports' },
-  { label: 'Recetas', icon: 'receipt', path: '/recipes' },
-  { label: 'Pruebas y Analíticas', icon: 'science', path: '/tests' },
-  { label: 'Tratamientos', icon: 'medical_services', path: '/treatments', separator: true },
-  { label: 'Mi perfil', icon: 'person', path: '/profile' },
-  { label: 'Ajustes', icon: 'settings', path: '/settings' },
-  { label: 'Cerrar sesión', icon: 'logout', action: () => authStore.logout() },
+  { label: 'Inicio', icon: 'home', path: '/home', show: true },
+  { label: 'Mis citas', icon: 'view_agenda', path: '/appointments', show: true },
+  { label: 'Mensajería', icon: 'chat', path: '/chats', show: true },
+  { label: 'Informes', icon: 'description', path: '/reports', show: true },
+  { label: 'Recetas', icon: 'receipt', path: '/recipes', show: true },
+  { label: 'Pruebas y Analíticas', icon: 'science', path: '/tests', show: true },
+  {
+    label: 'Tratamientos',
+    icon: 'medical_services',
+    path: '/treatments',
+    show: true,
+    separator: true,
+  },
+  {
+    label: 'Administración',
+    icon: 'admin_panel_settings',
+    path: '/admin',
+    show: userStore.hasRole('ADMIN'),
+  },
+  {
+    label: 'Área profesional',
+    icon: 'medical_information',
+    path: '/profesional',
+    show: userStore.hasRole('PROFESIONAL'),
+  },
+  { label: 'Mi perfil', icon: 'person', path: '/profile', show: true },
+  { label: 'Ajustes', icon: 'settings', path: '/settings', show: true },
+  { label: 'Cerrar sesión', icon: 'logout', show: true, action: () => authStore.logout() },
 ]
 </script>

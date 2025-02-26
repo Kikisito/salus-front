@@ -11,4 +11,5 @@ export interface User {
   sexo: string
   direccion: Direccion
   password: string
+  rolesList: string[]
 }

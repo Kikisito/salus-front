@@ -13,6 +13,14 @@ export const useUserStore = defineStore('userStore', {
     user: null as User | null,
   }),
 
+  getters: {
+    hasRole:
+      (state) =>
+      (role: string): boolean => {
+        return state.user?.rolesList.includes(role) ?? false
+      },
+  },
+
   actions: {
     async setUserProfile(user: User | null): Promise<void> {
       this.user = user
