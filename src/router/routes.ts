@@ -75,6 +75,12 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true },
   },
   {
+    name: 'profesional',
+    path: '/profesional',
+    component: () => import('layouts/ProfesionalLayout.vue'),
+    children: [],
+  },
+  {
     path: '/auth',
     component: () => import('layouts/AuthLayout.vue'),
     children: [

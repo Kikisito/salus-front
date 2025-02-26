@@ -3,7 +3,7 @@
     <q-header elevated>
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleDrawer" />
-        <q-toolbar-title>Project Salus</q-toolbar-title>
+        <q-toolbar-title>Área profesional de Project Salus</q-toolbar-title>
       </q-toolbar>
     </q-header>
 
@@ -59,15 +59,11 @@ function toggleDrawer() {
 }
 
 const menuItems = [
-  { label: 'Inicio', icon: 'home', path: '/home' },
-  { label: 'Mis citas', icon: 'view_agenda', path: '/appointments' },
-  { label: 'Mensajería', icon: 'chat', path: '/chats' },
-  { label: 'Informes', icon: 'description', path: '/reports' },
-  { label: 'Recetas', icon: 'receipt', path: '/recipes' },
-  { label: 'Pruebas y Analíticas', icon: 'science', path: '/tests' },
-  { label: 'Tratamientos', icon: 'medical_services', path: '/treatments', separator: true },
-  { label: 'Mi perfil', icon: 'person', path: '/profile' },
-  { label: 'Ajustes', icon: 'settings', path: '/settings' },
+  { label: 'Inicio', icon: 'home', path: '/profesional' },
+  { label: 'Agenda', icon: 'book', path: '/profesional/agenda' },
+  { label: 'Mensajería', icon: 'forum', path: '/profesional/chats' },
+  { label: 'Pacientes', icon: 'recent_actors', path: '/profesional/patients', separator: true },
+  { label: 'Volver a la aplicación', icon: 'arrow_back', path: '/home' },
   { label: 'Cerrar sesión', icon: 'logout', action: () => authStore.logout() },
 ]
 </script>
