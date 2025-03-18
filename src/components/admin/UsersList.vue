@@ -2,19 +2,17 @@
 import { storeToRefs } from 'pinia'
 import type { QTableColumn } from 'quasar'
 import { useUsersStore } from 'src/stores/admin/UsersStore'
-import { onMounted, ref } from 'vue'
+import { onMounted, type PropType, ref } from 'vue'
+
+defineProps({
+  columns: {
+    type: Array as PropType<QTableColumn[]>,
+    required: true,
+  },
+})
 
 const usersStore = useUsersStore()
 const { users, count } = storeToRefs(usersStore)
-
-const tableColumns: QTableColumn[] = [
-  { name: 'name', label: 'Nombre', field: 'nombre', align: 'left' },
-  { name: 'surname', label: 'Apellidos', field: 'apellidos', align: 'left' },
-  { name: 'idcard', label: 'DNI', field: 'nif', align: 'left' },
-  { name: 'email', label: 'Correo', field: 'email', align: 'left' },
-  { name: 'phone', label: 'Teléfono', field: 'telefono', align: 'left' },
-  { name: 'actions', label: 'Acciones', field: '', align: 'left' },
-]
 
 const usersList = ref()
 const loading = ref(false)
@@ -55,7 +53,7 @@ onMounted(async () => {
   <q-table
     ref="usersList"
     title="Listado de usuarios"
-    :columns="tableColumns"
+    :columns="columns"
     :rows="users"
     :filter="filter"
     :pagination-label="(start, end, total) => `${start} - ${end} de ${total}`"
@@ -77,10 +75,8 @@ onMounted(async () => {
       </q-input>
     </template>
 
-    <template v-slot:body-cell-actions="props">
-      <q-td :props="props" class="actions-column">
-        <q-btn icon="visibility" color="green" size="sm" round />
-      </q-td>
+    <template #body-cell-actions="props">
+      <slot name="actions" v-bind="props" />
     </template>
   </q-table>
 </template>
