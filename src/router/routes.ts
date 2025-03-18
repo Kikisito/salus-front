@@ -81,6 +81,27 @@ const routes: RouteRecordRaw[] = [
     children: [],
   },
   {
+    path: '/admin',
+    component: () => import('layouts/AdminLayout.vue'),
+    children: [
+      {
+        name: 'admin-index',
+        path: '',
+        redirect: { name: 'admin' },
+      },
+      {
+        name: 'admin',
+        path: 'home',
+        component: () => import('pages/admin/IndexPage.vue'),
+      },
+      {
+        name: 'admin-patients',
+        path: 'patients',
+        component: () => import('pages/admin/PatientsPage.vue'),
+      },
+    ],
+  },
+  {
     path: '/auth',
     component: () => import('layouts/AuthLayout.vue'),
     children: [
