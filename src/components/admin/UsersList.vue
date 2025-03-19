@@ -1,22 +1,25 @@
 <script lang="ts" setup>
-import { storeToRefs } from 'pinia'
-import type { QTableColumn } from 'quasar'
-import { useUsersStore } from 'src/stores/admin/UsersStore'
-import { onMounted, type PropType, ref } from 'vue'
+import EntityList from '../EntityList.vue'
 
-defineProps({
-  columns: {
-    type: Array as PropType<QTableColumn[]>,
-    required: true,
-  },
-})
+import { storeToRefs } from 'pinia'
+import { useUsersStore } from 'src/stores/admin/UsersStore'
+import { ref } from 'vue'
+
+import type { QTableColumn } from 'quasar'
 
 const usersStore = useUsersStore()
 const { users, count } = storeToRefs(usersStore)
 
-const usersList = ref()
+const tableColumns: QTableColumn[] = [
+  { name: 'name', label: 'Nombre', field: 'nombre', align: 'left' },
+  { name: 'surname', label: 'Apellidos', field: 'apellidos', align: 'left' },
+  { name: 'idcard', label: 'DNI', field: 'nif', align: 'left' },
+  { name: 'email', label: 'Correo', field: 'email', align: 'left' },
+  { name: 'phone', label: 'Teléfono', field: 'telefono', align: 'left' },
+  { name: 'actions', label: 'Acciones', field: '', align: 'left' },
+]
+
 const loading = ref(false)
-const filter = ref('')
 
 const pagination = ref({
   page: 1,
@@ -37,56 +40,29 @@ async function onRequest(props: any) {
   } else {
     await usersStore.getAllUsers(page - 1, rowsPerPage)
   }
+
   // Actualizamos los datos de la paginación
   pagination.value.rowsNumber = count.value
   pagination.value.page = page
   pagination.value.rowsPerPage = rowsPerPage
   loading.value = false
 }
-// Carga inicial de datos de la tabla
-onMounted(async () => {
-  usersList.value.requestServerInteraction()
-})
 </script>
 
 <template>
-  <q-table
-    ref="usersList"
-    title="Listado de usuarios"
-    :columns="columns"
-    :rows="users"
-    :filter="filter"
-    :pagination-label="(start, end, total) => `${start} - ${end} de ${total}`"
-    rows-per-page-label="Filas por página"
-    :rows-per-page-options="[5, 10, 25, 100]"
-    no-data-label="No hay datos disponibles"
-    no-results-label="No se encontraron resultados"
-    v-model:pagination="pagination"
+  <EntityList
+    tableTitle="Listado de usuarios"
+    :columns="tableColumns"
+    :entities="users"
+    :rowsNumber="count"
     :loading="loading"
-    @request="onRequest"
-    flat
-    bordered
+    v-model:pagination="pagination"
+    @table:request="onRequest($event)"
   >
-    <template v-slot:top-right>
-      <q-input borderless dense debounce="300" v-model="filter" placeholder="Buscar">
-        <template v-slot:append>
-          <q-icon name="search" />
-        </template>
-      </q-input>
+    <template #actions="props">
+      <q-td :props="props" class="actions-column">
+        <q-btn icon="visibility" color="green" size="sm" round />
+      </q-td>
     </template>
-
-    <template #body-cell-actions="props">
-      <slot name="actions" v-bind="props" />
-    </template>
-  </q-table>
+  </EntityList>
 </template>
-
-<style scoped>
-.q-table__container {
-  background-color: #f7faff;
-}
-
-.actions-column > .q-btn:not(:last-child) {
-  margin-right: 0.25rem;
-}
-</style>
