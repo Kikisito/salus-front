@@ -61,7 +61,6 @@ function toggleDrawer() {
 const menuItems = [
   { label: 'Inicio', icon: 'home', path: '/admin/home' },
   { label: 'Médicos', icon: 'medical_information', path: '/admin/doctors' },
-  { label: 'Horarios médicos', icon: 'calendar_month', path: '/admin/schedules' },
   { label: 'Usuarios', icon: 'group', path: '/admin/patients' },
   { label: 'Configuración', icon: 'settings', path: '/admin/config', separator: true },
   { label: 'Volver a mi área personal', icon: 'arrow_back', path: '/home' },
