@@ -95,9 +95,19 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/admin/IndexPage.vue'),
       },
       {
-        name: 'admin-patients',
         path: 'patients',
-        component: () => import('pages/admin/PatientsPage.vue'),
+        children: [
+          {
+            name: 'admin-patients',
+            path: '',
+            component: () => import('pages/admin/PatientsPage.vue'),
+          },
+          {
+            name: 'admin-patient',
+            path: ':id',
+            component: () => import('pages/admin/PatientDetailsPage.vue'),
+          },
+        ],
       },
     ],
   },

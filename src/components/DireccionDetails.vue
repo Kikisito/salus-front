@@ -67,5 +67,5 @@ defineProps({
     </q-item>
   </q-list>
 
-  <span v-else>No tienes ninguna dirección especificada</span>
+  <span v-else>No hay ninguna dirección asociada</span>
 </template>

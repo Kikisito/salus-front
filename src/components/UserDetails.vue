@@ -53,6 +53,8 @@ defineProps({
         </q-item-label>
       </q-item-section>
     </q-item>
+
+    <slot name="extraFields" />
   </q-list>
 
   <span v-else>No se han podido cargar los datos del perfil</span>

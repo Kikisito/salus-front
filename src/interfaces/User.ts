@@ -12,4 +12,5 @@ export interface User {
   direccion: Direccion
   password: string
   rolesList: string[]
+  restricted: boolean
 }

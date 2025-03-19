@@ -61,7 +61,13 @@ async function onRequest(props: any) {
   >
     <template #actions="props">
       <q-td :props="props" class="actions-column">
-        <q-btn icon="visibility" color="green" size="sm" round />
+        <q-btn
+          icon="visibility"
+          color="green"
+          size="sm"
+          round
+          @click="$router.push({ name: 'admin-patient', params: { id: props.row.id } })"
+        />
       </q-td>
     </template>
   </EntityList>
