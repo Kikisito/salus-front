@@ -119,7 +119,7 @@ onMounted(async () => {
 <template>
   <q-page padding>
     <div class="row justify-evenly">
-      <div class="col-12 col-md-6">
+      <div class="col-12 col-md-9">
         <div class="section-header row items-center">
           <q-btn flat round icon="arrow_back" @click="$router.back()" />
           <div>

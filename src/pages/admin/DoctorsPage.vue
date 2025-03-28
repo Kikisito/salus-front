@@ -5,7 +5,7 @@ import DoctorsList from 'src/components/admin/DoctorsList.vue'
 <template>
   <q-page padding>
     <div class="row justify-evenly">
-      <div class="col-12 col-md-6">
+      <div class="col-12 col-md-9">
         <div class="section-header">
           <div class="text-h6">Médicos</div>
           <div class="text-subtitle">Listado de médicos registrados</div>
