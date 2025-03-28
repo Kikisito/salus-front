@@ -37,7 +37,9 @@ export const useDoctorStore = defineStore('doctorStore', {
     ): Promise<ServiceAnswer<PerfilMedico[] | null>> {
       return handleRequest(
         async () => {
-          const response = await api.get('/user/search/' + search + '/' + page + '/' + limit)
+          const response = await api.get(
+            '/doctor-profiles/search/' + search + '/' + page + '/' + limit,
+          )
           this.count = await response.data.count
           this.doctors = await response.data.doctors
 
