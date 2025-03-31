@@ -117,6 +117,11 @@ const routes: RouteRecordRaw[] = [
             path: '',
             component: () => import('pages/admin/DoctorsPage.vue'),
           },
+          {
+            name: 'admin-doctor',
+            path: ':id',
+            component: () => import('pages/admin/DoctorDetailsPage.vue'),
+          },
         ],
       },
     ],

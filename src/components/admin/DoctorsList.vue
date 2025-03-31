@@ -72,7 +72,7 @@ async function onRequest(props: any) {
           color="green"
           size="sm"
           round
-          @click="$router.push({ name: 'admin-doctor', params: { id: props.row.user.id } })"
+          @click="$router.push({ name: 'admin-doctor', params: { id: props.row.id } })"
         />
       </q-td>
     </template>
