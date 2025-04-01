@@ -60,6 +60,9 @@ function toggleDrawer() {
 
 const menuItems = [
   { label: 'Inicio', icon: 'home', path: '/admin/home' },
+  { label: 'Centros médicos', icon: 'domain', path: '/admin/medical-centers' },
+  { label: 'Consultas', icon: 'meeting_room', path: '/admin/rooms' },
+  { label: 'Especialidades', icon: 'medical_services', path: '/admin/specialties' },
   { label: 'Médicos', icon: 'medical_information', path: '/admin/doctors' },
   { label: 'Usuarios', icon: 'group', path: '/admin/patients' },
   { label: 'Configuración', icon: 'settings', path: '/admin/config', separator: true },

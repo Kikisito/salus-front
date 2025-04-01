@@ -96,6 +96,16 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/admin/IndexPage.vue'),
       },
       {
+        path: 'medical-centers',
+        children: [
+          {
+            name: 'admin-medical-centers',
+            path: '',
+            component: () => import('pages/admin/MedicalCentersListPage.vue'),
+          },
+        ],
+      },
+      {
         path: 'patients',
         children: [
           {
