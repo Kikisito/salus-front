@@ -79,6 +79,7 @@ const routes: RouteRecordRaw[] = [
     path: '/profesional',
     component: () => import('layouts/ProfesionalLayout.vue'),
     children: [],
+    meta: { requiresAuth: true, requiresProfesional: true },
   },
   {
     path: '/admin',
@@ -125,6 +126,7 @@ const routes: RouteRecordRaw[] = [
         ],
       },
     ],
+    meta: { requiresAuth: true, requiresAdmin: true },
   },
   {
     path: '/auth',

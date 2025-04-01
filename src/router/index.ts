@@ -7,6 +7,7 @@ import {
 } from 'vue-router'
 import routes from './routes'
 import { useAuthStore } from 'src/stores/AuthStore'
+import { useUserStore } from 'src/stores/UserStore'
 
 /*
  * If not building with SSR mode, you can
@@ -36,6 +37,7 @@ export default defineRouter(function (/* { store, ssrContext } */) {
 
   Router.beforeEach((to, from, next) => {
     const authStore = useAuthStore()
+    const userStore = useUserStore()
 
     if (to.matched.some((record) => record.meta.requiresAuth) && !authStore.isAuthenticated) {
       next('/auth/login')
@@ -45,6 +47,24 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     ) {
       next('/')
     } else {
+      // Check if the route requires admin access
+      if (to.matched.some((record) => record.meta.requiresAdmin)) {
+        // Check if the user is an admin
+        if (!userStore.hasRole('ADMIN')) {
+          // Redirect to the home page or show an error message
+          next('/')
+          return
+        }
+      } else if (to.matched.some((record) => record.meta.requiresProfesional)) {
+        // Check if the user is a professional
+        if (!userStore.hasRole('PROFESIONAL')) {
+          // Redirect to the home page or show an error message
+          next('/')
+          return
+        }
+      }
+
+      // If the user is authenticated and the site is public, allow access to the route
       next()
     }
   })
