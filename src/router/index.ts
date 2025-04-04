@@ -35,10 +35,16 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   })
 
-  Router.beforeEach((to, from, next) => {
+  Router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore()
     const userStore = useUserStore()
 
+    // Check if the user store is loaded
+    if (authStore.isAuthenticated && !userStore.user) {
+      await userStore.getCurrentProfile() // the result is ignored, this is just to load the store
+    }
+
+    // Verifications
     if (to.matched.some((record) => record.meta.requiresAuth) && !authStore.isAuthenticated) {
       next('/auth/login')
     } else if (
