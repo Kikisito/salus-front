@@ -4,28 +4,52 @@ import EntityList from '../EntityList.vue'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 
-import type { QTableColumn } from 'quasar'
-import { useDoctorStore } from 'src/stores/admin/DoctorStore'
+import { Dialog, Notify, type QTableColumn } from 'quasar'
+import { useMedicalCenterStore } from 'src/stores/admin/MedicalCenterStore'
+import MedicalCenterDetails from './MedicalCenterDetails.vue'
+import type { MedicalCenter } from 'src/interfaces/MedicalCenter'
 
-const doctorStore = useDoctorStore()
-const { doctors, count } = storeToRefs(doctorStore)
+const medicalCenterStore = useMedicalCenterStore()
+const { medicalCenters, count } = storeToRefs(medicalCenterStore)
 
 const tableColumns: QTableColumn[] = [
-  { name: 'name', label: 'Nombre', field: (row) => row.user.nombre, align: 'left' },
-  { name: 'surname', label: 'Apellidos', field: (row) => row.user.apellidos, align: 'left' },
-  { name: 'idcard', label: 'DNI', field: (row) => row.user.nif, align: 'left' },
-  { name: 'email', label: 'Correo', field: (row) => row.user.email, align: 'left' },
-  { name: 'phone', label: 'Teléfono', field: (row) => row.user.telefono, align: 'left' },
-  {
-    name: 'numcol',
-    label: 'Número de Colegiado',
-    field: (row) => row.numeroColegiado,
-    align: 'left',
-  },
+  { name: 'name', label: 'Nombre', field: (row) => row.nombre, align: 'left' },
+  { name: 'phone', label: 'Teléfono', field: (row) => row.telefono, align: 'left' },
+  { name: 'email', label: 'Email', field: (row) => row.email, align: 'left' },
   { name: 'actions', label: 'Acciones', field: '', align: 'left' },
 ]
 
 const loading = ref(false)
+
+async function showMedicalCenter(id: number) {
+  // Solicitamos los datos del centro médico al servidor
+  const medicalCenterResponse = await medicalCenterStore.getMedicalCenter(id)
+
+  // Si la respuesta es exitosa, mostramos el diálogo con los datos del centro médico
+  let medicalCenter: MedicalCenter | null = null
+  if (medicalCenterResponse.success) {
+    medicalCenter = medicalCenterResponse.data
+  } else {
+    // Si hubo un error, mostramos un mensaje de error
+    Notify.create({
+      type: 'negative',
+      message: 'Error al cargar el centro médico',
+    })
+    return
+  }
+
+  console.log('medicalCenter', medicalCenterResponse)
+
+  Dialog.create({
+    component: MedicalCenterDetails,
+    componentProps: {
+      medicalCenter: medicalCenter,
+    },
+  }).onDismiss(() => {
+    // Aquí puedes manejar la respuesta del diálogo si es necesario
+    console.log('OK')
+  })
+}
 
 const pagination = ref({
   page: 1,
@@ -41,10 +65,10 @@ async function onRequest(props: any) {
   loading.value = true
   // Si hay un filtro, aplicamos el método específico de búsqueda
   if (filter) {
-    await doctorStore.search(filter, page - 1, rowsPerPage)
+    //await doctorStore.search(filter, page - 1, rowsPerPage)
     // Si no, cargamos todos los usuarios
   } else {
-    await doctorStore.getAll(page - 1, rowsPerPage)
+    await medicalCenterStore.getAllMedicalCenters(page - 1, rowsPerPage)
   }
 
   // Actualizamos los datos de la paginación
@@ -57,9 +81,9 @@ async function onRequest(props: any) {
 
 <template>
   <EntityList
-    tableTitle="Listado de médicos"
+    tableTitle="Listado de centros médicos"
     :columns="tableColumns"
-    :entities="doctors"
+    :entities="medicalCenters"
     :rowsNumber="count"
     :loading="loading"
     v-model:pagination="pagination"
@@ -72,7 +96,7 @@ async function onRequest(props: any) {
           color="green"
           size="sm"
           round
-          @click="$router.push({ name: 'admin-doctor', params: { id: props.row.id } })"
+          @click="showMedicalCenter(props.row.id)"
         />
       </q-td>
     </template>

@@ -28,6 +28,20 @@ export const useMedicalCenterStore = defineStore('medicalCenterStore', {
         },
       )
     },
+
+    async getMedicalCenter(id: number): Promise<ServiceAnswer<MedicalCenter | null>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get('/medical-centers/' + id)
+          const medicalCenter = await response.data
+
+          return medicalCenter
+        },
+        (error) => {
+          throw error
+        },
+      )
+    },
   },
 })
 

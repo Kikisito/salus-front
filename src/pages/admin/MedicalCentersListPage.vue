@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import DoctorsList from 'src/components/admin/DoctorsList.vue'
+import MedicalCentersList from 'src/components/admin/MedicalCentersList.vue'
 </script>
 
 <template>
@@ -14,7 +14,7 @@ import DoctorsList from 'src/components/admin/DoctorsList.vue'
           </div>
         </div>
 
-        <DoctorsList />
+        <MedicalCentersList />
       </div>
     </div>
   </q-page>
