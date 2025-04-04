@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import MedicalCentersList from 'src/components/admin/MedicalCentersList.vue'
+import MedicalCentersList from 'src/components/admin/medical-centers/MedicalCentersList.vue'
 </script>
 
 <template>

@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import EntityList from '../EntityList.vue'
+import EntityList from 'src/components/EntityList.vue'
 
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 
 import { Dialog, Notify, type QTableColumn } from 'quasar'
 import { useMedicalCenterStore } from 'src/stores/admin/MedicalCenterStore'
-import MedicalCenterDetails from './MedicalCenterDetails.vue'
+import MedicalCenterDetails from 'src/components/admin/medical-centers/MedicalCenterDetails.vue'
 import type { MedicalCenter } from 'src/interfaces/MedicalCenter'
 
 const medicalCenterStore = useMedicalCenterStore()
