@@ -29,6 +29,27 @@ export const useMedicalCenterStore = defineStore('medicalCenterStore', {
       )
     },
 
+    async searchMedicalCenters(
+      search: string,
+      page: number = 0,
+      limit: number = 10,
+    ): Promise<ServiceAnswer<MedicalCenter[]>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get(
+            '/medical-centers/search/' + search + '/' + page + '/' + limit,
+          )
+
+          this.count = await response.data.count
+          this.medicalCenters = await response.data.medicalCenters
+          return this.medicalCenters
+        },
+        (error) => {
+          throw error
+        },
+      )
+    },
+
     async getMedicalCenter(id: number): Promise<ServiceAnswer<MedicalCenter>> {
       return handleRequest(
         async () => {

@@ -9,6 +9,7 @@ const props = defineProps({
   entities: {
     type: Array,
     required: true,
+    default: () => [],
   },
 })
 
