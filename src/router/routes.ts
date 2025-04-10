@@ -116,6 +116,16 @@ const routes: RouteRecordRaw[] = [
         ],
       },
       {
+        path: 'specialties',
+        children: [
+          {
+            name: 'admin-specialties',
+            path: '',
+            component: () => import('pages/admin/SpecialtiesPage.vue'),
+          },
+        ],
+      },
+      {
         path: 'patients',
         children: [
           {
