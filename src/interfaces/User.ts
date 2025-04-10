@@ -1,6 +1,7 @@
 import type { Direccion } from './Direccion'
 
 export interface User {
+  id?: number
   nombre: string
   apellidos: string
   nif: string

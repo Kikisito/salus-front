@@ -68,14 +68,7 @@ const menuItems = [
   { label: 'Mensajería', icon: 'chat', path: '/chats', show: true },
   { label: 'Informes', icon: 'description', path: '/reports', show: true },
   { label: 'Recetas', icon: 'receipt', path: '/recipes', show: true },
-  { label: 'Pruebas y Analíticas', icon: 'science', path: '/tests', show: true },
-  {
-    label: 'Tratamientos',
-    icon: 'medical_services',
-    path: '/treatments',
-    show: true,
-    separator: true,
-  },
+  { label: 'Pruebas y Analíticas', icon: 'science', path: '/tests', show: true, separator: true },
   {
     label: 'Administración',
     icon: 'admin_panel_settings',

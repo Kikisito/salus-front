@@ -4,9 +4,9 @@ import { QCalendarDay } from '@quasar/quasar-ui-qcalendar'
 import { useRoute } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import DireccionDetails from 'src/components/DireccionDetails.vue'
-import PerfilMedicoModal from 'src/components/PerfilMedicoModal.vue'
 import { useDoctorStore } from 'src/stores/admin/DoctorStore'
+import { Dialog, Notify } from 'quasar'
+import DoctorSpecialtiesDialog from 'src/components/admin/doctors/DoctorSpecialtiesDialog.vue'
 
 const route = useRoute()
 const doctorStore = useDoctorStore()
@@ -15,9 +15,6 @@ const { inspectedDoctor } = storeToRefs(doctorStore)
 
 const rawDoctorId: string = route.params.id as string
 const doctorId = parseInt(rawDoctorId)
-
-const showDireccionModal = ref(false)
-const showPerfilMedicoModal = ref(false)
 
 const loading = ref(false)
 const calendar = ref<QCalendarDay>()
@@ -51,12 +48,56 @@ const getEvents = (timestamp: Timestamp) => {
   })
 }
 
+async function changeLicense() {
+  Dialog.create({
+    title: 'Modificar número de colegiado',
+    message: 'Introduce el nuevo número de colegiado',
+    prompt: {
+      model: inspectedDoctor.value!.numeroColegiado,
+      type: 'text',
+      label: 'Número de colegiado',
+      required: true,
+      rules: [(val: string) => !!val || 'El número de colegiado es obligatorio'],
+    },
+    cancel: true,
+    persistent: true,
+  }).onOk(async (license) => {
+    const response = await doctorStore.changeLicense(inspectedDoctor.value!.id, license)
+
+    if (response.success) {
+      Notify.create({
+        type: 'positive',
+        message: 'Número de colegiado modificado correctamente',
+      })
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: response.error,
+      })
+    }
+  })
+}
+
+async function manageSpecialties() {
+  Dialog.create({
+    component: DoctorSpecialtiesDialog,
+    componentProps: {
+      medicalProfile: inspectedDoctor.value,
+    },
+    persistent: true,
+  })
+}
+
 async function getData() {
   loading.value = true
   if (doctorId) {
     await doctorStore.getDoctorData(doctorId)
   } else {
     console.error('El ID del usuario no es válido. No se ha podido convertir a número.')
+    Notify.create({
+      type: 'negative',
+      message: 'No se ha podido cargar la información del perfil.',
+    })
   }
   loading.value = false
 }
@@ -79,6 +120,19 @@ onMounted(async () => {
             <div class="text-subtitle">
               Número de colegiado: {{ inspectedDoctor.numeroColegiado }}
             </div>
+
+            <q-badge
+              v-for="especialidad in inspectedDoctor.especialidades"
+              :key="especialidad.id"
+              color="secondary"
+              class="q-mr-xs q-mb-xs"
+              text-color="white"
+            >
+              {{ especialidad.nombre }}
+            </q-badge>
+            <q-badge v-if="!inspectedDoctor.especialidades?.length" color="grey" text-color="white">
+              Sin especialidades
+            </q-badge>
           </div>
 
           <div v-else>
@@ -88,8 +142,20 @@ onMounted(async () => {
           <q-space />
           <q-btn-dropdown label="Acciones" color="primary" icon="settings" rounded>
             <q-list>
-              <!-- Gestión de perfil profesional -->
-              <q-item clickable v-close-popup @click="showPerfilMedicoModal = true">
+              <!-- Número de colegiado -->
+              <q-item clickable v-close-popup @click="changeLicense()">
+                <q-item-section avatar>
+                  <q-avatar icon="edit" />
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label>Modificar número de colegiado</q-item-label>
+                  <q-item-label caption>Modifica el número de colegiado del médico</q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <!-- Especialidades -->
+              <q-item clickable v-close-popup @click="manageSpecialties()">
                 <q-item-section avatar>
                   <q-avatar icon="person_add" />
                 </q-item-section>
@@ -101,7 +167,7 @@ onMounted(async () => {
               </q-item>
 
               <!-- Agenda -->
-              <q-item clickable v-close-popup @click="showPerfilMedicoModal = true">
+              <q-item clickable v-close-popup>
                 <q-item-section avatar>
                   <q-avatar icon="edit_calendar" />
                 </q-item-section>
@@ -169,30 +235,7 @@ onMounted(async () => {
                 </template>
               </q-calendar-day>
             </div>
-
-            <div class="col-12 col-md-6">
-              <div class="row section-header">
-                <div class="text-h6">Dirección asociada</div>
-                <q-space />
-                <q-chip
-                  v-if="inspectedDoctor"
-                  color="primary"
-                  text-color="white"
-                  label="Editar"
-                  icon="edit"
-                  clickable
-                  @click="showDireccionModal = true"
-                />
-              </div>
-              <q-card flat bordered>
-                <q-card-section>
-                  <DireccionDetails :direccion="inspectedDoctor.user.direccion" />
-                </q-card-section>
-              </q-card>
-            </div>
           </div>
-
-          <PerfilMedicoModal v-model:show="showPerfilMedicoModal" />
         </template>
 
         <q-card v-else-if="loading">

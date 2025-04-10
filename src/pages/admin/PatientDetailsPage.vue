@@ -1,19 +1,18 @@
 <script lang="ts" setup>
 import UserDetails from 'src/components/UserDetails.vue'
 
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { useUsersStore } from 'src/stores/admin/UsersStore'
 import { storeToRefs } from 'pinia'
 import DireccionDetails from 'src/components/DireccionDetails.vue'
-import { Notify } from 'quasar'
+import { Dialog, Notify } from 'quasar'
 import type { Direccion } from 'src/interfaces/Direccion'
 import type { User } from 'src/interfaces/User'
 import ProfileChangeUserDataModal from 'src/components/ProfileChangeUserDataModal.vue'
 import DireccionModal from 'src/components/DireccionModal.vue'
-import PerfilMedicoModal from 'src/components/PerfilMedicoModal.vue'
-import type { PerfilMedico } from 'src/interfaces/PerfilMedico'
 
+const router = useRouter()
 const route = useRoute()
 const usersStore = useUsersStore()
 const { inspectedUser } = storeToRefs(usersStore)
@@ -23,7 +22,6 @@ const userId = parseInt(rawUserId)
 
 const showUserDataModal = ref(false)
 const showDireccionModal = ref(false)
-const showPerfilMedicoModal = ref(false)
 
 const loading = ref(false)
 
@@ -91,24 +89,43 @@ async function restrictUser(userId: number, restrict: boolean) {
   }
 }
 
-async function setPerfilMedico(perfilMedico: PerfilMedico) {
-  //const response = await usersStore.setPerfilMedico(userId, perfilMedico)
-  console.log(perfilMedico)
-  const response = { success: true, error: '' }
-  if (response.success) {
-    Notify.create({
-      message: 'Perfil médico actualizado correctamente',
-      color: 'positive',
-      icon: 'check',
-    })
-    showPerfilMedicoModal.value = false
-  } else {
-    Notify.create({
-      message: response.error,
-      color: 'negative',
-      icon: 'error',
-    })
-  }
+async function openMedicalProfileDialog() {
+  Dialog.create({
+    title: 'Convertir en profesional',
+    message: 'Para convertir al usuario en profesional, introduce su número de colegiado',
+    prompt: {
+      model: '',
+      type: 'text',
+      isValid: (val) => !!val,
+      label: 'Número de colegiado',
+    },
+    cancel: true,
+    persistent: true,
+  }).onOk(async (data) => {
+    const response = await usersStore.convertToProfessional(userId, data)
+    if (response.success) {
+      // Notificación de éxito
+      Notify.create({
+        message: 'El usuario ha sido convertido a profesional correctamente',
+        color: 'positive',
+        icon: 'check',
+      })
+
+      // Redirección al perfil del nuevo médico
+      if (response.data) {
+        router.push({
+          name: 'admin-doctor',
+          params: { id: response.data.id },
+        })
+      }
+    } else {
+      Notify.create({
+        message: response.error,
+        color: 'negative',
+        icon: 'error',
+      })
+    }
+  })
 }
 
 onMounted(async () => {
@@ -159,7 +176,7 @@ onMounted(async () => {
               </q-item>
 
               <!-- Gestión de perfil profesional -->
-              <q-item clickable v-close-popup @click="showPerfilMedicoModal = true">
+              <q-item clickable v-close-popup @click="openMedicalProfileDialog()">
                 <q-item-section avatar>
                   <q-avatar icon="person_add" />
                 </q-item-section>
@@ -256,11 +273,6 @@ onMounted(async () => {
             v-model:show="showDireccionModal"
             :direccion="inspectedUser.direccion"
             @form:submit="setDireccion($event)"
-          />
-
-          <PerfilMedicoModal
-            v-model:show="showPerfilMedicoModal"
-            @form:submit="setPerfilMedico($event)"
           />
         </template>
 

@@ -3,7 +3,7 @@
     <q-header elevated>
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleDrawer" />
-        <q-toolbar-title>Área profesional de Project Salus</q-toolbar-title>
+        <q-toolbar-title>Área profesional</q-toolbar-title>
       </q-toolbar>
     </q-header>
 
