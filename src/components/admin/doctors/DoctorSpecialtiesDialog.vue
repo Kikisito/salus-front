@@ -37,9 +37,18 @@ async function addSpecialty() {
   await doctorStore
     .addSpecialty(profile.value.id, selectedSpecialty.value.id)
     .then(() => {
+      // Notificamos de éxito
       Notify.create({
         type: 'positive',
         message: 'Especialidad añadida correctamente',
+      })
+
+      // Añadimos la especialidad a la lista local
+      profile.value.especialidades.push(selectedSpecialty.value)
+
+      // Actualizamos la lista de especialidades
+      filteredSpecialties.value = specialties.value.filter((item) => {
+        return !profile.value.especialidades.some((especialidad) => especialidad.id === item.id)
       })
     })
     .catch(() => {
@@ -51,14 +60,6 @@ async function addSpecialty() {
     .finally(() => {
       Loading.hide()
     })
-
-  // Añadimos la especialidad a la lista local
-  profile.value.especialidades.push(selectedSpecialty.value)
-
-  // Actualizamos la lista de especialidades
-  filteredSpecialties.value = filteredSpecialties.value.filter(
-    (especialidad) => especialidad.id !== selectedSpecialty.value.id,
-  )
 
   // Limpiamos la selección
   selectedSpecialty.value = null as unknown as Especialidad
@@ -73,10 +74,21 @@ async function removeSpecialty(specialtyId: number) {
   await doctorStore
     .removeSpecialty(profile.value.id, specialtyId)
     .then(() => {
+      // Notificamos de éxito
       Notify.create({
         type: 'positive',
         message: 'Especialidad eliminada correctamente',
       })
+
+      // Eliminamos la especialidad de la lista de especialidades local del perfil
+      profile.value.especialidades = profile.value.especialidades.filter(
+        (especialidad) => especialidad.id !== specialtyId,
+      )
+
+      // Actualizamos la lista de especialidades
+      filteredSpecialties.value = specialties.value.filter(
+        (especialidad) => especialidad.id !== specialtyId,
+      )
     })
     .catch(() => {
       Notify.create({
@@ -87,19 +99,6 @@ async function removeSpecialty(specialtyId: number) {
     .finally(() => {
       Loading.hide()
     })
-
-  // Eliminar la especialidad de la lista de especialidades local del perfil
-  const index = profile.value.especialidades.findIndex(
-    (especialidad) => especialidad.id === specialtyId,
-  )
-  if (index !== -1) {
-    profile.value.especialidades.splice(index, 1)
-  }
-
-  // Actualizamos la lista de especialidades
-  filteredSpecialties.value = filteredSpecialties.value.filter(
-    (especialidad) => especialidad.id !== selectedSpecialty.value.id,
-  )
 
   // Limpiamos la selección
   selectedSpecialty.value = null as unknown as Especialidad
