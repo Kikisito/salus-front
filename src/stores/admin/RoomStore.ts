@@ -26,6 +26,25 @@ export const useRoomStore = defineStore('roomStore', {
       )
     },
 
+    async searchRooms(
+      query: string,
+      page: number = 0,
+      limit: number = 10,
+    ): Promise<ServiceAnswer<Room[]>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get('/rooms/search/' + query + '/' + page + '/' + limit)
+          this.count = await response.data.count
+          this.rooms = await response.data.rooms
+
+          return this.rooms
+        },
+        (error) => {
+          throw error
+        },
+      )
+    },
+
     async getRoom(id: number): Promise<ServiceAnswer<Room>> {
       return handleRequest(
         async () => {

@@ -52,6 +52,8 @@ onMounted(async () => {
           </template>
         </q-input>
       </slot>
+
+      <slot name="top-right-additional" />
     </template>
 
     <template #body-cell-actions="props">

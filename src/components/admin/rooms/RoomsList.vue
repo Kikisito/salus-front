@@ -182,7 +182,7 @@ async function onRequest(props: any) {
 
   // Si hay un filtro, aplicamos el método específico de búsqueda
   if (filter) {
-    //await doctorStore.search(filter, page - 1, rowsPerPage)
+    await roomStore.searchRooms(filter, page - 1, rowsPerPage)
     // Si no, cargamos todos los usuarios
   } else {
     await roomStore.getAllRooms(page - 1, rowsPerPage)
@@ -206,13 +206,14 @@ async function onRequest(props: any) {
     v-model:pagination="pagination"
     @table:request="onRequest($event)"
   >
-    <template #top-right>
+    <template #top-right-additional>
       <q-btn
         icon="meeting_room"
         label="Añadir consulta"
         color="primary"
         @click="openRoomAddForm()"
         size="sm"
+        class="q-ml-md"
       />
     </template>
 
