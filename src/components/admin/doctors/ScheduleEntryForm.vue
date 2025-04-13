@@ -204,7 +204,7 @@ const filterRooms = async (val: string, update: (callback: () => void) => void) 
             </div>
           </div>
 
-          <q-btn class="q-mt-md full-width" color="primary" label="Guardar" type="submit" />
+          <q-btn class="q-mt-md full-width" color="grey-9" label="Aceptar" type="submit" outline />
         </q-form>
       </q-card-section>
     </q-card>
