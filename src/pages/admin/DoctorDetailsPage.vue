@@ -5,44 +5,40 @@ import { useRoute } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDoctorStore } from 'src/stores/admin/DoctorStore'
-import { Dialog, Notify } from 'quasar'
+import { Dialog, Loading, Notify } from 'quasar'
 import DoctorSpecialtiesDialog from 'src/components/admin/doctors/DoctorSpecialtiesDialog.vue'
+import { useScheduleStore } from 'src/stores/admin/ScheduleStore'
+import type { MedicalAgenda } from 'src/interfaces/MedicalAgenda'
 
 const route = useRoute()
-const doctorStore = useDoctorStore()
 
+const doctorStore = useDoctorStore()
 const { inspectedDoctor } = storeToRefs(doctorStore)
+
+const scheduleStore = useScheduleStore()
+const { schedules } = storeToRefs(scheduleStore)
 
 const rawDoctorId: string = route.params.id as string
 const doctorId = parseInt(rawDoctorId)
 
-const loading = ref(false)
 const calendar = ref<QCalendarDay>()
 
 const getEvents = (timestamp: Timestamp) => {
-  const mockEvents = [
-    {
-      id: 1,
-      especialidad: 'Cardiología',
-      start: new Date('2023-10-01T09:10:00').toISOString(),
-      end: new Date('2023-10-01T12:30:00').toISOString(),
-      weekday: 1,
-    },
-    {
-      id: 2,
-      especialidad: 'Pediatría',
-      start: new Date('2023-10-02T11:25:00').toISOString(),
-      end: new Date('2023-10-02T12:00:00').toISOString(),
-      weekday: 2,
-    },
-  ]
+  return schedules.value.filter((event) => {
+    // Parse time from "hh:mm:ss" format
+    const [eventHour] = event.horaInicio.split(':').map(Number)
 
-  return mockEvents.filter((event) => {
-    const eventDate = new Date(event.start)
-    const eventWeekday = eventDate.getDay()
-
-    const eventHour = eventDate.getHours()
-    console.log('timestamp', timestamp)
+    // Convert enum string to corresponding weekday number
+    const weekdayMap: Record<string, number> = {
+      MONDAY: 1,
+      TUESDAY: 2,
+      WEDNESDAY: 3,
+      THURSDAY: 4,
+      FRIDAY: 5,
+      SATURDAY: 6,
+      SUNDAY: 0,
+    }
+    const eventWeekday = weekdayMap[event.diaSemana]
 
     return eventWeekday === timestamp.weekday && eventHour === timestamp.hour
   })
@@ -89,9 +85,13 @@ async function manageSpecialties() {
 }
 
 async function getData() {
-  loading.value = true
+  Loading.show({
+    message: 'Cargando información del médico...',
+  })
+
   if (doctorId) {
     await doctorStore.getDoctorData(doctorId)
+    await scheduleStore.getDoctorSchedules(doctorId)
   } else {
     console.error('El ID del usuario no es válido. No se ha podido convertir a número.')
     Notify.create({
@@ -99,12 +99,56 @@ async function getData() {
       message: 'No se ha podido cargar la información del perfil.',
     })
   }
-  loading.value = false
+
+  Loading.hide()
 }
 
 onMounted(async () => {
   await getData()
 })
+
+// Métodos auxiliares para calcular la posición y altura de los eventos en el calendario
+function calculateTop(event: MedicalAgenda): string {
+  const [startHour, startMinutes]: number[] = event.horaInicio.split(':').map(Number)
+  console.log('startHour', startHour)
+  console.log('startMinutes', startMinutes)
+
+  if (
+    startHour === undefined ||
+    startHour === null ||
+    startMinutes === undefined ||
+    startMinutes === null
+  ) {
+    console.error('Error al calcular la posición superior del evento')
+    return ''
+  }
+
+  const top: number = (startMinutes / 60) * 64
+  return top + 'px'
+}
+
+function calculateHeight(event: MedicalAgenda): string {
+  const [startHour, startMinutes]: number[] = event.horaInicio.split(':').map(Number)
+  const [endHour, endMinutes]: number[] = event.horaFin.split(':').map(Number)
+
+  if (
+    startHour === undefined ||
+    startHour === null ||
+    startMinutes === undefined ||
+    startMinutes === null ||
+    endHour === undefined ||
+    endHour === null ||
+    endMinutes === undefined ||
+    endMinutes === null
+  ) {
+    console.error('Error al calcular la altura del evento')
+    return ''
+  }
+
+  // Cada hora equivale a 64px, por lo que (Horas * 64 + ((minutos / 60) * 64))
+  const height: number = (endHour - startHour) * 64 + ((endMinutes - startMinutes) / 60) * 64
+  return height + 'px'
+}
 </script>
 
 <template>
@@ -206,29 +250,15 @@ onMounted(async () => {
                     <div
                       class="calendar-event"
                       :style="{
-                        top: (new Date(event.start).getMinutes() / 60) * 64 + 'px',
-                        height:
-                          ((new Date(event.end).getTime() - new Date(event.start).getTime()) /
-                            (60 * 60 * 1000)) *
-                            64 +
-                          'px',
+                        top: calculateTop(event),
+                        height: calculateHeight(event),
                       }"
                     >
-                      <span>{{ event.especialidad }}</span>
+                      <span>{{ event.especialidad.nombre }}</span>
+                      <span>{{ event.consulta.nombre }}</span>
                       <span style="font-size: 9px">
-                        {{
-                          new Date(event.start).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })
-                        }}
-                        a
-                        {{
-                          new Date(event.end).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })
-                        }}
+                        {{ event.horaInicio.split(':').slice(0, 2).join(':') }} a
+                        {{ event.horaFin.split(':').slice(0, 2).join(':') }}
                       </span>
                     </div>
                   </template>
@@ -237,12 +267,6 @@ onMounted(async () => {
             </div>
           </div>
         </template>
-
-        <q-card v-else-if="loading">
-          <q-card-section>
-            <span>Cargando...</span>
-          </q-card-section>
-        </q-card>
 
         <q-card v-else>
           <q-card-section>
