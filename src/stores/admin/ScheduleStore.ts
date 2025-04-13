@@ -2,7 +2,6 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
 import type { MedicalAgenda } from 'src/interfaces/MedicalAgenda'
-import type { RawMedicalAgenda } from 'src/interfaces/RawMedicalAgenda'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
 
 export const useScheduleStore = defineStore('scheduleStore', {
@@ -20,12 +19,13 @@ export const useScheduleStore = defineStore('scheduleStore', {
           return this.schedules
         },
         (error) => {
-          throw error
+          console.error(error)
+          return 'Ha ocurrido un error al obtener la agenda'
         },
       )
     },
 
-    async addScheduleEntry(entry: RawMedicalAgenda): Promise<ServiceAnswer<MedicalAgenda[]>> {
+    async addScheduleEntry(entry: MedicalAgenda): Promise<ServiceAnswer<MedicalAgenda[]>> {
       return handleRequest(
         async () => {
           const response = await api.post('/schedules/add', entry)
@@ -37,15 +37,22 @@ export const useScheduleStore = defineStore('scheduleStore', {
           return schedule
         },
         (error) => {
-          throw error
+          if (error.status === 409) {
+            return 'Este horario colapsa con otro ya existente'
+          } else if (error.status === 404) {
+            return 'Alguno de los datos introducidos no es correcto. Refresca la página e inténtalo de nuevo'
+          }
+
+          console.error(error)
+          return 'Ha ocurrido un error al añadir la entrada'
         },
       )
     },
 
-    async updateSchedule(schedule: MedicalAgenda): Promise<ServiceAnswer<MedicalAgenda[]>> {
+    async updateScheduleEntry(entry: MedicalAgenda): Promise<ServiceAnswer<MedicalAgenda[]>> {
       return handleRequest(
         async () => {
-          const response = await api.put('/rooms/' + schedule.id, schedule)
+          const response = await api.put('/schedules/' + entry.id, entry)
           const updatedSchedule = await response.data
 
           // Actualizamos en la lista local
@@ -57,7 +64,8 @@ export const useScheduleStore = defineStore('scheduleStore', {
           return updatedSchedule
         },
         (error) => {
-          throw error
+          console.error(error)
+          return 'Ha ocurrido un error al actualizar la entrada'
         },
       )
     },

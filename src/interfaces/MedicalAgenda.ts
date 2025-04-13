@@ -3,7 +3,7 @@ import type { PerfilMedico } from './PerfilMedico'
 import type { Room } from './Room'
 
 export interface MedicalAgenda {
-  id?: number
+  id: number
   medico: PerfilMedico
   especialidad: Especialidad
   consulta: Room

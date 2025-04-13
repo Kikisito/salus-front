@@ -6,7 +6,6 @@ import type { Room } from 'src/interfaces/Room'
 import type { PerfilMedico } from 'src/interfaces/PerfilMedico'
 import type { PropType } from 'vue'
 import type { ServiceAnswer } from 'src/interfaces/ServiceAnswer'
-import type { RawMedicalAgenda } from 'src/interfaces/RawMedicalAgenda'
 
 const props = defineProps({
   medicalProfile: {
@@ -37,10 +36,11 @@ const rooms = ref<Room[]>([])
 const isLoadingRooms = ref(false)
 
 // Modelo del formulario
-const scheduleEntry = ref<Partial<RawMedicalAgenda>>({
-  medico: props.medicalProfile.id,
-  especialidad: props.schedule?.especialidad.id,
-  consulta: props.schedule?.consulta.id,
+const scheduleEntry = ref<Partial<MedicalAgenda>>({
+  id: props.schedule?.id,
+  medico: props.medicalProfile,
+  especialidad: props.schedule?.especialidad,
+  consulta: props.schedule?.consulta,
   diaSemana: props.schedule?.diaSemana,
   horaInicio: props.schedule?.horaInicio?.substring(0, 5),
   horaFin: props.schedule?.horaFin?.substring(0, 5),

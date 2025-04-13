@@ -103,12 +103,63 @@ async function addScheduleEntry() {
       message: 'Añadiendo turno...',
     })
 
-    const response = await scheduleStore.addScheduleEntry(scheduleEntry)
+    const rawEntry = {
+      ...scheduleEntry,
+      medico: scheduleEntry.medico.id,
+    }
+
+    const response = await scheduleStore.addScheduleEntry(rawEntry)
 
     if (response.success) {
       Notify.create({
         type: 'positive',
         message: 'Turno añadido correctamente',
+      })
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: response.error,
+      })
+    }
+
+    Loading.hide()
+  })
+}
+
+async function updateScheduleEntry(event: MedicalAgenda) {
+  Dialog.create({
+    component: ScheduleEntryForm,
+    componentProps: {
+      medicalProfile: inspectedDoctor.value,
+      schedule: event,
+      getRooms: roomStore.getAllRooms,
+      searchRooms: roomStore.searchRooms,
+    },
+    persistent: true,
+  }).onOk(async (scheduleEntry) => {
+    Loading.show({
+      message: 'Actualizando turno...',
+    })
+
+    const rawEntry = {
+      ...scheduleEntry,
+      medico: scheduleEntry.medico.id,
+      especialidad:
+        typeof scheduleEntry.especialidad === 'object'
+          ? scheduleEntry.especialidad.id
+          : scheduleEntry.especialidad,
+      consulta:
+        typeof scheduleEntry.consulta === 'object'
+          ? scheduleEntry.consulta.id
+          : scheduleEntry.consulta,
+    }
+
+    const response = await scheduleStore.updateScheduleEntry(rawEntry)
+
+    if (response.success) {
+      Notify.create({
+        type: 'positive',
+        message: 'Turno actualizado correctamente',
       })
     } else {
       Notify.create({
@@ -268,6 +319,7 @@ function calculateHeight(event: MedicalAgenda): string {
                 <div class="text-h6">Turnos de trabajo</div>
                 <q-space />
                 <q-btn
+                  v-if="inspectedDoctor.especialidades.length > 0"
                   color="primary"
                   label="Añadir turno"
                   icon="add"
@@ -275,6 +327,15 @@ function calculateHeight(event: MedicalAgenda): string {
                   class="q-mr-sm"
                   size="sm"
                 />
+
+                <q-badge
+                  v-if="inspectedDoctor.especialidades.length === 0"
+                  color="grey"
+                  text-color="white"
+                  class="q-mr-sm"
+                >
+                  Este médico no tiene especialidades asignadas. No se puede añadir un turno.
+                </q-badge>
               </div>
 
               <q-calendar-day
@@ -297,6 +358,7 @@ function calculateHeight(event: MedicalAgenda): string {
                         top: calculateTop(event),
                         height: calculateHeight(event),
                       }"
+                      @click="updateScheduleEntry(event)"
                     >
                       <span>{{ event.especialidad.nombre }}</span>
                       <span>{{ event.consulta.nombre }}</span>
