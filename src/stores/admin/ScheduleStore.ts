@@ -2,6 +2,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
 import type { MedicalAgenda } from 'src/interfaces/MedicalAgenda'
+import type { RawMedicalAgenda } from 'src/interfaces/RawMedicalAgenda'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
 
 export const useScheduleStore = defineStore('scheduleStore', {
@@ -24,13 +25,13 @@ export const useScheduleStore = defineStore('scheduleStore', {
       )
     },
 
-    async addScheduleEntry(entry: MedicalAgenda): Promise<ServiceAnswer<MedicalAgenda[]>> {
+    async addScheduleEntry(entry: RawMedicalAgenda): Promise<ServiceAnswer<MedicalAgenda[]>> {
       return handleRequest(
         async () => {
           const response = await api.post('/schedules/add', entry)
           const schedule = await response.data
 
-          // Añadimos el nuevo centro médico a la lista local
+          // Añadimos a la lista local
           this.schedules.push(schedule)
 
           return schedule
@@ -47,7 +48,7 @@ export const useScheduleStore = defineStore('scheduleStore', {
           const response = await api.put('/rooms/' + schedule.id, schedule)
           const updatedSchedule = await response.data
 
-          // Actualizamos el centro médico en la lista local
+          // Actualizamos en la lista local
           const index = this.schedules.findIndex((s) => s.id === updatedSchedule.id)
           if (index !== -1) {
             this.schedules[index] = updatedSchedule
@@ -67,7 +68,7 @@ export const useScheduleStore = defineStore('scheduleStore', {
           const response = await api.delete('/schedules/' + id)
           const deleted = response.status === 204
 
-          // Eliminamos el centro médico de la lista local
+          // Eliminamos de la lista local
           this.schedules = this.schedules.filter((s) => s.id !== id)
 
           return deleted

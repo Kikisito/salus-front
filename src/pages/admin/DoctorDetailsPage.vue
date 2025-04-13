@@ -9,6 +9,8 @@ import { Dialog, Loading, Notify } from 'quasar'
 import DoctorSpecialtiesDialog from 'src/components/admin/doctors/DoctorSpecialtiesDialog.vue'
 import { useScheduleStore } from 'src/stores/admin/ScheduleStore'
 import type { MedicalAgenda } from 'src/interfaces/MedicalAgenda'
+import ScheduleEntryForm from 'src/components/admin/doctors/ScheduleEntryForm.vue'
+import { useRoomStore } from 'src/stores/admin/RoomStore'
 
 const route = useRoute()
 
@@ -17,6 +19,8 @@ const { inspectedDoctor } = storeToRefs(doctorStore)
 
 const scheduleStore = useScheduleStore()
 const { schedules } = storeToRefs(scheduleStore)
+
+const roomStore = useRoomStore()
 
 const rawDoctorId: string = route.params.id as string
 const doctorId = parseInt(rawDoctorId)
@@ -84,6 +88,39 @@ async function manageSpecialties() {
   })
 }
 
+async function addScheduleEntry() {
+  Dialog.create({
+    component: ScheduleEntryForm,
+    componentProps: {
+      medicalProfile: inspectedDoctor.value,
+      schedule: null,
+      getRooms: roomStore.getAllRooms,
+      searchRooms: roomStore.searchRooms,
+    },
+    persistent: true,
+  }).onOk(async (scheduleEntry) => {
+    Loading.show({
+      message: 'Añadiendo turno...',
+    })
+
+    const response = await scheduleStore.addScheduleEntry(scheduleEntry)
+
+    if (response.success) {
+      Notify.create({
+        type: 'positive',
+        message: 'Turno añadido correctamente',
+      })
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: response.error,
+      })
+    }
+
+    Loading.hide()
+  })
+}
+
 async function getData() {
   Loading.show({
     message: 'Cargando información del médico...',
@@ -110,8 +147,6 @@ onMounted(async () => {
 // Métodos auxiliares para calcular la posición y altura de los eventos en el calendario
 function calculateTop(event: MedicalAgenda): string {
   const [startHour, startMinutes]: number[] = event.horaInicio.split(':').map(Number)
-  console.log('startHour', startHour)
-  console.log('startMinutes', startMinutes)
 
   if (
     startHour === undefined ||
@@ -231,6 +266,15 @@ function calculateHeight(event: MedicalAgenda): string {
             <div class="col-12">
               <div class="row section-header">
                 <div class="text-h6">Turnos de trabajo</div>
+                <q-space />
+                <q-btn
+                  color="primary"
+                  label="Añadir turno"
+                  icon="add"
+                  @click="addScheduleEntry()"
+                  class="q-mr-sm"
+                  size="sm"
+                />
               </div>
 
               <q-calendar-day
