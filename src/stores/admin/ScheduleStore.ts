@@ -70,7 +70,7 @@ export const useScheduleStore = defineStore('scheduleStore', {
       )
     },
 
-    async deleteRoom(id: number): Promise<ServiceAnswer<boolean>> {
+    async deleteScheduleEntry(id: number): Promise<ServiceAnswer<boolean>> {
       return handleRequest(
         async () => {
           const response = await api.delete('/schedules/' + id)

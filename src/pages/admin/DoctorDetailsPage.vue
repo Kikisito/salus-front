@@ -172,6 +172,35 @@ async function updateScheduleEntry(event: MedicalAgenda) {
   })
 }
 
+async function deleteScheduleEntry(event: MedicalAgenda) {
+  Dialog.create({
+    title: 'Eliminar turno',
+    message: '¿Estás seguro de que quieres eliminar este turno?',
+    cancel: true,
+    persistent: true,
+  }).onOk(async () => {
+    Loading.show({
+      message: 'Eliminando turno...',
+    })
+
+    const response = await scheduleStore.deleteScheduleEntry(event.id)
+
+    if (response.success) {
+      Notify.create({
+        type: 'positive',
+        message: 'Turno eliminado correctamente',
+      })
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: response.error,
+      })
+    }
+
+    Loading.hide()
+  })
+}
+
 async function getData() {
   Loading.show({
     message: 'Cargando información del médico...',
@@ -359,6 +388,7 @@ function calculateHeight(event: MedicalAgenda): string {
                         height: calculateHeight(event),
                       }"
                       @click="updateScheduleEntry(event)"
+                      @contextmenu.prevent="deleteScheduleEntry(event)"
                     >
                       <span>{{ event.especialidad.nombre }}</span>
                       <span>{{ event.consulta.nombre }}</span>
@@ -370,6 +400,9 @@ function calculateHeight(event: MedicalAgenda): string {
                   </template>
                 </template>
               </q-calendar-day>
+              <span class="calendar-info">
+                Haz click izquierdo para editar un turno, click derecho para eliminarlo
+              </span>
             </div>
           </div>
         </template>
@@ -411,5 +444,12 @@ function calculateHeight(event: MedicalAgenda): string {
   span:first-child {
     font-weight: bold;
   }
+}
+
+.calendar-info {
+  color: #6e6e6e;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 20px;
 }
 </style>
