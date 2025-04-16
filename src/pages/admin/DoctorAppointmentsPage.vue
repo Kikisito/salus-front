@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-/*import type { Timestamp } from '@quasar/quasar-ui-qcalendar'
-import type { QCalendarDay } from '@quasar/quasar-ui-qcalendar'
+import type { Timestamp } from '@quasar/quasar-ui-qcalendar'
+import { QCalendarDay } from '@quasar/quasar-ui-qcalendar'
 import { useRoute } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -8,6 +8,7 @@ import { useDoctorStore } from 'src/stores/admin/DoctorStore'
 import { Loading, Notify } from 'quasar'
 import { useAppointmentSlotStore } from 'src/stores/admin/AppointmentSlotStore'
 import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
+import CalendarSettings from 'src/components/CalendarSettings.vue'
 
 const route = useRoute()
 
@@ -21,25 +22,24 @@ const rawDoctorId: string = route.params.id as string
 const doctorId = parseInt(rawDoctorId)
 
 const calendar = ref<QCalendarDay>()
+const calendarStartHour = ref(8)
+const calendarEndHour = ref(22)
+const rowHeight = ref(64)
+
+const getIntervalCount = () => calendarEndHour.value - calendarStartHour.value
 
 const getEvents = (timestamp: Timestamp) => {
-  /*return slots.value.filter((event) => {
+  return slots.value.filter((event) => {
     // Parse time from "hh:mm:ss" format
-    const [eventHour] = event.horaInicio.split(':').map(Number)
+    const [eventHour] = event.startTime.split(':').map(Number)
+    const [eventYear, eventMonth, eventDay] = event.date.split('-').map(Number)
 
-    // Convert enum string to corresponding weekday number
-    const weekdayMap: Record<string, number> = {
-      MONDAY: 1,
-      TUESDAY: 2,
-      WEDNESDAY: 3,
-      THURSDAY: 4,
-      FRIDAY: 5,
-      SATURDAY: 6,
-      SUNDAY: 0,
-    }
-    const eventWeekday = weekdayMap[event.diaSemana]
-
-    return eventWeekday === timestamp.weekday && eventHour === timestamp.hour
+    return (
+      eventHour === timestamp.hour &&
+      eventDay === timestamp.day &&
+      eventMonth === timestamp.month &&
+      eventYear === timestamp.year
+    )
   })
 }
 
@@ -68,7 +68,7 @@ onMounted(async () => {
 
 // Métodos auxiliares para calcular la posición y altura de los eventos en el calendario
 function calculateTop(event: AppointmentSlot): string {
-  const [startHour, startMinutes]: number[] = event.time.split(':').map(Number)
+  const [startHour, startMinutes]: number[] = event.startTime.split(':').map(Number)
 
   if (
     startHour === undefined ||
@@ -80,13 +80,13 @@ function calculateTop(event: AppointmentSlot): string {
     return ''
   }
 
-  const top: number = (startMinutes / 60) * 64
+  const top: number = (startMinutes / 60) * rowHeight.value
   return top + 'px'
 }
 
 function calculateHeight(event: AppointmentSlot): string {
-  /*const [startHour, startMinutes]: number[] = event.time.split(':').map(Number)
-  const duration = event.
+  const [startHour, startMinutes]: number[] = event.startTime.split(':').map(Number)
+  const [endHour, endMinutes]: number[] = event.endTime.split(':').map(Number)
 
   if (
     startHour === undefined ||
@@ -102,17 +102,16 @@ function calculateHeight(event: AppointmentSlot): string {
     return ''
   }
 
-  // Cada hora equivale a 64px, por lo que (Horas * 64 + ((minutos / 60) * 64))
-  const height: number = (endHour - startHour) * 64 + ((endMinutes - startMinutes) / 60) * 64
+  // Cada hora equivale a (rowHeight)px, por lo que (Horas * rowHeight.value + ((minutos / 60) * rowHeight.value))
+  const height: number =
+    (endHour - startHour) * rowHeight.value + ((endMinutes - startMinutes) / 60) * rowHeight.value
   return height + 'px'
-  console.log(event)
-  return 'ok'
-}*/
+}
 </script>
 
 <template>
   <q-page padding>
-    <!--<div class="row justify-evenly">
+    <div class="row justify-evenly">
       <div class="col-12 col-md-9">
         <div class="section-header row items-center">
           <q-btn flat round icon="arrow_back" @click="$router.back()" />
@@ -120,20 +119,18 @@ function calculateHeight(event: AppointmentSlot): string {
             <div class="text-h6">
               {{ inspectedDoctor.user.nombre }} {{ inspectedDoctor.user.apellidos }}
             </div>
-            <div class="text-subtitle">
-              Número de colegiado: {{ inspectedDoctor.numeroColegiado }}
-            </div>
+            <div class="text-subtitle">Número de colegiado: {{ inspectedDoctor.license }}</div>
 
             <q-badge
-              v-for="especialidad in inspectedDoctor.especialidades"
-              :key="especialidad.id"
+              v-for="specialty in inspectedDoctor.specialties"
+              :key="specialty.id"
               color="secondary"
               class="q-mr-xs q-mb-xs"
               text-color="white"
             >
-              {{ especialidad.nombre }}
+              {{ specialty.name }}
             </q-badge>
-            <q-badge v-if="!inspectedDoctor.especialidades?.length" color="grey" text-color="white">
+            <q-badge v-if="!inspectedDoctor.specialties?.length" color="grey" text-color="white">
               Sin especialidades
             </q-badge>
           </div>
@@ -144,25 +141,39 @@ function calculateHeight(event: AppointmentSlot): string {
           </div>
         </div>
 
-        Datos del médico ->
+        <!-- Datos del médico -->
         <template v-if="inspectedDoctor">
           <div class="row">
             <div class="col-12">
               <div class="row section-header">
                 <div class="text-h6">Agenda</div>
                 <q-space />
+                <q-btn-dropdown
+                  color="secondary"
+                  icon="settings"
+                  label="Configuración"
+                  class="q-mr-sm"
+                  flat
+                  dense
+                >
+                  <CalendarSettings
+                    v-model:start-hour="calendarStartHour"
+                    v-model:end-hour="calendarEndHour"
+                    v-model:height="rowHeight"
+                  />
+                </q-btn-dropdown>
+
                 <q-btn
-                  v-if="inspectedDoctor.especialidades.length > 0"
+                  v-if="inspectedDoctor.specialties.length > 0"
                   color="primary"
-                  label="Añadir turno"
+                  label="Añadir hueco"
                   icon="add"
-                  @click="addScheduleEntry()"
                   class="q-mr-sm"
                   size="sm"
                 />
 
                 <q-badge
-                  v-if="inspectedDoctor.especialidades.length === 0"
+                  v-if="inspectedDoctor.specialties.length === 0"
                   color="grey"
                   text-color="white"
                   class="q-mr-sm"
@@ -175,30 +186,37 @@ function calculateHeight(event: AppointmentSlot): string {
                 ref="calendar"
                 view="week"
                 :weekdays="[1, 2, 3, 4, 5, 6, 0]"
-                :interval-start="6"
+                :interval-start="calendarStartHour"
                 :interval-minutes="60"
-                :interval-count="16"
-                :interval-height="64"
+                :interval-count="getIntervalCount()"
+                :interval-height="rowHeight"
                 hour24-format
                 bordered
               >
                 <template #day-interval="{ scope }">
                   <template v-for="(event, index) in getEvents(scope.timestamp)" :key="index">
                     <div
-                      class="calendar-event"
+                      :class="['calendar-event', event.appointmentId ? 'locked-slot' : 'free-slot']"
                       :style="{
                         top: calculateTop(event),
                         height: calculateHeight(event),
                       }"
-                      @click="updateScheduleEntry(event)"
-                      @contextmenu.prevent="deleteScheduleEntry(event)"
                     >
-                      <span>{{ event.especialidad.nombre }}</span>
-                      <span>{{ event.consulta.nombre }}</span>
-                      <span style="font-size: 9px">
-                        {{ event.horaInicio.split(':').slice(0, 2).join(':') }} a
-                        {{ event.horaFin.split(':').slice(0, 2).join(':') }}
-                      </span>
+                      <q-tooltip
+                        anchor="center right"
+                        self="center left"
+                        class="bg-primary text-body2"
+                      >
+                        <div>
+                          <b>{{ event.room.name }}</b>
+                        </div>
+                        <div>{{ event.specialty.name }}</div>
+                        <div>
+                          {{ event.startTime.split(':').slice(0, 2).join(':') }} a
+                          {{ event.endTime.split(':').slice(0, 2).join(':') }}
+                        </div>
+                      </q-tooltip>
+                      <span>{{ event.room.name }}</span>
                     </div>
                   </template>
                 </template>
@@ -216,7 +234,7 @@ function calculateHeight(event: AppointmentSlot): string {
           </q-card-section>
         </q-card>
       </div>
-    </div>-->
+    </div>
   </q-page>
 </template>
 
@@ -228,17 +246,20 @@ function calculateHeight(event: AppointmentSlot): string {
 .calendar-event {
   position: absolute;
   background-color: #1976d2;
+  border: 1px solid darkblue;
   color: white;
   padding: 2px;
   border-radius: 4px;
-  border: 1px solid darkblue;
   font-size: 12px;
   width: 100%;
-  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 
   span {
     display: block;
@@ -247,6 +268,26 @@ function calculateHeight(event: AppointmentSlot): string {
   span:first-child {
     font-weight: bold;
   }
+}
+
+.free-slot {
+  background-color: #4caf50;
+  border: 1px solid #388e3c;
+}
+
+.free-slot:hover {
+  background-color: #388e3c;
+  border: 1px solid #2e7d32;
+}
+
+.locked-slot {
+  background-color: #f44336;
+  border: 1px solid #d32f2f;
+}
+
+.locked-slot:hover {
+  background-color: #d32f2f;
+  border: 1px solid #c62828;
 }
 
 .calendar-info {

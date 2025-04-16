@@ -1,4 +1,5 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
+import { date } from 'quasar'
 import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
 import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
@@ -13,7 +14,9 @@ export const useAppointmentSlotStore = defineStore('appointmentSlotStore', {
     async getDoctorAppointmentSlots(doctorId: number): Promise<ServiceAnswer<AppointmentSlot[]>> {
       return handleRequest(
         async () => {
-          const response = await api.get('/appointment-slots/' + doctorId)
+          const response = await api.get(
+            '/appointment-slots/' + doctorId + '/' + date.formatDate(Date.now(), 'DD-MM-YYYY'),
+          )
           this.slots = await response.data
 
           return this.slots
