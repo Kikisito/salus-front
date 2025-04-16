@@ -6,7 +6,6 @@ import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDoctorStore } from 'src/stores/admin/DoctorStore'
 import { Dialog, Loading, Notify } from 'quasar'
-import DoctorSpecialtiesDialog from 'src/components/admin/doctors/DoctorSpecialtiesDialog.vue'
 import { useScheduleStore } from 'src/stores/admin/ScheduleStore'
 import type { MedicalAgenda } from 'src/interfaces/MedicalAgenda'
 import ScheduleEntryForm from 'src/components/admin/doctors/ScheduleEntryForm.vue'
@@ -45,46 +44,6 @@ const getEvents = (timestamp: Timestamp) => {
     const eventWeekday = weekdayMap[event.diaSemana]
 
     return eventWeekday === timestamp.weekday && eventHour === timestamp.hour
-  })
-}
-
-async function changeLicense() {
-  Dialog.create({
-    title: 'Modificar número de colegiado',
-    message: 'Introduce el nuevo número de colegiado',
-    prompt: {
-      model: inspectedDoctor.value!.numeroColegiado,
-      type: 'text',
-      label: 'Número de colegiado',
-      required: true,
-      rules: [(val: string) => !!val || 'El número de colegiado es obligatorio'],
-    },
-    cancel: true,
-    persistent: true,
-  }).onOk(async (license) => {
-    const response = await doctorStore.changeLicense(inspectedDoctor.value!.id, license)
-
-    if (response.success) {
-      Notify.create({
-        type: 'positive',
-        message: 'Número de colegiado modificado correctamente',
-      })
-    } else {
-      Notify.create({
-        type: 'negative',
-        message: response.error,
-      })
-    }
-  })
-}
-
-async function manageSpecialties() {
-  Dialog.create({
-    component: DoctorSpecialtiesDialog,
-    componentProps: {
-      medicalProfile: inspectedDoctor.value,
-    },
-    persistent: true,
   })
 }
 
@@ -298,52 +257,6 @@ function calculateHeight(event: MedicalAgenda): string {
             <div class="text-h6">Perfil del médico</div>
             <div class="text-subtitle">Revisa y mantén actualizados los datos de los médicos</div>
           </div>
-          <q-space />
-          <q-btn-dropdown label="Acciones" color="primary" icon="settings" rounded>
-            <q-list>
-              <!-- Número de colegiado -->
-              <q-item clickable v-close-popup @click="changeLicense()">
-                <q-item-section avatar>
-                  <q-avatar icon="edit" />
-                </q-item-section>
-
-                <q-item-section>
-                  <q-item-label>Modificar número de colegiado</q-item-label>
-                  <q-item-label caption>Modifica el número de colegiado del médico</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <!-- Especialidades -->
-              <q-item clickable v-close-popup @click="manageSpecialties()">
-                <q-item-section avatar>
-                  <q-avatar icon="person_add" />
-                </q-item-section>
-
-                <q-item-section>
-                  <q-item-label>Modificar especialidades</q-item-label>
-                  <q-item-label caption>Modifica las especialidades del médico</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <!-- Agenda -->
-              <q-item clickable v-close-popup>
-                <q-item-section avatar>
-                  <q-avatar icon="edit_calendar" />
-                </q-item-section>
-
-                <q-item-section
-                  @click="
-                    $router.push({ name: 'admin-doctor-appointments', params: { id: doctorId } })
-                  "
-                >
-                  <q-item-label>Agenda</q-item-label>
-                  <q-item-label caption>
-                    Consulta y modifica las citas y slots del médico
-                  </q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
         </div>
 
         <!-- Datos del médico -->
@@ -351,7 +264,7 @@ function calculateHeight(event: MedicalAgenda): string {
           <div class="row">
             <div class="col-12">
               <div class="row section-header">
-                <div class="text-h6">Turnos de trabajo</div>
+                <div class="text-h6">Agenda</div>
                 <q-space />
                 <q-btn
                   v-if="inspectedDoctor.especialidades.length > 0"
@@ -382,7 +295,6 @@ function calculateHeight(event: MedicalAgenda): string {
                 :interval-count="16"
                 :interval-height="64"
                 hour24-format
-                no-default-header-btn
                 bordered
               >
                 <template #day-interval="{ scope }">
