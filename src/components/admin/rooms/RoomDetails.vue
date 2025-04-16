@@ -31,18 +31,18 @@ const { dialogRef, onDialogHide } = useDialogPluginComponent()
       <q-card-section>
         <div class="card-header q-mb-md">
           <q-icon name="meeting_room" size="2em" class="q-mr-sm" />
-          <span class="text-h5 text-weight-regular q-mb-sm">{{ room.nombre }}</span>
+          <span class="text-h5 text-weight-regular q-mb-sm">{{ room.name }}</span>
           <span class="text-subtitle2">
-            {{ room.centroMedico.nombre }}
+            {{ room.medicalCenter.name }}
           </span>
 
           <span class="text-subtitle2 text-weight-light">
-            {{ room.centroMedico.lineaDireccion1 }}, {{ room.centroMedico.lineaDireccion2 }}
+            {{ room.medicalCenter.addressLine1 }}, {{ room.medicalCenter.addressLine2 }}
           </span>
 
           <span class="text-subtitle2 text-weight-light">
-            {{ room.centroMedico.localidad }}, {{ room.centroMedico.municipio }}
-            {{ room.centroMedico.codigoPostal }}, {{ room.centroMedico.provincia }}
+            {{ room.medicalCenter.locality }}, {{ room.medicalCenter.municipality }}
+            {{ room.medicalCenter.zipCode }}, {{ room.medicalCenter.province }}
           </span>
         </div>
 
@@ -53,14 +53,14 @@ const { dialogRef, onDialogHide } = useDialogPluginComponent()
           <div class="q-mt-sm">
             <q-icon name="phone" size="1.5em" class="q-mr-sm" />
             <span class="text-subtitle2 text-weight-light">
-              {{ room.centroMedico.telefono }}
+              {{ room.medicalCenter.phone }}
             </span>
           </div>
 
           <div class="q-mt-sm">
             <q-icon name="email" size="1.5em" class="q-mr-sm" />
             <span class="text-subtitle2 text-weight-light">
-              {{ room.centroMedico.email }}
+              {{ room.medicalCenter.email }}
             </span>
           </div>
         </div>

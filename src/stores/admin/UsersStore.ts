@@ -2,7 +2,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
 import type { Direccion } from 'src/interfaces/Direccion'
-import type { PerfilMedico } from 'src/interfaces/PerfilMedico'
+import type { MedicalProfile } from 'src/interfaces/MedicalProfile'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
 import type { User } from 'src/interfaces/User'
 
@@ -110,7 +110,7 @@ export const useUsersStore = defineStore('usersStore', {
     async convertToProfessional(
       id: number,
       license: string,
-    ): Promise<ServiceAnswer<PerfilMedico | null>> {
+    ): Promise<ServiceAnswer<MedicalProfile | null>> {
       return handleRequest(
         async () => {
           const response = await api.post('/doctor-profiles/add', {

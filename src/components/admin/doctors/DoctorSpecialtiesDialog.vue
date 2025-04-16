@@ -1,15 +1,15 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia'
 import { Loading, Notify, useDialogPluginComponent } from 'quasar'
-import type { Especialidad } from 'src/interfaces/Especialidad'
-import type { PerfilMedico } from 'src/interfaces/PerfilMedico'
+import type { Specialty } from 'src/interfaces/Specialty'
+import type { MedicalProfile } from 'src/interfaces/MedicalProfile'
 import { useDoctorStore } from 'src/stores/admin/DoctorStore'
 import { useSpecialtyStore } from 'src/stores/admin/SpecialtyStore'
 import { onMounted, ref, toRef, type PropType } from 'vue'
 
 const props = defineProps({
   medicalProfile: {
-    type: Object as PropType<PerfilMedico>,
+    type: Object as PropType<MedicalProfile>,
     required: true,
   },
 })
@@ -25,8 +25,8 @@ const doctorStore = useDoctorStore()
 const specialtiesStore = useSpecialtyStore()
 const { specialties } = storeToRefs(specialtiesStore)
 
-const filteredSpecialties = ref<Especialidad[]>([])
-const selectedSpecialty = ref<Especialidad>(null as unknown as Especialidad)
+const filteredSpecialties = ref<Specialty[]>([])
+const selectedSpecialty = ref<Specialty>(null as unknown as Specialty)
 
 async function addSpecialty() {
   Loading.show({
@@ -44,11 +44,11 @@ async function addSpecialty() {
       })
 
       // Añadimos la especialidad a la lista local
-      profile.value.especialidades.push(selectedSpecialty.value)
+      profile.value.specialties.push(selectedSpecialty.value)
 
       // Actualizamos la lista de especialidades
       filteredSpecialties.value = specialties.value.filter((item) => {
-        return !profile.value.especialidades.some((especialidad) => especialidad.id === item.id)
+        return !profile.value.specialties.some((especialidad) => especialidad.id === item.id)
       })
     })
     .catch(() => {
@@ -62,7 +62,7 @@ async function addSpecialty() {
     })
 
   // Limpiamos la selección
-  selectedSpecialty.value = null as unknown as Especialidad
+  selectedSpecialty.value = null as unknown as Specialty
 }
 
 async function removeSpecialty(specialtyId: number) {
@@ -81,7 +81,7 @@ async function removeSpecialty(specialtyId: number) {
       })
 
       // Eliminamos la especialidad de la lista de especialidades local del perfil
-      profile.value.especialidades = profile.value.especialidades.filter(
+      profile.value.specialties = profile.value.specialties.filter(
         (especialidad) => especialidad.id !== specialtyId,
       )
 
@@ -101,18 +101,18 @@ async function removeSpecialty(specialtyId: number) {
     })
 
   // Limpiamos la selección
-  selectedSpecialty.value = null as unknown as Especialidad
+  selectedSpecialty.value = null as unknown as Specialty
 }
 
 // @ts-expect-error Método de Quasar
 async function filterSpecialties(value, update) {
-  const filter = (especialidad: Especialidad) => {
-    return especialidad.nombre.toLowerCase().includes(value.toLowerCase())
+  const filter = (especialidad: Specialty) => {
+    return especialidad.name.toLowerCase().includes(value.toLowerCase())
   }
 
   update(() => {
     filteredSpecialties.value = specialties.value.filter(filter).filter((item) => {
-      return !profile.value.especialidades.some((especialidad) => especialidad.id === item.id)
+      return !profile.value.specialties.some((especialidad) => especialidad.id === item.id)
     })
   })
 }
@@ -141,13 +141,13 @@ onMounted(async () => {
 
       <q-card-section>
         <q-list separator dense>
-          <q-item v-for="(specialty, index) in medicalProfile.especialidades" :key="index">
+          <q-item v-for="(specialty, index) in medicalProfile.specialties" :key="index">
             <q-item-section>
               <q-item-label>
                 <q-avatar>
                   <q-icon name="medical_information" />
                 </q-avatar>
-                {{ specialty.nombre }}
+                {{ specialty.name }}
               </q-item-label>
             </q-item-section>
             <q-item-section side>
@@ -168,7 +168,7 @@ onMounted(async () => {
           <q-select
             v-model="selectedSpecialty"
             :options="filteredSpecialties"
-            option-label="nombre"
+            option-label="name"
             label="Añadir especialidad"
             use-input
             hide-selected

@@ -1,14 +1,15 @@
 import type { Appointment } from './Appointment'
-import type { Especialidad } from './Especialidad'
-import type { PerfilMedico } from './PerfilMedico'
+import type { Specialty } from './Specialty'
+import type { MedicalProfile } from './MedicalProfile'
 import type { Room } from './Room'
 
 export interface AppointmentSlot {
   id: number
-  doctor: PerfilMedico
-  specialty: Especialidad
+  doctor: MedicalProfile
+  specialty: Specialty
   room: Room
   date: string
-  time: string
+  startTime: string
+  endTime: string
   appointment?: Appointment
 }

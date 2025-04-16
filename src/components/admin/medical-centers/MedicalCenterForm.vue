@@ -17,16 +17,16 @@ const { dialogRef, onDialogOK } = useDialogPluginComponent()
 
 const medicalCenter = ref<MedicalCenter>({
   id: props.medicalCenterProp?.id || 0,
-  nombre: props.medicalCenterProp?.nombre || '',
-  telefono: props.medicalCenterProp?.telefono || '',
+  name: props.medicalCenterProp?.name || '',
+  phone: props.medicalCenterProp?.phone || '',
   email: props.medicalCenterProp?.email || '',
-  lineaDireccion1: props.medicalCenterProp?.lineaDireccion1 || '',
-  lineaDireccion2: props.medicalCenterProp?.lineaDireccion2 || '',
-  localidad: props.medicalCenterProp?.localidad || '',
-  municipio: props.medicalCenterProp?.municipio || '',
-  codigoPostal: props.medicalCenterProp?.codigoPostal || '',
-  provincia: props.medicalCenterProp?.provincia || '',
-  pais: props.medicalCenterProp?.pais || '',
+  addressLine1: props.medicalCenterProp?.addressLine1 || '',
+  addressLine2: props.medicalCenterProp?.addressLine2 || '',
+  locality: props.medicalCenterProp?.locality || '',
+  municipality: props.medicalCenterProp?.municipality || '',
+  zipCode: props.medicalCenterProp?.zipCode || '',
+  province: props.medicalCenterProp?.province || '',
+  country: props.medicalCenterProp?.country || '',
 })
 </script>
 
@@ -48,7 +48,7 @@ const medicalCenter = ref<MedicalCenter>({
           <div class="text-h6 text-center q-mb-md">Datos básicos</div>
           <q-input
             filled
-            v-model="medicalCenter.nombre"
+            v-model="medicalCenter.name"
             label="Nombre"
             class="q-mb-md"
             :rules="[(val) => !!val || 'El nombre es obligatorio']"
@@ -56,7 +56,7 @@ const medicalCenter = ref<MedicalCenter>({
 
           <div class="row q-col-gutter-md">
             <div class="col-12 col-sm-6">
-              <q-input filled v-model="medicalCenter.telefono" label="Teléfono" class="q-mb-md" />
+              <q-input filled v-model="medicalCenter.phone" label="Teléfono" class="q-mb-md" />
             </div>
             <div class="col-12 col-sm-6">
               <q-input
@@ -80,7 +80,7 @@ const medicalCenter = ref<MedicalCenter>({
             <div class="col-12 col-sm-6">
               <q-input
                 filled
-                v-model="medicalCenter.lineaDireccion1"
+                v-model="medicalCenter.addressLine1"
                 label="Línea de Dirección 1"
                 class="q-mb-md"
                 :rules="[(val) => !!val || 'La línea de dirección 1 es obligatoria']"
@@ -89,7 +89,7 @@ const medicalCenter = ref<MedicalCenter>({
             <div class="col-12 col-sm-6">
               <q-input
                 filled
-                v-model="medicalCenter.lineaDireccion2"
+                v-model="medicalCenter.addressLine2"
                 label="Línea de Dirección 2"
                 class="q-mb-md"
               />
@@ -100,7 +100,7 @@ const medicalCenter = ref<MedicalCenter>({
             <div class="col-12 col-sm-6">
               <q-input
                 filled
-                v-model="medicalCenter.localidad"
+                v-model="medicalCenter.locality"
                 label="Localidad"
                 class="q-mb-md"
                 :rules="[(val) => !!val || 'La localidad es obligatoria']"
@@ -109,7 +109,7 @@ const medicalCenter = ref<MedicalCenter>({
             <div class="col-12 col-sm-6">
               <q-input
                 filled
-                v-model="medicalCenter.municipio"
+                v-model="medicalCenter.municipality"
                 label="Municipio"
                 class="q-mb-md"
                 :rules="[(val) => !!val || 'El municipio es obligatorio']"
@@ -121,7 +121,7 @@ const medicalCenter = ref<MedicalCenter>({
             <div class="col-12 col-sm-4">
               <q-input
                 filled
-                v-model="medicalCenter.provincia"
+                v-model="medicalCenter.province"
                 label="Provincia"
                 class="q-mb-md"
                 :rules="[(val) => !!val || 'La provincia es obligatoria']"
@@ -130,7 +130,7 @@ const medicalCenter = ref<MedicalCenter>({
             <div class="col-12 col-sm-4">
               <q-input
                 filled
-                v-model="medicalCenter.codigoPostal"
+                v-model="medicalCenter.zipCode"
                 label="Código Postal"
                 class="q-mb-md"
                 :rules="[(val) => !!val || 'El código postal es obligatorio']"
@@ -139,7 +139,7 @@ const medicalCenter = ref<MedicalCenter>({
             <div class="col-12 col-sm-4">
               <q-input
                 filled
-                v-model="medicalCenter.pais"
+                v-model="medicalCenter.country"
                 label="País"
                 class="q-mb-md"
                 :rules="[(val) => !!val || 'El país es obligatorio']"

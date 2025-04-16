@@ -30,7 +30,7 @@ const calendar = ref<QCalendarDay>()
 const getEvents = (timestamp: Timestamp) => {
   return schedules.value.filter((event) => {
     // Parse time from "hh:mm:ss" format
-    const [eventHour] = event.horaInicio.split(':').map(Number)
+    const [eventHour] = event.startTime.split(':').map(Number)
 
     // Convert enum string to corresponding weekday number
     const weekdayMap: Record<string, number> = {
@@ -42,7 +42,7 @@ const getEvents = (timestamp: Timestamp) => {
       SATURDAY: 6,
       SUNDAY: 0,
     }
-    const eventWeekday = weekdayMap[event.diaSemana]
+    const eventWeekday = weekdayMap[event.dayOfWeek]
 
     return eventWeekday === timestamp.weekday && eventHour === timestamp.hour
   })
@@ -53,7 +53,7 @@ async function changeLicense() {
     title: 'Modificar número de colegiado',
     message: 'Introduce el nuevo número de colegiado',
     prompt: {
-      model: inspectedDoctor.value!.numeroColegiado,
+      model: inspectedDoctor.value!.license,
       type: 'text',
       label: 'Número de colegiado',
       required: true,
@@ -105,7 +105,7 @@ async function addScheduleEntry() {
 
     const rawEntry = {
       ...scheduleEntry,
-      medico: scheduleEntry.medico.id,
+      doctor: scheduleEntry.doctor.id,
     }
 
     const response = await scheduleStore.addScheduleEntry(rawEntry)
@@ -143,15 +143,12 @@ async function updateScheduleEntry(event: MedicalAgenda) {
 
     const rawEntry = {
       ...scheduleEntry,
-      medico: scheduleEntry.medico.id,
-      especialidad:
-        typeof scheduleEntry.especialidad === 'object'
-          ? scheduleEntry.especialidad.id
-          : scheduleEntry.especialidad,
-      consulta:
-        typeof scheduleEntry.consulta === 'object'
-          ? scheduleEntry.consulta.id
-          : scheduleEntry.consulta,
+      doctor: scheduleEntry.doctor.id,
+      specialty:
+        typeof scheduleEntry.specialty === 'object'
+          ? scheduleEntry.specialty.id
+          : scheduleEntry.specialty,
+      room: typeof scheduleEntry.room === 'object' ? scheduleEntry.room.id : scheduleEntry.room,
     }
 
     const response = await scheduleStore.updateScheduleEntry(rawEntry)
@@ -226,7 +223,7 @@ onMounted(async () => {
 
 // Métodos auxiliares para calcular la posición y altura de los eventos en el calendario
 function calculateTop(event: MedicalAgenda): string {
-  const [startHour, startMinutes]: number[] = event.horaInicio.split(':').map(Number)
+  const [startHour, startMinutes]: number[] = event.startTime.split(':').map(Number)
 
   if (
     startHour === undefined ||
@@ -243,8 +240,8 @@ function calculateTop(event: MedicalAgenda): string {
 }
 
 function calculateHeight(event: MedicalAgenda): string {
-  const [startHour, startMinutes]: number[] = event.horaInicio.split(':').map(Number)
-  const [endHour, endMinutes]: number[] = event.horaFin.split(':').map(Number)
+  const [startHour, startMinutes]: number[] = event.startTime.split(':').map(Number)
+  const [endHour, endMinutes]: number[] = event.endTime.split(':').map(Number)
 
   if (
     startHour === undefined ||
@@ -276,20 +273,18 @@ function calculateHeight(event: MedicalAgenda): string {
             <div class="text-h6">
               {{ inspectedDoctor.user.nombre }} {{ inspectedDoctor.user.apellidos }}
             </div>
-            <div class="text-subtitle">
-              Número de colegiado: {{ inspectedDoctor.numeroColegiado }}
-            </div>
+            <div class="text-subtitle">Número de colegiado: {{ inspectedDoctor.license }}</div>
 
             <q-badge
-              v-for="especialidad in inspectedDoctor.especialidades"
+              v-for="especialidad in inspectedDoctor.specialties"
               :key="especialidad.id"
               color="secondary"
               class="q-mr-xs q-mb-xs"
               text-color="white"
             >
-              {{ especialidad.nombre }}
+              {{ especialidad.name }}
             </q-badge>
-            <q-badge v-if="!inspectedDoctor.especialidades?.length" color="grey" text-color="white">
+            <q-badge v-if="!inspectedDoctor.specialties?.length" color="grey" text-color="white">
               Sin especialidades
             </q-badge>
           </div>
@@ -354,7 +349,7 @@ function calculateHeight(event: MedicalAgenda): string {
                 <div class="text-h6">Turnos de trabajo</div>
                 <q-space />
                 <q-btn
-                  v-if="inspectedDoctor.especialidades.length > 0"
+                  v-if="inspectedDoctor.specialties.length > 0"
                   color="primary"
                   label="Añadir turno"
                   icon="add"
@@ -364,7 +359,7 @@ function calculateHeight(event: MedicalAgenda): string {
                 />
 
                 <q-badge
-                  v-if="inspectedDoctor.especialidades.length === 0"
+                  v-if="inspectedDoctor.specialties.length === 0"
                   color="grey"
                   text-color="white"
                   class="q-mr-sm"
@@ -396,11 +391,11 @@ function calculateHeight(event: MedicalAgenda): string {
                       @click="updateScheduleEntry(event)"
                       @contextmenu.prevent="deleteScheduleEntry(event)"
                     >
-                      <span>{{ event.especialidad.nombre }}</span>
-                      <span>{{ event.consulta.nombre }}</span>
+                      <span>{{ event.specialty.name }}</span>
+                      <span>{{ event.room.name }}</span>
                       <span style="font-size: 9px">
-                        {{ event.horaInicio.split(':').slice(0, 2).join(':') }} a
-                        {{ event.horaFin.split(':').slice(0, 2).join(':') }}
+                        {{ event.startTime.split(':').slice(0, 2).join(':') }} a
+                        {{ event.endTime.split(':').slice(0, 2).join(':') }}
                       </span>
                     </div>
                   </template>

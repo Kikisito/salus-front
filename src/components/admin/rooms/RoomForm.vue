@@ -36,8 +36,8 @@ const { dialogRef, onDialogOK } = useDialogPluginComponent()
 
 const room = ref<RawRoom>({
   id: props.room?.id || 0,
-  nombre: props.room?.nombre || '',
-  centroMedico: props.room?.centroMedico?.id || (null as unknown as number),
+  name: props.room?.name || '',
+  medicalCenter: props.room?.medicalCenter?.id || (null as unknown as number),
 })
 
 // Lista de centros médicos para el select
@@ -108,11 +108,11 @@ const filterMedicalCenters = async (val: string, update: (callback: () => void) 
         <q-form @submit.prevent="onDialogOK(room)">
           <q-select
             filled
-            v-model="room.centroMedico"
+            v-model="room.medicalCenter"
             :options="medicalCenters"
             option-value="id"
-            option-label="nombre"
-            label="Centro Médico"
+            option-label="name"
+            label="Centro médico"
             use-input
             input-debounce="300"
             class="q-mb-md"
@@ -126,7 +126,7 @@ const filterMedicalCenters = async (val: string, update: (callback: () => void) 
 
           <q-input
             filled
-            v-model="room.nombre"
+            v-model="room.name"
             label="Nombre"
             class="q-mb-md"
             :rules="[(val) => !!val || 'El nombre es obligatorio']"

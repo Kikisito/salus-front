@@ -19,7 +19,7 @@ const tableColumns: QTableColumn[] = [
   {
     name: 'numcol',
     label: 'Número de Colegiado',
-    field: (row) => row.numeroColegiado,
+    field: (row) => row.license,
     align: 'left',
   },
   { name: 'actions', label: 'Acciones', field: '', align: 'left' },

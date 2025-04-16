@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { useDialogPluginComponent } from 'quasar'
-import type { Especialidad } from 'src/interfaces/Especialidad'
+import type { Specialty } from 'src/interfaces/Specialty'
 import { ref, type PropType } from 'vue'
 
 const props = defineProps({
   specialtyProp: {
-    type: Object as PropType<Especialidad>,
+    type: Object as PropType<Specialty>,
     required: false,
     default: null,
   },
@@ -15,10 +15,10 @@ defineEmits([...useDialogPluginComponent.emits])
 
 const { dialogRef, onDialogOK } = useDialogPluginComponent()
 
-const specialty = ref<Especialidad>({
+const specialty = ref<Specialty>({
   id: props.specialtyProp?.id || 0,
-  nombre: props.specialtyProp?.nombre || '',
-  descripcion: props.specialtyProp?.descripcion || '',
+  name: props.specialtyProp?.name || '',
+  description: props.specialtyProp?.description || '',
 })
 </script>
 
@@ -41,14 +41,14 @@ const specialty = ref<Especialidad>({
 
           <q-input
             filled
-            v-model="specialty.nombre"
+            v-model="specialty.name"
             label="Nombre"
             :rules="[(val) => !!val || 'El nombre es obligatorio']"
           />
 
           <q-input
             filled
-            v-model="specialty.descripcion"
+            v-model="specialty.description"
             label="Descripción"
             type="textarea"
             :rules="[(val) => !!val || 'La descripción es obligatoria']"

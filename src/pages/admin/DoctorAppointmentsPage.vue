@@ -1,25 +1,21 @@
 <script lang="ts" setup>
-import type { Timestamp } from '@quasar/quasar-ui-qcalendar'
-import { QCalendarDay } from '@quasar/quasar-ui-qcalendar'
+/*import type { Timestamp } from '@quasar/quasar-ui-qcalendar'
+import type { QCalendarDay } from '@quasar/quasar-ui-qcalendar'
 import { useRoute } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDoctorStore } from 'src/stores/admin/DoctorStore'
-import { Dialog, Loading, Notify } from 'quasar'
-import { useScheduleStore } from 'src/stores/admin/ScheduleStore'
-import type { MedicalAgenda } from 'src/interfaces/MedicalAgenda'
-import ScheduleEntryForm from 'src/components/admin/doctors/ScheduleEntryForm.vue'
-import { useRoomStore } from 'src/stores/admin/RoomStore'
+import { Loading, Notify } from 'quasar'
+import { useAppointmentSlotStore } from 'src/stores/admin/AppointmentSlotStore'
+import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
 
 const route = useRoute()
 
 const doctorStore = useDoctorStore()
 const { inspectedDoctor } = storeToRefs(doctorStore)
 
-const scheduleStore = useScheduleStore()
-const { schedules } = storeToRefs(scheduleStore)
-
-const roomStore = useRoomStore()
+const appointmentSlotStore = useAppointmentSlotStore()
+const { slots } = storeToRefs(appointmentSlotStore)
 
 const rawDoctorId: string = route.params.id as string
 const doctorId = parseInt(rawDoctorId)
@@ -27,7 +23,7 @@ const doctorId = parseInt(rawDoctorId)
 const calendar = ref<QCalendarDay>()
 
 const getEvents = (timestamp: Timestamp) => {
-  return schedules.value.filter((event) => {
+  /*return slots.value.filter((event) => {
     // Parse time from "hh:mm:ss" format
     const [eventHour] = event.horaInicio.split(':').map(Number)
 
@@ -47,119 +43,6 @@ const getEvents = (timestamp: Timestamp) => {
   })
 }
 
-async function addScheduleEntry() {
-  Dialog.create({
-    component: ScheduleEntryForm,
-    componentProps: {
-      medicalProfile: inspectedDoctor.value,
-      schedule: null,
-      getRooms: roomStore.getAllRooms,
-      searchRooms: roomStore.searchRooms,
-    },
-    persistent: true,
-  }).onOk(async (scheduleEntry) => {
-    Loading.show({
-      message: 'Añadiendo turno...',
-    })
-
-    const rawEntry = {
-      ...scheduleEntry,
-      medico: scheduleEntry.medico.id,
-    }
-
-    const response = await scheduleStore.addScheduleEntry(rawEntry)
-
-    if (response.success) {
-      Notify.create({
-        type: 'positive',
-        message: 'Turno añadido correctamente',
-      })
-    } else {
-      Notify.create({
-        type: 'negative',
-        message: response.error,
-      })
-    }
-
-    Loading.hide()
-  })
-}
-
-async function updateScheduleEntry(event: MedicalAgenda) {
-  Dialog.create({
-    component: ScheduleEntryForm,
-    componentProps: {
-      medicalProfile: inspectedDoctor.value,
-      schedule: event,
-      getRooms: roomStore.getAllRooms,
-      searchRooms: roomStore.searchRooms,
-    },
-    persistent: true,
-  }).onOk(async (scheduleEntry) => {
-    Loading.show({
-      message: 'Actualizando turno...',
-    })
-
-    const rawEntry = {
-      ...scheduleEntry,
-      medico: scheduleEntry.medico.id,
-      especialidad:
-        typeof scheduleEntry.especialidad === 'object'
-          ? scheduleEntry.especialidad.id
-          : scheduleEntry.especialidad,
-      consulta:
-        typeof scheduleEntry.consulta === 'object'
-          ? scheduleEntry.consulta.id
-          : scheduleEntry.consulta,
-    }
-
-    const response = await scheduleStore.updateScheduleEntry(rawEntry)
-
-    if (response.success) {
-      Notify.create({
-        type: 'positive',
-        message: 'Turno actualizado correctamente',
-      })
-    } else {
-      Notify.create({
-        type: 'negative',
-        message: response.error,
-      })
-    }
-
-    Loading.hide()
-  })
-}
-
-async function deleteScheduleEntry(event: MedicalAgenda) {
-  Dialog.create({
-    title: 'Eliminar turno',
-    message: '¿Estás seguro de que quieres eliminar este turno?',
-    cancel: true,
-    persistent: true,
-  }).onOk(async () => {
-    Loading.show({
-      message: 'Eliminando turno...',
-    })
-
-    const response = await scheduleStore.deleteScheduleEntry(event.id)
-
-    if (response.success) {
-      Notify.create({
-        type: 'positive',
-        message: 'Turno eliminado correctamente',
-      })
-    } else {
-      Notify.create({
-        type: 'negative',
-        message: response.error,
-      })
-    }
-
-    Loading.hide()
-  })
-}
-
 async function getData() {
   Loading.show({
     message: 'Cargando información del médico...',
@@ -167,7 +50,7 @@ async function getData() {
 
   if (doctorId) {
     await doctorStore.getDoctorData(doctorId)
-    await scheduleStore.getDoctorSchedules(doctorId)
+    await appointmentSlotStore.getDoctorAppointmentSlots(doctorId)
   } else {
     console.error('El ID del usuario no es válido. No se ha podido convertir a número.')
     Notify.create({
@@ -184,8 +67,8 @@ onMounted(async () => {
 })
 
 // Métodos auxiliares para calcular la posición y altura de los eventos en el calendario
-function calculateTop(event: MedicalAgenda): string {
-  const [startHour, startMinutes]: number[] = event.horaInicio.split(':').map(Number)
+function calculateTop(event: AppointmentSlot): string {
+  const [startHour, startMinutes]: number[] = event.time.split(':').map(Number)
 
   if (
     startHour === undefined ||
@@ -201,9 +84,9 @@ function calculateTop(event: MedicalAgenda): string {
   return top + 'px'
 }
 
-function calculateHeight(event: MedicalAgenda): string {
-  const [startHour, startMinutes]: number[] = event.horaInicio.split(':').map(Number)
-  const [endHour, endMinutes]: number[] = event.horaFin.split(':').map(Number)
+function calculateHeight(event: AppointmentSlot): string {
+  /*const [startHour, startMinutes]: number[] = event.time.split(':').map(Number)
+  const duration = event.
 
   if (
     startHour === undefined ||
@@ -222,12 +105,14 @@ function calculateHeight(event: MedicalAgenda): string {
   // Cada hora equivale a 64px, por lo que (Horas * 64 + ((minutos / 60) * 64))
   const height: number = (endHour - startHour) * 64 + ((endMinutes - startMinutes) / 60) * 64
   return height + 'px'
-}
+  console.log(event)
+  return 'ok'
+}*/
 </script>
 
 <template>
   <q-page padding>
-    <div class="row justify-evenly">
+    <!--<div class="row justify-evenly">
       <div class="col-12 col-md-9">
         <div class="section-header row items-center">
           <q-btn flat round icon="arrow_back" @click="$router.back()" />
@@ -259,7 +144,7 @@ function calculateHeight(event: MedicalAgenda): string {
           </div>
         </div>
 
-        <!-- Datos del médico -->
+        Datos del médico ->
         <template v-if="inspectedDoctor">
           <div class="row">
             <div class="col-12">
@@ -331,7 +216,7 @@ function calculateHeight(event: MedicalAgenda): string {
           </q-card-section>
         </q-card>
       </div>
-    </div>
+    </div>-->
   </q-page>
 </template>
 

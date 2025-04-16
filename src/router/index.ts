@@ -63,7 +63,7 @@ export default defineRouter(function (/* { store, ssrContext } */) {
         }
       } else if (to.matched.some((record) => record.meta.requiresProfesional)) {
         // Check if the user is a professional
-        if (!userStore.hasRole('PROFESIONAL')) {
+        if (!userStore.hasRole('PROFESSIONAL')) {
           // Redirect to the home page or show an error message
           next('/')
           return

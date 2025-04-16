@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { useDialogPluginComponent } from 'quasar'
-import type { Especialidad } from 'src/interfaces/Especialidad'
+import type { Specialty } from 'src/interfaces/Specialty'
 import type { PropType } from 'vue'
 
 defineProps({
   specialty: {
-    type: Object as PropType<Especialidad>,
+    type: Object as PropType<Specialty>,
     required: true,
   },
 })
@@ -31,7 +31,7 @@ const { dialogRef, onDialogHide } = useDialogPluginComponent()
       <q-card-section>
         <div class="card-header q-mb-md">
           <q-icon name="medical_services" size="2em" class="q-mr-sm" />
-          <span class="text-h5 text-weight-regular q-mb-sm">{{ specialty.nombre }}</span>
+          <span class="text-h5 text-weight-regular q-mb-sm">{{ specialty.name }}</span>
         </div>
 
         <q-separator />
@@ -39,7 +39,7 @@ const { dialogRef, onDialogHide } = useDialogPluginComponent()
         <div class="card-body q-mt-md">
           <span>Descripción</span>
           <p class="text-subtitle2 text-weight-light q-mt-sm">
-            {{ specialty.descripcion }}
+            {{ specialty.description }}
           </p>
         </div>
 

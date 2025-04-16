@@ -3,13 +3,13 @@ import { Notify, useDialogPluginComponent } from 'quasar'
 import { ref } from 'vue'
 import type { MedicalAgenda } from 'src/interfaces/MedicalAgenda'
 import type { Room } from 'src/interfaces/Room'
-import type { PerfilMedico } from 'src/interfaces/PerfilMedico'
+import type { MedicalProfile } from 'src/interfaces/MedicalProfile'
 import type { PropType } from 'vue'
 import type { ServiceAnswer } from 'src/interfaces/ServiceAnswer'
 
 const props = defineProps({
   medicalProfile: {
-    type: Object as PropType<PerfilMedico>,
+    type: Object as PropType<MedicalProfile>,
     required: true,
   },
   schedule: {
@@ -38,13 +38,13 @@ const isLoadingRooms = ref(false)
 // Modelo del formulario
 const scheduleEntry = ref<Partial<MedicalAgenda>>({
   id: props.schedule?.id,
-  medico: props.medicalProfile,
-  especialidad: props.schedule?.especialidad,
-  consulta: props.schedule?.consulta,
-  diaSemana: props.schedule?.diaSemana,
-  horaInicio: props.schedule?.horaInicio?.substring(0, 5),
-  horaFin: props.schedule?.horaFin?.substring(0, 5),
-  duracionCita: props.schedule?.duracionCita || 15,
+  doctor: props.medicalProfile,
+  specialty: props.schedule?.specialty,
+  room: props.schedule?.room,
+  dayOfWeek: props.schedule?.dayOfWeek,
+  startTime: props.schedule?.startTime?.substring(0, 5),
+  endTime: props.schedule?.endTime?.substring(0, 5),
+  duration: props.schedule?.duration || 15,
 })
 
 const weekdays = [
@@ -100,10 +100,10 @@ const filterRooms = async (val: string, update: (callback: () => void) => void) 
             <div class="col-12 col-sm-6">
               <q-select
                 filled
-                v-model="scheduleEntry.especialidad"
-                :options="medicalProfile.especialidades"
+                v-model="scheduleEntry.specialty"
+                :options="medicalProfile.specialties"
                 option-value="id"
-                option-label="nombre"
+                option-label="name"
                 label="Especialidad"
                 :rules="[(val) => !!val || 'La especialidad es obligatoria']"
                 emit-value
@@ -115,7 +115,7 @@ const filterRooms = async (val: string, update: (callback: () => void) => void) 
             <div class="col-12 col-sm-6">
               <q-select
                 filled
-                v-model="scheduleEntry.diaSemana"
+                v-model="scheduleEntry.dayOfWeek"
                 :options="weekdays"
                 option-value="value"
                 option-label="label"
@@ -130,10 +130,10 @@ const filterRooms = async (val: string, update: (callback: () => void) => void) 
             <div class="col-12">
               <q-select
                 filled
-                v-model="scheduleEntry.consulta"
+                v-model="scheduleEntry.room"
                 :options="rooms"
                 option-value="id"
-                option-label="nombre"
+                option-label="name"
                 label="Consulta médica"
                 :rules="[(val) => !!val || 'La consulta es obligatoria']"
                 :loading="isLoadingRooms"
@@ -153,8 +153,8 @@ const filterRooms = async (val: string, update: (callback: () => void) => void) 
                 <template v-slot:option="scope">
                   <q-item v-bind="scope.itemProps">
                     <q-item-section>
-                      <q-item-label>{{ scope.opt.nombre }}</q-item-label>
-                      <q-item-label caption>{{ scope.opt.centroMedico?.nombre }}</q-item-label>
+                      <q-item-label>{{ scope.opt.name }}</q-item-label>
+                      <q-item-label caption>{{ scope.opt.medicalCenter?.name }}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </template>
@@ -165,7 +165,7 @@ const filterRooms = async (val: string, update: (callback: () => void) => void) 
             <div class="col-12 col-sm-4">
               <q-input
                 filled
-                v-model="scheduleEntry.horaInicio"
+                v-model="scheduleEntry.startTime"
                 type="time"
                 label="Hora de inicio"
                 :rules="[(val) => !!val || 'La hora de inicio es obligatoria']"
@@ -176,13 +176,13 @@ const filterRooms = async (val: string, update: (callback: () => void) => void) 
             <div class="col-12 col-sm-4">
               <q-input
                 filled
-                v-model="scheduleEntry.horaFin"
+                v-model="scheduleEntry.endTime"
                 type="time"
                 label="Hora de fin"
                 :rules="[
                   (val) => !!val || 'La hora de fin es obligatoria',
                   (val) =>
-                    (scheduleEntry.horaInicio && val > scheduleEntry.horaInicio) ||
+                    (scheduleEntry.startTime && val > scheduleEntry.startTime) ||
                     'La hora de fin debe ser posterior a la hora de inicio',
                 ]"
               />
@@ -192,7 +192,7 @@ const filterRooms = async (val: string, update: (callback: () => void) => void) 
             <div class="col-12 col-sm-4">
               <q-input
                 filled
-                v-model.number="scheduleEntry.duracionCita"
+                v-model.number="scheduleEntry.duration"
                 type="number"
                 label="Duración de cita"
                 :rules="[

@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
 import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
-import type { Especialidad } from 'src/interfaces/Especialidad'
+import type { Specialty } from 'src/interfaces/Specialty'
 import type { ServiceAnswer } from 'src/interfaces/ServiceAnswer'
 
 export const useSpecialtyStore = defineStore('specialties', {
   state: () => ({
-    specialties: [] as Especialidad[],
+    specialties: [] as Specialty[],
     count: 0,
   }),
 
@@ -14,7 +14,7 @@ export const useSpecialtyStore = defineStore('specialties', {
     async getAllSpecialties(
       page: number = 0,
       limit: number = 10,
-    ): Promise<ServiceAnswer<Especialidad[]>> {
+    ): Promise<ServiceAnswer<Specialty[]>> {
       return handleRequest(
         async () => {
           const response = await api.get('/specialties/all/' + page + '/' + limit)
@@ -33,7 +33,7 @@ export const useSpecialtyStore = defineStore('specialties', {
       search: string,
       page: number = 0,
       limit: number = 10,
-    ): Promise<ServiceAnswer<Especialidad[]>> {
+    ): Promise<ServiceAnswer<Specialty[]>> {
       return handleRequest(
         async () => {
           const response = await api.get('/specialties/search/' + search + '/' + page + '/' + limit)
@@ -48,7 +48,7 @@ export const useSpecialtyStore = defineStore('specialties', {
       )
     },
 
-    async getSpecialty(id: number): Promise<ServiceAnswer<Especialidad>> {
+    async getSpecialty(id: number): Promise<ServiceAnswer<Specialty>> {
       return handleRequest(
         async () => {
           const response = await api.get('/specialties/' + id)
@@ -60,7 +60,7 @@ export const useSpecialtyStore = defineStore('specialties', {
       )
     },
 
-    async addSpecialty(specialty: Especialidad): Promise<ServiceAnswer<Especialidad>> {
+    async addSpecialty(specialty: Specialty): Promise<ServiceAnswer<Specialty>> {
       return handleRequest(
         async () => {
           const response = await api.post('/specialties/add', specialty)
@@ -77,7 +77,7 @@ export const useSpecialtyStore = defineStore('specialties', {
       )
     },
 
-    async updateSpecialty(specialty: Especialidad): Promise<ServiceAnswer<Especialidad>> {
+    async updateSpecialty(specialty: Specialty): Promise<ServiceAnswer<Specialty>> {
       return handleRequest(
         async () => {
           const response = await api.put('/specialties/' + specialty.id, specialty)

@@ -5,7 +5,7 @@ import { ref } from 'vue'
 import { Dialog, Loading, Notify, type QTableColumn } from 'quasar'
 import { useSpecialtyStore } from 'src/stores/admin/SpecialtyStore'
 import SpecialtyDetails from 'src/components/admin/specialties/SpecialtyDetails.vue'
-import type { Especialidad } from 'src/interfaces/Especialidad'
+import type { Specialty } from 'src/interfaces/Specialty'
 import SpecialtyForm from './SpecialtyForm.vue'
 import type { ServiceAnswer } from 'src/interfaces/ServiceAnswer'
 
@@ -13,8 +13,8 @@ const specialtyStore = useSpecialtyStore()
 const { specialties, count } = storeToRefs(specialtyStore)
 
 const tableColumns: QTableColumn[] = [
-  { name: 'name', label: 'Nombre', field: (row) => row.nombre, align: 'left' },
-  { name: 'description', label: 'Descripción', field: (row) => row.descripcion, align: 'left' },
+  { name: 'name', label: 'Nombre', field: (row) => row.name, align: 'left' },
+  { name: 'description', label: 'Descripción', field: (row) => row.description, align: 'left' },
   { name: 'actions', label: 'Acciones', field: '', align: 'left' },
 ]
 
@@ -23,7 +23,7 @@ const loading = ref(false)
 async function fetchSpecialty(
   id: number,
   loadingMessage = 'Cargando especialidad...',
-): Promise<Especialidad | null> {
+): Promise<Specialty | null> {
   Loading.show({ message: loadingMessage })
 
   // Solicitamos los datos de la especialidad al servidor
@@ -61,14 +61,14 @@ async function showSpecialty(id: number) {
 
 // Función genérica para editar o añadir una especialidad
 function handleSpecialtyForm(
-  specialtyProp: Especialidad | null,
-  submitAction: (data: Especialidad) => Promise<ServiceAnswer<Especialidad>>,
-  retryForm: (data?: Especialidad) => void,
+  specialtyProp: Specialty | null,
+  submitAction: (data: Specialty) => Promise<ServiceAnswer<Specialty>>,
+  retryForm: (data?: Specialty) => void,
 ) {
   Dialog.create({
     component: SpecialtyForm,
     componentProps: { specialtyProp },
-  }).onOk((data: Especialidad) => {
+  }).onOk((data: Specialty) => {
     Loading.show({
       message: 'Procesando...',
     })
@@ -95,7 +95,7 @@ function handleSpecialtyForm(
   })
 }
 
-function openSpecialtyAddForm(data?: Especialidad) {
+function openSpecialtyAddForm(data?: Specialty) {
   handleSpecialtyForm(
     data || null,
     (data) => specialtyStore.addSpecialty(data),
@@ -111,13 +111,13 @@ async function editSpecialty(id: number) {
   const specialty = await fetchSpecialty(id)
 
   if (specialty) {
-    openSpecialtyEditForm(specialty as Especialidad)
+    openSpecialtyEditForm(specialty as Specialty)
   }
 
   Loading.hide()
 }
 
-function openSpecialtyEditForm(specialty?: Especialidad) {
+function openSpecialtyEditForm(specialty?: Specialty) {
   handleSpecialtyForm(
     specialty || null,
     (data) => specialtyStore.updateSpecialty(data),

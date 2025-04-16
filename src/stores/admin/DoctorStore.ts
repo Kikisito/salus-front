@@ -1,21 +1,21 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
-import type { PerfilMedico } from 'src/interfaces/PerfilMedico'
+import type { MedicalProfile } from 'src/interfaces/MedicalProfile'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
 
 export const useDoctorStore = defineStore('doctorStore', {
   state: () => ({
     count: 0,
-    doctors: [] as PerfilMedico[],
-    inspectedDoctor: null as PerfilMedico | null,
+    doctors: [] as MedicalProfile[],
+    inspectedDoctor: null as MedicalProfile | null,
   }),
 
   actions: {
     async getAll(
       page: number = 0,
       limit: number = 10,
-    ): Promise<ServiceAnswer<PerfilMedico[] | null>> {
+    ): Promise<ServiceAnswer<MedicalProfile[] | null>> {
       return handleRequest(
         async () => {
           const response = await api.get('/doctor-profiles/all/' + page + '/' + limit)
@@ -34,7 +34,7 @@ export const useDoctorStore = defineStore('doctorStore', {
       search: string,
       page: number = 0,
       limit: number = 10,
-    ): Promise<ServiceAnswer<PerfilMedico[] | null>> {
+    ): Promise<ServiceAnswer<MedicalProfile[] | null>> {
       return handleRequest(
         async () => {
           const response = await api.get(
@@ -51,11 +51,11 @@ export const useDoctorStore = defineStore('doctorStore', {
       )
     },
 
-    async getDoctorData(id: number): Promise<ServiceAnswer<PerfilMedico | null>> {
+    async getDoctorData(id: number): Promise<ServiceAnswer<MedicalProfile | null>> {
       return handleRequest(
         async () => {
           const response = await api.get('/doctor-profiles/' + id)
-          this.inspectedDoctor = response.data as PerfilMedico
+          this.inspectedDoctor = response.data as MedicalProfile
 
           return response.data
         },
@@ -65,7 +65,10 @@ export const useDoctorStore = defineStore('doctorStore', {
       )
     },
 
-    async changeLicense(id: number, license: string): Promise<ServiceAnswer<PerfilMedico | null>> {
+    async changeLicense(
+      id: number,
+      license: string,
+    ): Promise<ServiceAnswer<MedicalProfile | null>> {
       return handleRequest(
         async () => {
           const response = await api.put('/doctor-profiles/' + id + '/license', {
@@ -89,7 +92,7 @@ export const useDoctorStore = defineStore('doctorStore', {
     async addSpecialty(
       doctorId: number,
       specialtyId: number,
-    ): Promise<ServiceAnswer<PerfilMedico | null>> {
+    ): Promise<ServiceAnswer<MedicalProfile | null>> {
       return handleRequest(
         async () => {
           const response = await api.post('/doctor-profiles/' + doctorId + '/specialties/add', {
@@ -112,7 +115,7 @@ export const useDoctorStore = defineStore('doctorStore', {
     async removeSpecialty(
       doctorId: number,
       specialtyId: number,
-    ): Promise<ServiceAnswer<PerfilMedico | null>> {
+    ): Promise<ServiceAnswer<MedicalProfile | null>> {
       return handleRequest(
         async () => {
           const response = await api.delete(

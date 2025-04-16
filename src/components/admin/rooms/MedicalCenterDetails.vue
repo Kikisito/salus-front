@@ -31,15 +31,15 @@ const { dialogRef, onDialogHide } = useDialogPluginComponent()
       <q-card-section>
         <div class="card-header q-mb-md">
           <q-icon name="domain" size="2em" class="q-mr-sm" />
-          <span class="text-h5 text-weight-regular q-mb-sm">{{ medicalCenter.nombre }}</span>
+          <span class="text-h5 text-weight-regular q-mb-sm">{{ medicalCenter.name }}</span>
 
           <span class="text-subtitle2 text-weight-light">
-            {{ medicalCenter.lineaDireccion1 }}, {{ medicalCenter.lineaDireccion2 }}
+            {{ medicalCenter.addressLine1 }}, {{ medicalCenter.addressLine2 }}
           </span>
 
           <span class="text-subtitle2 text-weight-light">
-            {{ medicalCenter.localidad }}, {{ medicalCenter.municipio }}
-            {{ medicalCenter.codigoPostal }}, {{ medicalCenter.provincia }}
+            {{ medicalCenter.locality }}, {{ medicalCenter.municipality }}
+            {{ medicalCenter.zipCode }}, {{ medicalCenter.province }}
           </span>
         </div>
 
@@ -50,7 +50,7 @@ const { dialogRef, onDialogHide } = useDialogPluginComponent()
           <div class="q-mt-sm">
             <q-icon name="phone" size="1.5em" class="q-mr-sm" />
             <span class="text-subtitle2 text-weight-light">
-              {{ medicalCenter.telefono }}
+              {{ medicalCenter.phone }}
             </span>
           </div>
 

@@ -13,8 +13,8 @@ const medicalCenterStore = useMedicalCenterStore()
 const { medicalCenters, count } = storeToRefs(medicalCenterStore)
 
 const tableColumns: QTableColumn[] = [
-  { name: 'name', label: 'Nombre', field: (row) => row.nombre, align: 'left' },
-  { name: 'phone', label: 'Teléfono', field: (row) => row.telefono, align: 'left' },
+  { name: 'name', label: 'Nombre', field: (row) => row.name, align: 'left' },
+  { name: 'phone', label: 'Teléfono', field: (row) => row.phone, align: 'left' },
   { name: 'email', label: 'Email', field: (row) => row.email, align: 'left' },
   { name: 'actions', label: 'Acciones', field: '', align: 'left' },
 ]

@@ -1,13 +1,13 @@
 export interface MedicalCenter {
   id: number
-  nombre: string
+  name: string
   email: string
-  telefono: string
-  lineaDireccion1: string
-  lineaDireccion2: string
-  codigoPostal: string
-  pais: string
-  provincia: string
-  municipio: string
-  localidad: string
+  phone: string
+  addressLine1: string
+  addressLine2: string
+  zipCode: string
+  country: string
+  province: string
+  municipality: string
+  locality: string
 }
