@@ -5,10 +5,12 @@ import { useRoute } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDoctorStore } from 'src/stores/admin/DoctorStore'
-import { Loading, Notify } from 'quasar'
+import { Dialog, Loading, Notify } from 'quasar'
 import { useAppointmentSlotStore } from 'src/stores/admin/AppointmentSlotStore'
 import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
 import CalendarSettings from 'src/components/CalendarSettings.vue'
+import AppointmentSlotDialog from 'src/components/admin/appointment-slots/AppointmentSlotDialog.vue'
+import { useAppointmentStore } from 'src/stores/admin/AppointmentStore'
 
 const route = useRoute()
 
@@ -18,15 +20,52 @@ const { inspectedDoctor } = storeToRefs(doctorStore)
 const appointmentSlotStore = useAppointmentSlotStore()
 const { slots } = storeToRefs(appointmentSlotStore)
 
+const appointmentStore = useAppointmentStore()
+
 const rawDoctorId: string = route.params.id as string
 const doctorId = parseInt(rawDoctorId)
 
+// Start calendar settings
 const calendar = ref<QCalendarDay>()
 const calendarStartHour = ref(8)
 const calendarEndHour = ref(22)
 const rowHeight = ref(64)
 
 const getIntervalCount = () => calendarEndHour.value - calendarStartHour.value
+// End calendar settings
+
+async function showAppointmentSlot(appointmentSlot: AppointmentSlot) {
+  Loading.show({
+    message: 'Cargando información del turno...',
+  })
+
+  let appointment = null
+  if (appointmentSlot.appointmentId) {
+    const response = await appointmentStore.getAppointment(appointmentSlot.appointmentId)
+
+    if (!response.success) {
+      Notify.create({
+        type: 'negative',
+        message: 'Error al cargar la cita. Algunos datos se mostrarán incompletos.',
+      })
+      Loading.hide()
+      return
+    } else {
+      appointment = response.data
+    }
+  }
+
+  Dialog.create({
+    component: AppointmentSlotDialog,
+    componentProps: {
+      appointmentSlot: appointmentSlot,
+      appointment: appointment,
+    },
+    persistent: true,
+  })
+
+  Loading.hide()
+}
 
 const getEvents = (timestamp: Timestamp) => {
   return slots.value.filter((event) => {
@@ -201,6 +240,7 @@ function calculateHeight(event: AppointmentSlot): string {
                         top: calculateTop(event),
                         height: calculateHeight(event),
                       }"
+                      @click="showAppointmentSlot(event)"
                     >
                       <q-tooltip
                         anchor="center right"

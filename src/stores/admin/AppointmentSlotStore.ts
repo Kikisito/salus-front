@@ -28,6 +28,20 @@ export const useAppointmentSlotStore = defineStore('appointmentSlotStore', {
       )
     },
 
+    async getAppointmentSlot(id: number): Promise<ServiceAnswer<AppointmentSlot>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get('/appointment-slots/' + id)
+          const slot = await response.data
+          return slot
+        },
+        (error) => {
+          console.error(error)
+          return 'Ha ocurrido un error al obtener el hueco de cita'
+        },
+      )
+    },
+
     async addAppointmentSlot(entry: AppointmentSlot): Promise<ServiceAnswer<AppointmentSlot[]>> {
       return handleRequest(
         async () => {
