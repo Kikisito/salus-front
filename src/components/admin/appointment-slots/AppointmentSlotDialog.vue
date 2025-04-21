@@ -6,15 +6,20 @@ import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
 import type { Room } from 'src/interfaces/Room'
 import type { ServiceAnswer } from 'src/interfaces/ServiceAnswer'
 import type { Appointment } from 'src/interfaces/Appointment'
+import type { Specialty } from 'src/interfaces/Specialty'
 
 const props = defineProps({
   appointmentSlot: {
     type: Object as PropType<AppointmentSlot>,
-    required: true,
+    default: null,
   },
   appointment: {
     type: Object as PropType<Appointment>,
     default: null,
+  },
+  specialties: {
+    type: Array as PropType<Specialty[]>,
+    default: () => [],
   },
   getRooms: {
     type: Function as PropType<(page: number, limit: number) => Promise<ServiceAnswer<Room[]>>>,
@@ -28,12 +33,14 @@ const props = defineProps({
   },
 })
 
+defineEmits([...useDialogPluginComponent.emits])
+
 const { dialogRef, onDialogOK } = useDialogPluginComponent()
 
 const readonly = ref(false)
 
 // Modelo del formulario
-const appointmentSlot = ref<Partial<AppointmentSlot>>(props.appointmentSlot)
+const appointmentSlot = ref<Partial<AppointmentSlot>>(props.appointmentSlot || {}) // Hueco de cita (opcional)
 const appointment = ref<Partial<Appointment>>(props.appointment) // Cita asignada (opcional)
 
 // Lista de salas disponibles
@@ -63,8 +70,8 @@ const filterRooms = async (val: string, update: (callback: () => void) => void) 
 }
 
 onMounted(async () => {
-  // Si el id de la cita es 0, significa que es una nueva cita
-  if (props.appointmentSlot.id === 0) {
+  // Si no se pasa un hueco de cita, se debe crear uno nuevo
+  if (!props.appointmentSlot) {
     readonly.value = false
   } else {
     // Si no, es una cita existente y se debe cargar la información
@@ -95,7 +102,7 @@ onMounted(async () => {
               <q-select
                 filled
                 v-model="appointmentSlot.specialty"
-                :options="appointmentSlot.doctor?.specialties"
+                :options="specialties"
                 option-value="id"
                 option-label="name"
                 label="Especialidad"
@@ -148,13 +155,8 @@ onMounted(async () => {
                 filled
                 v-model="appointmentSlot.date"
                 type="date"
-                label="Hora de fin"
-                :rules="[
-                  (val) => !!val || 'La hora de fin es obligatoria',
-                  (val) =>
-                    (appointmentSlot.startTime && val > appointmentSlot.startTime) ||
-                    'La hora de fin debe ser posterior a la hora de inicio',
-                ]"
+                label="Fecha"
+                :rules="[(val) => !!val || 'La fecha es obligatoria']"
                 :readonly="readonly"
               />
             </div>

@@ -1,7 +1,11 @@
 <script lang="ts" setup>
-const calendarStartHour = defineModel('startHour', { required: true, type: Number })
-const calendarEndHour = defineModel('endHour', { required: true, type: Number })
-const rowHeight = defineModel('height', { required: true, type: Number })
+interface CalendarSettings {
+  startHour: number
+  endHour: number
+  rowHeight: number
+}
+
+const calendarSettings = defineModel<CalendarSettings>('calendarSettings', { required: true })
 </script>
 
 <template>
@@ -10,7 +14,7 @@ const rowHeight = defineModel('height', { required: true, type: Number })
     <div class="row q-mt-sm items-center">
       <span class="q-mr-sm">Desde:</span>
       <q-input
-        v-model.number="calendarStartHour"
+        v-model.number="calendarSettings.startHour"
         type="number"
         dense
         min="0"
@@ -19,7 +23,7 @@ const rowHeight = defineModel('height', { required: true, type: Number })
       />
       <span class="q-mx-sm">hasta:</span>
       <q-input
-        v-model.number="calendarEndHour"
+        v-model.number="calendarSettings.endHour"
         type="number"
         dense
         min="1"
@@ -34,7 +38,7 @@ const rowHeight = defineModel('height', { required: true, type: Number })
     <div class="row q-mt-sm items-center">
       <span class="q-mr-sm">Altura en píxeles:</span>
       <q-input
-        v-model.number="rowHeight"
+        v-model.number="calendarSettings.rowHeight"
         type="number"
         dense
         min="32"
@@ -44,9 +48,23 @@ const rowHeight = defineModel('height', { required: true, type: Number })
     </div>
 
     <div class="row q-mt-md">
-      <q-btn label="Pequeño" flat dense size="sm" @click="rowHeight = 48" class="q-mr-xs" />
-      <q-btn label="Normal" flat dense size="sm" @click="rowHeight = 64" class="q-mr-xs" />
-      <q-btn label="Grande" flat dense size="sm" @click="rowHeight = 96" />
+      <q-btn
+        label="Pequeño"
+        flat
+        dense
+        size="sm"
+        @click="calendarSettings.rowHeight = 48"
+        class="q-mr-xs"
+      />
+      <q-btn
+        label="Normal"
+        flat
+        dense
+        size="sm"
+        @click="calendarSettings.rowHeight = 64"
+        class="q-mr-xs"
+      />
+      <q-btn label="Grande" flat dense size="sm" @click="calendarSettings.rowHeight = 96" />
     </div>
   </div>
 </template>

@@ -1,5 +1,4 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
-import { date } from 'quasar'
 import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
 import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
@@ -11,12 +10,13 @@ export const useAppointmentSlotStore = defineStore('appointmentSlotStore', {
   }),
 
   actions: {
-    async getDoctorAppointmentSlots(doctorId: number): Promise<ServiceAnswer<AppointmentSlot[]>> {
+    async getDoctorAppointmentSlots(
+      doctorId: number,
+      date: string,
+    ): Promise<ServiceAnswer<AppointmentSlot[]>> {
       return handleRequest(
         async () => {
-          const response = await api.get(
-            '/appointment-slots/' + doctorId + '/' + date.formatDate(Date.now(), 'DD-MM-YYYY'),
-          )
+          const response = await api.get('/appointment-slots/' + doctorId + '/' + date + '/weekly')
           this.slots = await response.data
 
           return this.slots
@@ -45,7 +45,7 @@ export const useAppointmentSlotStore = defineStore('appointmentSlotStore', {
     async addAppointmentSlot(entry: AppointmentSlot): Promise<ServiceAnswer<AppointmentSlot[]>> {
       return handleRequest(
         async () => {
-          const response = await api.post('/appointment-slot/add', entry)
+          const response = await api.post('/appointment-slots/add', entry)
           const slot = await response.data
 
           // Añadimos a la lista local
@@ -55,7 +55,7 @@ export const useAppointmentSlotStore = defineStore('appointmentSlotStore', {
         },
         (error) => {
           if (error.status === 409) {
-            return 'Este hueco con otro ya existente'
+            return 'Este hueco colapsa con otro ya existente'
           } else if (error.status === 404) {
             return 'Alguno de los datos introducidos no es correcto. Refresca la página e inténtalo de nuevo'
           }
@@ -69,7 +69,7 @@ export const useAppointmentSlotStore = defineStore('appointmentSlotStore', {
     async deleteAppointmentSlot(id: number): Promise<ServiceAnswer<boolean>> {
       return handleRequest(
         async () => {
-          const response = await api.delete('/appointment-slot/' + id)
+          const response = await api.delete('/appointment-slots/' + id)
           const deleted = response.status === 204
 
           // Eliminamos de la lista local
