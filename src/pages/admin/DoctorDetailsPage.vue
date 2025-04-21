@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { Timestamp } from '@quasar/quasar-ui-qcalendar'
 import { QCalendarDay } from '@quasar/quasar-ui-qcalendar'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDoctorStore } from 'src/stores/admin/DoctorStore'
@@ -13,6 +13,7 @@ import ScheduleEntryForm from 'src/components/admin/doctors/ScheduleEntryForm.vu
 import { useRoomStore } from 'src/stores/admin/RoomStore'
 
 const route = useRoute()
+const router = useRouter()
 
 const doctorStore = useDoctorStore()
 const { inspectedDoctor } = storeToRefs(doctorStore)
@@ -85,6 +86,36 @@ async function manageSpecialties() {
       medicalProfile: inspectedDoctor.value,
     },
     persistent: true,
+  })
+}
+
+async function deleteMedicalProfile() {
+  Dialog.create({
+    title: 'Eliminar perfil médico',
+    message: '¿Estás seguro de que quieres eliminar este perfil médico?',
+    cancel: true,
+    persistent: true,
+  }).onOk(async () => {
+    Loading.show({
+      message: 'Eliminando perfil médico...',
+    })
+
+    const response = await doctorStore.deleteMedicalProfile(inspectedDoctor.value!.id)
+
+    if (response.success) {
+      Notify.create({
+        type: 'positive',
+        message: 'Perfil médico eliminado correctamente',
+      })
+      router.push({ name: 'admin-doctors' })
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: response.error,
+      })
+    }
+
+    Loading.hide()
   })
 }
 
@@ -296,30 +327,6 @@ function calculateHeight(event: MedicalAgenda): string {
           <q-space />
           <q-btn-dropdown label="Acciones" color="primary" icon="settings" rounded>
             <q-list>
-              <!-- Número de colegiado -->
-              <q-item clickable v-close-popup @click="changeLicense()">
-                <q-item-section avatar>
-                  <q-avatar icon="edit" />
-                </q-item-section>
-
-                <q-item-section>
-                  <q-item-label>Modificar número de colegiado</q-item-label>
-                  <q-item-label caption>Modifica el número de colegiado del médico</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <!-- Especialidades -->
-              <q-item clickable v-close-popup @click="manageSpecialties()">
-                <q-item-section avatar>
-                  <q-avatar icon="person_add" />
-                </q-item-section>
-
-                <q-item-section>
-                  <q-item-label>Modificar especialidades</q-item-label>
-                  <q-item-label caption>Modifica las especialidades del médico</q-item-label>
-                </q-item-section>
-              </q-item>
-
               <!-- Agenda -->
               <q-item clickable v-close-popup>
                 <q-item-section avatar>
@@ -335,6 +342,42 @@ function calculateHeight(event: MedicalAgenda): string {
                   <q-item-label caption>
                     Consulta y modifica las citas y slots del médico
                   </q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <!-- Especialidades -->
+              <q-item clickable v-close-popup @click="manageSpecialties()">
+                <q-item-section avatar>
+                  <q-avatar icon="person_add" />
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label>Modificar especialidades</q-item-label>
+                  <q-item-label caption>Modifica las especialidades del médico</q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <!-- Número de colegiado -->
+              <q-item clickable v-close-popup @click="changeLicense()">
+                <q-item-section avatar>
+                  <q-avatar icon="edit" />
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label>Modificar número de colegiado</q-item-label>
+                  <q-item-label caption>Modifica el número de colegiado del médico</q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <!-- Eliminar perfil como médico -->
+              <q-item clickable v-close-popup @click="deleteMedicalProfile()">
+                <q-item-section avatar>
+                  <q-avatar icon="delete" />
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label>Eliminar rol de médico</q-item-label>
+                  <q-item-label caption>Elimina el rol de médico del usuario.</q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>

@@ -136,6 +136,26 @@ export const useDoctorStore = defineStore('doctorStore', {
         },
       )
     },
+
+    async deleteMedicalProfile(id: number): Promise<ServiceAnswer<boolean>> {
+      return handleRequest(
+        async () => {
+          const response = await api.delete('/doctor-profiles/' + id)
+          this.inspectedDoctor = null
+
+          return response.data
+        },
+        (error) => {
+          if (error.status === 404) {
+            return 'El perfil médico indicado no existe'
+          } else if (error.status === 409) {
+            return 'El perfil médico no puede ser eliminado porque tiene datos asociados'
+          } else {
+            return 'Error al eliminar el perfil médico'
+          }
+        },
+      )
+    },
   },
 })
 
