@@ -106,6 +106,23 @@ export const useUsersStore = defineStore('usersStore', {
       )
     },
 
+    // Sección admin
+    async createUser(data: User): Promise<ServiceAnswer<User>> {
+      return handleRequest(
+        async () => {
+          const response = await api.post('/user/add', data)
+          this.users.push(response.data as User)
+
+          return response.data
+        },
+        (error) => {
+          if (error.status === 409) {
+            return 'El correo ya está en uso'
+          }
+        },
+      )
+    },
+
     // Medico
     async convertToProfessional(
       id: number,

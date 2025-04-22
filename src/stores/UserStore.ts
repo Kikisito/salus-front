@@ -87,7 +87,7 @@ export const useUserStore = defineStore('userStore', {
           authStore.setToken(jwtToken)
 
           // Actualizamos en el usuario local la fecha del último cambio de contraseña
-          this.user!.lastPasswordChange = new Date()
+          this.user!.lastPasswordChange = new Date().toISOString()
 
           return true
         },

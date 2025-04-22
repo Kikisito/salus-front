@@ -5,9 +5,9 @@ export interface User {
   nombre: string
   apellidos: string
   nif: string
-  fechaNacimiento: Date
+  fechaNacimiento: string
   email: string
-  lastPasswordChange: Date
+  lastPasswordChange: string
   telefono: string
   sexo: string
   direccion: Direccion

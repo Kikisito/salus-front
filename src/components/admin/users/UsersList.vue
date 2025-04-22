@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import EntityList from '../EntityList.vue'
+import EntityList from 'src/components/EntityList.vue'
 
 import { storeToRefs } from 'pinia'
 import { useUsersStore } from 'src/stores/admin/UsersStore'
 import { ref } from 'vue'
 
-import type { QTableColumn } from 'quasar'
+import { Dialog, Loading, Notify, type QTableColumn } from 'quasar'
+import RegisterUserDialog from './RegisterUserDialog.vue'
 
 const usersStore = useUsersStore()
 const { users, count } = storeToRefs(usersStore)
@@ -26,6 +27,36 @@ const pagination = ref({
   rowsPerPage: 10,
   rowsNumber: count.value,
 })
+
+async function openCreateUserDialog() {
+  Dialog.create({
+    component: RegisterUserDialog,
+    componentProps: {
+      randomPassword: true,
+      persistent: true,
+    },
+  }).onOk(async (user) => {
+    Loading.show({
+      message: 'Creando usuario...',
+    })
+
+    const response = await usersStore.createUser(user)
+
+    if (response.success) {
+      Notify.create({
+        type: 'positive',
+        message: 'Usuario creado correctamente',
+      })
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: 'Error al crear el usuario',
+      })
+    }
+
+    Loading.hide()
+  })
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function onRequest(props: any) {
@@ -59,6 +90,17 @@ async function onRequest(props: any) {
     v-model:pagination="pagination"
     @table:request="onRequest($event)"
   >
+    <template #top-right-additional>
+      <q-btn
+        icon="person_add"
+        label="Crear usuario"
+        color="primary"
+        size="sm"
+        class="q-ml-md"
+        @click="openCreateUserDialog()"
+      />
+    </template>
+
     <template #actions="props">
       <q-td :props="props" class="actions-column">
         <q-btn
