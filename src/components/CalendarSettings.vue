@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 interface CalendarSettings {
+  type: string // 'day' | 'week'
   startHour: number
   endHour: number
   rowHeight: number
@@ -10,6 +11,22 @@ const calendarSettings = defineModel<CalendarSettings>('calendarSettings', { req
 
 <template>
   <div class="q-pa-md">
+    <div class="text-subtitle2">Tipo de vista</div>
+    <div class="row q-mt-sm items-center">
+      <q-btn-toggle
+        v-model="calendarSettings.type"
+        toggle-color="primary"
+        :options="[
+          { label: 'Día', value: 'day' },
+          { label: 'Semana', value: 'week' },
+        ]"
+        flat
+        dense
+      />
+    </div>
+
+    <q-separator class="q-my-md" />
+
     <div class="text-subtitle2">Horas visibles</div>
     <div class="row q-mt-sm items-center">
       <span class="q-mr-sm">Desde:</span>

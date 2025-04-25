@@ -1,16 +1,19 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
+import { useAuthStore } from './AuthStore'
+
 import type { ApiError } from 'src/interfaces/ApiError'
 import type { Direccion } from 'src/interfaces/Direccion'
 import type { PasswordChangeRequest } from 'src/interfaces/PasswordChangeRequest'
-import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
+import type { ServiceAnswer } from 'src/interfaces/ServiceAnswer'
 import type { User } from 'src/interfaces/User'
-import { useAuthStore } from './AuthStore'
+import type { MedicalProfile } from 'src/interfaces/MedicalProfile'
 
 export const useUserStore = defineStore('userStore', {
   state: () => ({
     user: null as User | null,
+    medicalProfile: {} as MedicalProfile,
   }),
 
   getters: {
@@ -26,7 +29,11 @@ export const useUserStore = defineStore('userStore', {
       this.user = user
     },
 
-    async getCurrentProfile(): Promise<ServiceAnswer<User | null>> {
+    async setMedicalProfile(medicalProfile: MedicalProfile | null): Promise<void> {
+      this.medicalProfile = medicalProfile as MedicalProfile
+    },
+
+    async getCurrentUser(): Promise<ServiceAnswer<User | null>> {
       return handleRequest(
         async () => {
           const response = await api.get('/user/@me')
@@ -38,6 +45,15 @@ export const useUserStore = defineStore('userStore', {
           throw error
         },
       )
+    },
+
+    async getCurrentMedicalProfile(): Promise<ServiceAnswer<MedicalProfile | null>> {
+      return handleRequest(async () => {
+        const response = await api.get('/doctor-profiles/@me')
+        this.medicalProfile = await response.data
+
+        return this.medicalProfile
+      })
     },
 
     async updateProfile(newData: User): Promise<ServiceAnswer<User | null>> {

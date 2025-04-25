@@ -75,10 +75,34 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true },
   },
   {
-    name: 'profesional',
-    path: '/profesional',
-    component: () => import('layouts/ProfesionalLayout.vue'),
-    children: [],
+    path: '/professional',
+    component: () => import('layouts/ProfessionalLayout.vue'),
+    children: [
+      {
+        path: '',
+        redirect: { name: 'professional' },
+      },
+      {
+        name: 'professional',
+        path: 'home',
+        component: () => import('pages/professional/IndexPage.vue'),
+      },
+      {
+        path: 'agenda',
+        children: [
+          {
+            name: 'professional-agenda',
+            path: '',
+            component: () => import('pages/professional/AgendaPage.vue'),
+          },
+          {
+            name: 'professional-appointment',
+            path: ':id',
+            component: () => import('pages/professional/AppointmentDetailsPage.vue'),
+          },
+        ],
+      },
+    ],
     meta: { requiresAuth: true, requiresProfesional: true },
   },
   {

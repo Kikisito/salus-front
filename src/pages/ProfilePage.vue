@@ -21,7 +21,7 @@ const showDireccionModal = ref(false)
 onMounted(async () => {
   // Actualizamos los datos del usuario cada vez que se carga la página
   // Así, si se cambian los datos desde otro sitio, se reflejarán
-  await userStore.getCurrentProfile()
+  await userStore.getCurrentUser()
 })
 
 const updateProfile = async (user: User) => {

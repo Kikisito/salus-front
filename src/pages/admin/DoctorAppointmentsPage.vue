@@ -4,10 +4,10 @@ import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDoctorStore } from 'src/stores/admin/DoctorStore'
 import { date, Dialog, Loading, Notify } from 'quasar'
-import { useAppointmentSlotStore } from 'src/stores/admin/AppointmentSlotStore'
+import { useAppointmentSlotStore } from 'src/stores/AppointmentSlotStore'
 import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
 import AppointmentSlotDialog from 'src/components/admin/appointment-slots/AppointmentSlotDialog.vue'
-import { useAppointmentStore } from 'src/stores/admin/AppointmentStore'
+import { useAppointmentStore } from 'src/stores/AppointmentStore'
 import { useRoomStore } from 'src/stores/admin/RoomStore'
 import AppointmentsCalendar from 'src/components/AppointmentsCalendar.vue'
 
@@ -202,8 +202,8 @@ onMounted(async () => {
 
               <AppointmentsCalendar
                 v-model:appointment-slots="slots"
-                @show:appointment-slot="showAppointmentSlot($event)"
-                @delete:appointment-slot="deleteAppointmentSlot($event)"
+                @appointment-slot:click="showAppointmentSlot($event)"
+                @appointment-slot:context="deleteAppointmentSlot($event)"
                 @update:model-value="getData($event)"
               />
 

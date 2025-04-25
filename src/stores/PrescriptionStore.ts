@@ -1,0 +1,81 @@
+import { defineStore, acceptHMRUpdate } from 'pinia'
+import { api } from 'src/boot/axios'
+import { handleRequest } from 'src/helpers/handleRequest'
+import type { Prescription } from 'src/interfaces/Prescription'
+import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
+
+export const usePrescriptionStore = defineStore('prescriptionStore', {
+  state: () => ({
+    prescriptions: [] as Prescription[],
+  }),
+
+  actions: {
+    async downloadPrescriptionPdf(prescription: Prescription): Promise<ServiceAnswer<Blob>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get(`/prescriptions/${prescription.id}/pdf`, {
+            responseType: 'blob',
+          })
+          const pdfBlob = await response.data
+
+          const url = window.URL.createObjectURL(pdfBlob)
+          const link = document.createElement('a')
+          link.href = url
+          link.download = `Prescription-${prescription.patient.nif}.pdf`
+          link.click()
+          window.URL.revokeObjectURL(url)
+
+          return pdfBlob
+        },
+        (error) => {
+          if (error.status === 401) {
+            return 'No tienes permisos para realizar esta acción.'
+          } else {
+            console.error(error)
+            return 'Ha ocurrido un error al obtener la receta.'
+          }
+        },
+      )
+    },
+
+    async addPrescription(data: Prescription): Promise<ServiceAnswer<Prescription>> {
+      return handleRequest(
+        async () => {
+          const response = await api.post('/prescriptions/add', data)
+
+          const prescription = await response.data
+          return prescription
+        },
+        (error) => {
+          if (error.status === 401) {
+            return 'No tienes permisos para realizar esta acción.'
+          } else {
+            console.error(error)
+            return 'Ha ocurrido un error al añadir el informe.'
+          }
+        },
+      )
+    },
+
+    async deletePrescription(id: number): Promise<ServiceAnswer<boolean>> {
+      return handleRequest(
+        async () => {
+          const response = await api.delete(`/prescriptions/${id}`)
+          return response.status === 204
+        },
+        (error) => {
+          if (error.status === 401) {
+            return 'No tienes permisos para realizar esta acción.'
+          } else {
+            console.error(error)
+            return 'Ha ocurrido un error al eliminar el informe.'
+          }
+        },
+      )
+    },
+  },
+})
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(usePrescriptionStore, import.meta.hot))
+}

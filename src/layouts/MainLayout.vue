@@ -78,7 +78,7 @@ const menuItems = [
   {
     label: 'Área profesional',
     icon: 'medical_information',
-    path: '/profesional',
+    path: '/professional',
     show: userStore.hasRole('PROFESSIONAL'),
   },
   { label: 'Mi perfil', icon: 'person', path: '/profile', show: true },

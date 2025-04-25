@@ -1,16 +1,25 @@
 <script lang="ts" setup>
 import { today, type Timestamp } from '@quasar/quasar-ui-qcalendar'
 import { date } from 'quasar'
-import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
 import { ref } from 'vue'
 import CalendarSettings from './CalendarSettings.vue'
 
-defineEmits(['update:model-value', 'show:appointment-slot', 'delete:appointment-slot'])
+import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
+
+const props = defineProps({
+  calendarType: {
+    type: String,
+    default: 'week',
+  },
+})
+
+defineEmits(['update:model-value', 'appointment-slot:click', 'appointment-slot:context'])
 
 // Ajustes varios del calendario
 const calendar = ref()
 const selectedDate = ref(today())
 const calendarSettings = ref({
+  type: props.calendarType,
   startHour: 8,
   endHour: 22,
   rowHeight: 64,
@@ -146,7 +155,7 @@ function goToNextWeek() {
   <q-calendar-day
     ref="calendar"
     v-model="selectedDate"
-    view="week"
+    :view="calendarSettings.type"
     transition-next="slide-left"
     transition-prev="slide-right"
     :weekdays="[1, 2, 3, 4, 5, 6, 0]"
@@ -168,8 +177,8 @@ function goToNextWeek() {
             top: calculateTop(event),
             height: calculateHeight(event),
           }"
-          @click="$emit('show:appointment-slot', event)"
-          @contextmenu.prevent="$emit('delete:appointment-slot', event)"
+          @click="$emit('appointment-slot:click', event)"
+          @contextmenu.prevent="$emit('appointment-slot:context', event)"
         >
           <q-tooltip anchor="center right" self="center left" class="bg-primary text-body2">
             <div>

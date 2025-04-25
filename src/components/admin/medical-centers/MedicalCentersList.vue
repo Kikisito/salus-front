@@ -129,7 +129,8 @@ function openMedicalCenterEditForm(medicalCenter?: MedicalCenter) {
 async function deleteMedicalCenter(id: number) {
   Dialog.create({
     title: 'Confirmar eliminación',
-    message: '¿Estás seguro de que deseas eliminar este centro médico?',
+    message:
+      '¿Estás seguro de que deseas eliminar este centro médico? Solo podrás eliminar este centro si no tiene citas asignadas. Las consultas asociadas serán también eliminadas.',
     cancel: true,
     persistent: true,
   }).onOk(async () => {

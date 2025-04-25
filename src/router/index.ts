@@ -41,7 +41,7 @@ export default defineRouter(function (/* { store, ssrContext } */) {
 
     // Check if the user store is loaded
     if (authStore.isAuthenticated && !userStore.user) {
-      await userStore.getCurrentProfile() // the result is ignored, this is just to load the store
+      await userStore.getCurrentUser() // the result is ignored, this is just to load the store
     }
 
     // Verifications
