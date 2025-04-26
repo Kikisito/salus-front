@@ -56,6 +56,7 @@ onMounted(async () => {
       <slot name="top-right-additional" />
     </template>
 
+    <!-- Botones de la columna de acciones -->
     <template #body-cell-actions="props">
       <slot name="actions" v-bind="props" />
     </template>

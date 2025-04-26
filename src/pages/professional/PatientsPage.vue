@@ -1,5 +1,40 @@
 <script lang="ts" setup>
-import UsersList from 'src/components/admin/users/UsersList.vue'
+import UsersList from 'src/components/UsersList.vue'
+import { storeToRefs } from 'pinia'
+import { useUsersStore } from 'src/stores/admin/UsersStore'
+import { ref } from 'vue'
+
+const usersStore = useUsersStore()
+const { users, count } = storeToRefs(usersStore)
+
+const pagination = ref({
+  page: 1,
+  rowsPerPage: 10,
+  rowsNumber: count.value,
+})
+
+const loading = ref(false)
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function onRequest(props: any) {
+  const { page, rowsPerPage } = props.pagination
+  const filter = props.filter
+
+  loading.value = true
+  // Si hay un filtro, aplicamos el método específico de búsqueda
+  if (filter) {
+    await usersStore.searchFromAllUsers(filter, page - 1, rowsPerPage)
+    // Si no, cargamos todos los usuarios
+  } else {
+    await usersStore.getAllUsers(page - 1, rowsPerPage)
+  }
+
+  // Actualizamos los datos de la paginación
+  pagination.value.rowsNumber = count.value
+  pagination.value.page = page
+  pagination.value.rowsPerPage = rowsPerPage
+  loading.value = false
+}
 </script>
 
 <template>
@@ -11,7 +46,23 @@ import UsersList from 'src/components/admin/users/UsersList.vue'
           <div class="text-subtitle">Comprueba los usuarios registrados en la aplicación</div>
         </div>
 
-        <UsersList />
+        <UsersList
+          v-model:pagination="pagination"
+          :users="users"
+          :total-users="count"
+          :onTableRequest="onRequest"
+          :loading="loading"
+        >
+          <template #actions="props">
+            <q-btn
+              icon="visibility"
+              color="green"
+              size="sm"
+              round
+              @click="$router.push({ name: 'professional-patient', params: { id: props.row.id } })"
+            />
+          </template>
+        </UsersList>
       </div>
     </div>
   </q-page>

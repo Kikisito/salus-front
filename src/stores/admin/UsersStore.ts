@@ -29,7 +29,7 @@ export const useUsersStore = defineStore('usersStore', {
       )
     },
 
-    async searchUsers(
+    async searchFromAllUsers(
       search: string,
       page: number = 0,
       limit: number = 10,
@@ -123,7 +123,6 @@ export const useUsersStore = defineStore('usersStore', {
       )
     },
 
-    // Medico
     async convertToProfessional(
       id: number,
       license: string,

@@ -21,18 +21,24 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  showAddUserButton: {
+    type: Boolean,
+    default: false,
+  },
+  tableColumns: {
+    type: Array as () => QTableColumn[],
+    default: () => [
+      { name: 'name', label: 'Nombre', field: 'nombre', align: 'left' },
+      { name: 'surname', label: 'Apellidos', field: 'apellidos', align: 'left' },
+      { name: 'idcard', label: 'DNI', field: 'nif', align: 'left' },
+      { name: 'email', label: 'Correo', field: 'email', align: 'left' },
+      { name: 'phone', label: 'Teléfono', field: 'telefono', align: 'left' },
+      { name: 'actions', label: 'Acciones', field: '', align: 'left' },
+    ],
+  },
 })
 
 defineEmits(['user:new'])
-
-const tableColumns: QTableColumn[] = [
-  { name: 'name', label: 'Nombre', field: 'nombre', align: 'left' },
-  { name: 'surname', label: 'Apellidos', field: 'apellidos', align: 'left' },
-  { name: 'idcard', label: 'DNI', field: 'nif', align: 'left' },
-  { name: 'email', label: 'Correo', field: 'email', align: 'left' },
-  { name: 'phone', label: 'Teléfono', field: 'telefono', align: 'left' },
-  { name: 'actions', label: 'Acciones', field: '', align: 'left' },
-]
 
 const pagination = defineModel('pagination', {
   type: Object as () => {
@@ -56,6 +62,7 @@ const pagination = defineModel('pagination', {
   >
     <template #top-right-additional>
       <q-btn
+        v-if="showAddUserButton"
         icon="person_add"
         label="Crear usuario"
         color="primary"
@@ -67,13 +74,7 @@ const pagination = defineModel('pagination', {
 
     <template #actions="props">
       <q-td :props="props" class="actions-column">
-        <q-btn
-          icon="visibility"
-          color="green"
-          size="sm"
-          round
-          @click="$router.push({ name: 'admin-patient', params: { id: props.row.id } })"
-        />
+        <slot name="actions" :row="props.row" />
       </q-td>
     </template>
   </EntityList>

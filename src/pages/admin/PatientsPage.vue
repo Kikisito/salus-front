@@ -55,7 +55,7 @@ async function onRequest(props: any) {
   loading.value = true
   // Si hay un filtro, aplicamos el método específico de búsqueda
   if (filter) {
-    await usersStore.searchUsers(filter, page - 1, rowsPerPage)
+    await usersStore.searchFromAllUsers(filter, page - 1, rowsPerPage)
     // Si no, cargamos todos los usuarios
   } else {
     await usersStore.getAllUsers(page - 1, rowsPerPage)
@@ -85,7 +85,18 @@ async function onRequest(props: any) {
           :onTableRequest="onRequest"
           :loading="loading"
           @user:new="openCreateUserDialog()"
-        />
+          show-add-user-button
+        >
+          <template #actions="props">
+            <q-btn
+              icon="visibility"
+              color="green"
+              size="sm"
+              round
+              @click="$router.push({ name: 'admin-patient', params: { id: props.row.id } })"
+            />
+          </template>
+        </UsersList>
       </div>
     </div>
   </q-page>
