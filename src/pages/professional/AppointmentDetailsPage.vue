@@ -2,16 +2,21 @@
 import { storeToRefs } from 'pinia'
 import { Dialog, Notify } from 'quasar'
 import AppointmentData from 'src/components/AppointmentData.vue'
+import MedicalTestList from 'src/components/MedicalTestList.vue'
 import ObservationsInput from 'src/components/ObservationsInput.vue'
 import PatientData from 'src/components/PatientData.vue'
 import PrescriptionList from 'src/components/PrescriptionList.vue'
+import MedicalTestFormDialog from 'src/components/professional/MedicalTestFormDialog.vue'
 import PrescriptionFormDialog from 'src/components/professional/PrescriptionFormDialog.vue'
 import ReportFormDialog from 'src/components/professional/ReportFormDialog.vue'
 import ReportList from 'src/components/ReportList.vue'
 import type { Appointment } from 'src/interfaces/Appointment'
+import type { MedicalTest } from 'src/interfaces/MedicalTest'
 import type { Prescription } from 'src/interfaces/Prescription'
 import type { Report } from 'src/interfaces/Report'
 import { useAppointmentStore } from 'src/stores/AppointmentStore'
+import { useAttachmentStore } from 'src/stores/AttachmentStore'
+import { useMedicalTestStore } from 'src/stores/MedicalTestStore'
 import { usePrescriptionStore } from 'src/stores/PrescriptionStore'
 import { useReportStore } from 'src/stores/ReportStore'
 import { useUserStore } from 'src/stores/UserStore'
@@ -26,10 +31,10 @@ const doctorStore = useUserStore()
 const { medicalProfile } = storeToRefs(doctorStore)
 
 const appointmentStore = useAppointmentStore()
-
 const reportStore = useReportStore()
-
 const prescriptionStore = usePrescriptionStore()
+const medicalTestStore = useMedicalTestStore()
+const attachmentStore = useAttachmentStore()
 
 const appointment = ref<Appointment>(null as unknown as Appointment)
 const doctorObservationsSynced = ref(true)
@@ -258,6 +263,44 @@ async function openNewPrescriptionDialog() {
   })
 }
 
+async function updatePrescriptionDialog(prescription: Prescription) {
+  Dialog.create({
+    component: PrescriptionFormDialog,
+    componentProps: {
+      prescription: { ...prescription },
+      persistent: true,
+    },
+  }).onOk(async (data) => {
+    if (data) {
+      // Especificamos el ID del informe y sus datos asociados
+      data.doctor = medicalProfile.value.id
+      data.patient = appointment.value.patient.id
+      data.appointment = appointment.value.id
+      data.specialty = appointment.value.slot.specialty.id
+
+      // Petición API
+      const response = await prescriptionStore.updatePrescription(data)
+
+      if (response.success) {
+        Notify.create({
+          type: 'positive',
+          message: 'Receta actualizada correctamente',
+        })
+
+        const index = appointment.value.prescriptions.findIndex((r) => r.id === prescription.id)
+        if (index !== -1) {
+          appointment.value.prescriptions[index] = response.data
+        }
+      } else {
+        Notify.create({
+          type: 'negative',
+          message: response.error,
+        })
+      }
+    }
+  })
+}
+
 async function showPrescriptionDialog(prescription: Prescription) {
   Dialog.create({
     component: PrescriptionFormDialog,
@@ -290,6 +333,78 @@ async function deletePrescriptionDialog(prescription: Prescription) {
       Notify.create({
         type: 'negative',
         message: response.error,
+      })
+    }
+  })
+}
+
+// Métodos PRUEBAS MÉDICAS
+async function openNewMedicalTestDialog() {
+  Dialog.create({
+    component: MedicalTestFormDialog,
+    componentProps: {
+      specialties: medicalProfile.value.specialties,
+      persistent: true,
+    },
+  }).onOk(async (data) => {
+    if (data) {
+      // Especificamos el ID del informe y sus datos asociados
+      data.medicalTest.doctor = medicalProfile.value.id
+      data.medicalTest.patient = appointment.value.patient.id
+      data.medicalTest.appointment = appointment.value.id
+
+      // Petición API
+      const response = await medicalTestStore.addMedicalTest(data.medicalTest, data.files)
+
+      if (response.success) {
+        Notify.create({
+          type: 'positive',
+          message: 'Informe creado correctamente',
+        })
+
+        appointment.value.medicalTests.push(response.data)
+      } else {
+        Notify.create({
+          type: 'negative',
+          message: 'Error al crear el informe: ' + response.error,
+        })
+      }
+    }
+  })
+}
+
+async function showMedicalTestDialog(medicalTest: MedicalTest) {
+  Dialog.create({
+    component: MedicalTestFormDialog,
+    componentProps: {
+      medicalTest: medicalTest,
+      readonly: true,
+      download: attachmentStore.downloadAttachment,
+    },
+  })
+}
+
+async function deleteMedicalTestDialog(medicalTestId: number) {
+  Dialog.create({
+    title: 'Eliminar prueba médica',
+    message: '¿Estás seguro de que quieres eliminar esta prueba médica?',
+    persistent: true,
+    cancel: true,
+  }).onOk(async () => {
+    const response = await medicalTestStore.deleteMedicalTest(medicalTestId)
+
+    if (response.success) {
+      Notify.create({
+        type: 'positive',
+        message: 'Prueba médica eliminada correctamente',
+      })
+      appointment.value.medicalTests = appointment.value.medicalTests.filter(
+        (r) => r.id !== medicalTestId,
+      )
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: 'Error al eliminar la prueba médica: ' + response.error,
       })
     }
   })
@@ -382,6 +497,7 @@ onMounted(async () => {
                 :prescriptions="appointment.prescriptions"
                 @prescription:new="openNewPrescriptionDialog()"
                 @prescription:show="showPrescriptionDialog($event)"
+                @prescription:edit="updatePrescriptionDialog($event)"
                 @prescription:download_pdf="prescriptionStore.downloadPrescriptionPdf($event)"
                 @prescription:delete="deletePrescriptionDialog($event)"
               />
@@ -389,21 +505,13 @@ onMounted(async () => {
 
             <!-- Pruebas médicas -->
             <div class="col-12">
-              <q-card flat bordered>
-                <q-card-section>
-                  <div class="row items-center">
-                    <q-icon name="science" class="q-mr-sm" />
-                    <div class="text-h6">Pruebas médicas</div>
-                    <q-space />
-                    <q-btn color="primary" icon="add" round size="sm" />
-                  </div>
-                  <q-separator class="q-my-sm" />
-
-                  <div class="text-center q-pa-md text-grey">
-                    No hay pruebas médicas disponibles
-                  </div>
-                </q-card-section>
-              </q-card>
+              <MedicalTestList
+                :medical-tests="appointment.medicalTests"
+                @medicaltest:new="openNewMedicalTestDialog()"
+                @medicaltest:show="showMedicalTestDialog($event)"
+                @medicaltest:download_pdf="medicalTestStore.downloadMedicalTestPdf($event)"
+                @medicaltest:delete="deleteMedicalTestDialog($event)"
+              />
             </div>
           </div>
         </template>

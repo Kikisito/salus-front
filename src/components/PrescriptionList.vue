@@ -13,6 +13,7 @@ defineProps({
 defineEmits([
   'prescription:new',
   'prescription:show',
+  'prescription:edit',
   'prescription:download_pdf',
   'prescription:delete',
 ])
@@ -57,6 +58,7 @@ defineEmits([
                   round
                   @click="$emit('prescription:show', prescription)"
                 />
+                <q-btn icon="edit" flat round @click="$emit('prescription:edit', prescription)" />
                 <q-btn
                   icon="download"
                   flat

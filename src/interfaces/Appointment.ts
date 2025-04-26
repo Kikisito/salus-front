@@ -1,4 +1,5 @@
 import type { AppointmentSlot } from './AppointmentSlot'
+import type { MedicalTest } from './MedicalTest'
 import type { Prescription } from './Prescription'
 import type { Report } from './Report'
 import type { User } from './User'
@@ -15,4 +16,5 @@ export interface Appointment {
   updatedAt: string
   reports: Report[]
   prescriptions: Prescription[]
+  medicalTests: MedicalTest[]
 }

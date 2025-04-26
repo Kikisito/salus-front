@@ -57,6 +57,24 @@ export const usePrescriptionStore = defineStore('prescriptionStore', {
       )
     },
 
+    async updatePrescription(data: Prescription): Promise<ServiceAnswer<Prescription>> {
+      return handleRequest(
+        async () => {
+          const response = await api.put(`/prescriptions/${data.id}`, data)
+          const prescription = await response.data
+          return prescription
+        },
+        (error) => {
+          if (error.status === 401) {
+            return 'No tienes permisos para realizar esta acción.'
+          } else {
+            console.error(error)
+            return 'Ha ocurrido un error al actualizar el informe.'
+          }
+        },
+      )
+    },
+
     async deletePrescription(id: number): Promise<ServiceAnswer<boolean>> {
       return handleRequest(
         async () => {
