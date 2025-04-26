@@ -48,6 +48,47 @@ export const useUsersStore = defineStore('usersStore', {
       )
     },
 
+    async getDoctorPatients(
+      doctorId: number,
+      page: number = 0,
+      limit: number = 10,
+    ): Promise<ServiceAnswer<User[] | null>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get(`/user/patients/${doctorId}/${page}/${limit}`)
+          this.count = await response.data.count
+          this.users = await response.data.users
+
+          return this.users
+        },
+        (error) => {
+          throw error
+        },
+      )
+    },
+
+    async searchDoctorPatients(
+      doctorId: number,
+      search: string,
+      page: number = 0,
+      limit: number = 10,
+    ): Promise<ServiceAnswer<User[] | null>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get(
+            `/user/patients/search/${search}/${doctorId}/${page}/${limit}`,
+          )
+
+          this.count = await response.data.count
+          this.users = await response.data.users
+          return this.users
+        },
+        (error) => {
+          throw error
+        },
+      )
+    },
+
     async getUserData(id: number): Promise<ServiceAnswer<User | null>> {
       return handleRequest(
         async () => {

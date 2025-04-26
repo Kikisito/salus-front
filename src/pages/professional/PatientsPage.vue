@@ -3,9 +3,13 @@ import UsersList from 'src/components/UsersList.vue'
 import { storeToRefs } from 'pinia'
 import { useUsersStore } from 'src/stores/admin/UsersStore'
 import { ref } from 'vue'
+import { useUserStore } from 'src/stores/UserStore'
 
 const usersStore = useUsersStore()
 const { users, count } = storeToRefs(usersStore)
+
+const doctorStore = useUserStore()
+const { medicalProfile } = storeToRefs(doctorStore)
 
 const pagination = ref({
   page: 1,
@@ -23,10 +27,10 @@ async function onRequest(props: any) {
   loading.value = true
   // Si hay un filtro, aplicamos el método específico de búsqueda
   if (filter) {
-    await usersStore.searchFromAllUsers(filter, page - 1, rowsPerPage)
-    // Si no, cargamos todos los usuarios
+    await usersStore.searchDoctorPatients(medicalProfile.value.id, filter, page - 1, rowsPerPage)
+    // Si no, cargamos todos los usuarios de este doctor
   } else {
-    await usersStore.getAllUsers(page - 1, rowsPerPage)
+    await usersStore.getDoctorPatients(medicalProfile.value.id, page - 1, rowsPerPage)
   }
 
   // Actualizamos los datos de la paginación
