@@ -102,6 +102,11 @@ const routes: RouteRecordRaw[] = [
           },
         ],
       },
+      {
+        name: 'professional-patients',
+        path: 'patients',
+        component: () => import('pages/professional/PatientsPage.vue'),
+      },
     ],
     meta: { requiresAuth: true, requiresProfesional: true },
   },
