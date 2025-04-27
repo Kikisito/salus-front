@@ -24,6 +24,27 @@ export const useAppointmentStore = defineStore('appointmentStore', {
       )
     },
 
+    async getPatientAppointmentsWithDoctorOrItsSpecialties(
+      patientId: number,
+      doctorId: number,
+    ): Promise<ServiceAnswer<Appointment[]>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get(`/appointments/patient/${patientId}/doctor/${doctorId}`)
+          const appointments = await response.data
+          return appointments
+        },
+        (error) => {
+          if (error.status === 401) {
+            return 'No tienes permisos para realizar esta acción. Solo puedes ver tus citas asignadas.'
+          } else {
+            console.error(error)
+            return 'Ha ocurrido un error al obtener las citas del paciente'
+          }
+        },
+      )
+    },
+
     async setAppointmentStatus(id: number, status: string): Promise<ServiceAnswer<Appointment>> {
       return handleRequest(
         async () => {

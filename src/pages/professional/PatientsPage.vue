@@ -46,8 +46,10 @@ async function onRequest(props: any) {
     <div class="row justify-evenly">
       <div class="col-12 col-md-9">
         <div class="section-header">
-          <div class="text-h6">Usuarios registrados</div>
-          <div class="text-subtitle">Comprueba los usuarios registrados en la aplicación</div>
+          <div class="text-h6">Mis pacientes</div>
+          <div class="text-subtitle">
+            Listado con los pacientes que han tenido o tendrán una cita médica contigo
+          </div>
         </div>
 
         <UsersList
@@ -63,7 +65,9 @@ async function onRequest(props: any) {
               color="green"
               size="sm"
               round
-              @click="$router.push({ name: 'professional-patient', params: { id: props.row.id } })"
+              @click="
+                $router.push({ name: 'professional-patient-details', params: { id: props.row.id } })
+              "
             />
           </template>
         </UsersList>

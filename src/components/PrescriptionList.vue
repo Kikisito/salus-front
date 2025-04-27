@@ -58,13 +58,13 @@ defineEmits([
                   round
                   @click="$emit('prescription:show', prescription)"
                 />
-                <q-btn icon="edit" flat round @click="$emit('prescription:edit', prescription)" />
                 <q-btn
                   icon="download"
                   flat
                   round
                   @click="$emit('prescription:download_pdf', prescription)"
                 />
+                <q-btn icon="edit" flat round @click="$emit('prescription:edit', prescription)" />
                 <q-btn
                   icon="delete"
                   flat

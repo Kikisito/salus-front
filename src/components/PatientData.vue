@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { HeFilledPerson } from '@kalimahapps/vue-icons'
 import type { User } from 'src/interfaces/User'
 import type { PropType } from 'vue'
 
