@@ -10,6 +10,27 @@ export const useReportStore = defineStore('reportStore', {
   }),
 
   actions: {
+    async getPatientReportsWithDoctorOrItsSpecialties(
+      userId: number,
+      doctorId: number,
+    ): Promise<ServiceAnswer<Report[]>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get(`/reports/patient/${userId}/doctor/${doctorId}`)
+          const reports = await response.data
+          return reports
+        },
+        (error) => {
+          if (error.status === 401) {
+            return 'No tienes permisos para realizar esta acción.'
+          } else {
+            console.error(error)
+            return 'Ha ocurrido un error al obtener los informes.'
+          }
+        },
+      )
+    },
+
     async addReport(data: Report): Promise<ServiceAnswer<Report>> {
       return handleRequest(
         async () => {

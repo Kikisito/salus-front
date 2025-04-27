@@ -4,11 +4,16 @@ import { Notify, useDialogPluginComponent } from 'quasar'
 import { ref, type PropType } from 'vue'
 import type { Prescription } from 'src/interfaces/Prescription'
 import type { Medication } from 'src/interfaces/Medication'
+import type { Specialty } from 'src/interfaces/Specialty'
 
 const props = defineProps({
   prescription: {
     type: Object as PropType<Prescription>,
     default: null,
+  },
+  specialties: {
+    type: Array as PropType<Specialty[]>,
+    default: () => [],
   },
   readonly: {
     type: Boolean,
@@ -21,6 +26,7 @@ defineEmits([...useDialogPluginComponent.emits])
 const { dialogRef, onDialogOK } = useDialogPluginComponent()
 
 const readonly = ref(props.readonly)
+const specialtyInput = ref()
 
 // Modelo del formulario
 const prescription = ref<Partial<Prescription>>(props.prescription || {})
@@ -64,6 +70,22 @@ function addMedication() {
 // Eliminar un medicamento de la receta
 function removeMedication(index: number) {
   prescription.value.medications?.splice(index, 1)
+}
+
+async function submitPrescription() {
+  // Validamos el campo de especialidad
+  if (specialtyInput.value) {
+    const specialty = specialtyInput.value.validate()
+    if (!specialty) {
+      Notify.create({
+        type: 'negative',
+        message: 'La especialidad es obligatoria',
+      })
+      return
+    }
+  }
+
+  onDialogOK(prescription.value)
 }
 </script>
 
@@ -215,11 +237,30 @@ function removeMedication(index: number) {
 
         <q-separator class="q-my-md" />
 
+        <!-- Especialidad (si viene como props el listado specialties) -->
+        <div v-if="specialties.length > 0" class="col-12">
+          <q-select
+            v-model="prescription.specialty"
+            ref="specialtyInput"
+            :options="specialties"
+            option-value="id"
+            option-label="name"
+            label="Especialidad de la receta"
+            :rules="[(val) => !!val || 'La especialidad es obligatoria']"
+            emit-value
+            map-options
+            :readonly="readonly"
+            filled
+          />
+
+          <q-separator class="q-my-md" />
+        </div>
+
         <q-btn
           class="full-width"
           color="primary"
           :label="readonly ? 'Cerrar' : 'Guardar receta'"
-          @click="onDialogOK(prescription)"
+          @click="submitPrescription()"
           :disable="prescription.medications?.length === 0"
         />
       </q-card-section>

@@ -10,6 +10,27 @@ export const usePrescriptionStore = defineStore('prescriptionStore', {
   }),
 
   actions: {
+    async getPatientPrescriptionsWithDoctorOrItsSpecialties(
+      userId: number,
+      doctorId: number,
+    ): Promise<ServiceAnswer<Prescription[]>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get(`/prescriptions/patient/${userId}/doctor/${doctorId}`)
+          const prescriptions = await response.data
+          return prescriptions
+        },
+        (error) => {
+          if (error.status === 401) {
+            return 'No tienes permisos para realizar esta acción.'
+          } else {
+            console.error(error)
+            return 'Ha ocurrido un error al obtener las recetas.'
+          }
+        },
+      )
+    },
+
     async downloadPrescriptionPdf(prescription: Prescription): Promise<ServiceAnswer<Blob>> {
       return handleRequest(
         async () => {

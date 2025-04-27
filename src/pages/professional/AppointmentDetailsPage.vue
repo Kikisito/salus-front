@@ -134,6 +134,7 @@ async function openNewReportDialog() {
       // Especificamos el ID del informe y sus datos asociados
       data.doctor = medicalProfile.value.id
       data.patient = appointment.value.patient.id
+      data.specialty = appointment.value.slot.specialty.id
       data.appointment = appointment.value.id
 
       // Petición API
@@ -178,6 +179,7 @@ async function editReportDialog(report: Report) {
       // Especificamos el ID del informe y sus datos asociados
       data.doctor = medicalProfile.value.id
       data.patient = appointment.value.patient.id
+      data.specialty = appointment.value.slot.specialty.id
       data.appointment = appointment.value.id
 
       // Petición API

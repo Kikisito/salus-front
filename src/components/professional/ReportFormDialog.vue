@@ -3,11 +3,16 @@ import { useDialogPluginComponent } from 'quasar'
 
 import { ref, type PropType } from 'vue'
 import type { Report } from 'src/interfaces/Report'
+import type { Specialty } from 'src/interfaces/Specialty'
 
 const props = defineProps({
   report: {
     type: Object as PropType<Report>,
     default: null,
+  },
+  specialties: {
+    type: Array as PropType<Specialty[]>,
+    default: () => [],
   },
   readonly: {
     type: Boolean,
@@ -41,6 +46,22 @@ const report = ref<Partial<Report>>(props.report || {})
       <q-card-section>
         <q-form @submit.prevent="onDialogOK(report)">
           <div class="row q-col-gutter-md">
+            <!-- Especialidad (si viene como props el listado specialties) -->
+            <div v-if="specialties.length > 0" class="col-12">
+              <q-select
+                v-model="report.specialty"
+                :options="specialties"
+                option-value="id"
+                option-label="name"
+                label="Especialidad"
+                :rules="[(val) => !!val || 'La especialidad es obligatoria']"
+                emit-value
+                map-options
+                :readonly="readonly"
+                filled
+              />
+            </div>
+
             <!-- Descripción -->
             <div class="col-12">
               <q-input

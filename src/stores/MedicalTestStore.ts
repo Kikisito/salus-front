@@ -10,6 +10,27 @@ export const useMedicalTestStore = defineStore('medicalTestStore', {
   }),
 
   actions: {
+    async getPatientMedicalTestsWithDoctorOrItsSpecialties(
+      userId: number,
+      doctorId: number,
+    ): Promise<ServiceAnswer<MedicalTest[]>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get(`/medical-tests/patient/${userId}/doctor/${doctorId}`)
+          const tests = await response.data
+          return tests
+        },
+        (error) => {
+          if (error.status === 401) {
+            return 'No tienes permisos para realizar esta acción.'
+          } else {
+            console.error(error)
+            return 'Ha ocurrido un error al obtener las pruebas médicas.'
+          }
+        },
+      )
+    },
+
     async downloadMedicalTestPdf(medicalTest: MedicalTest): Promise<ServiceAnswer<Blob>> {
       return handleRequest(
         async () => {

@@ -1,17 +1,32 @@
 <script lang="ts" setup>
 import { useRoute, useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
-import { Notify } from 'quasar'
+import { Dialog, Notify } from 'quasar'
+
+import { useAppointmentStore } from 'src/stores/AppointmentStore'
+import { useUsersStore } from 'src/stores/admin/UsersStore'
+import { useUserStore } from 'src/stores/UserStore'
+import { storeToRefs } from 'pinia'
+import { useReportStore } from 'src/stores/ReportStore'
+import { usePrescriptionStore } from 'src/stores/PrescriptionStore'
+import { useMedicalTestStore } from 'src/stores/MedicalTestStore'
+import { useAttachmentStore } from 'src/stores/AttachmentStore'
 
 import PatientData from 'src/components/PatientData.vue'
 import DireccionDetails from 'src/components/DireccionDetails.vue'
-import { useAppointmentStore } from 'src/stores/AppointmentStore'
-import { useUsersStore } from 'src/stores/admin/UsersStore'
+import AppointmentsHistory from 'src/components/AppointmentsHistory.vue'
+import ReportList from 'src/components/ReportList.vue'
+import MedicalTestList from 'src/components/MedicalTestList.vue'
+import PrescriptionList from 'src/components/PrescriptionList.vue'
+import ReportFormDialog from 'src/components/professional/ReportFormDialog.vue'
+import PrescriptionFormDialog from 'src/components/professional/PrescriptionFormDialog.vue'
+import MedicalTestFormDialog from 'src/components/professional/MedicalTestFormDialog.vue'
+
 import type { User } from 'src/interfaces/User'
 import type { Appointment } from 'src/interfaces/Appointment'
-import { useUserStore } from 'src/stores/UserStore'
-import { storeToRefs } from 'pinia'
-import AppointmentsHistory from 'src/components/AppointmentsHistory.vue'
+import type { Report } from 'src/interfaces/Report'
+import type { Prescription } from 'src/interfaces/Prescription'
+import type { MedicalTest } from 'src/interfaces/MedicalTest'
 
 const route = useRoute()
 const router = useRouter()
@@ -20,14 +35,22 @@ const doctorStore = useUserStore()
 const { medicalProfile } = storeToRefs(doctorStore)
 
 const userId = parseInt(route.params.id as string)
+
 const usersStore = useUsersStore()
 const appointmentStore = useAppointmentStore()
+const reportStore = useReportStore()
+const prescriptionStore = usePrescriptionStore()
+const medicalTestStore = useMedicalTestStore()
+const attachmentStore = useAttachmentStore()
+
+const loading = ref(true)
+const tab = ref('info')
 
 const patient = ref<User | null>(null)
 const appointments = ref<Appointment[]>([])
-const loading = ref(true)
-const appointmentsLoading = ref(true)
-const tab = ref('info')
+const reports = ref<Report[]>([])
+const prescriptions = ref<Prescription[]>([])
+const medicalTests = ref<MedicalTest[]>([])
 
 async function loadPatientData() {
   loading.value = true
@@ -56,7 +79,7 @@ async function loadPatientData() {
 }
 
 async function loadPatientAppointments() {
-  appointmentsLoading.value = true
+  loading.value = true
 
   try {
     const response = await appointmentStore.getPatientAppointmentsWithDoctorOrItsSpecialties(
@@ -73,13 +96,365 @@ async function loadPatientAppointments() {
       })
     }
   } finally {
-    appointmentsLoading.value = false
+    loading.value = false
   }
 }
+
+async function loadPatientReports() {
+  loading.value = true
+
+  try {
+    const response = await reportStore.getPatientReportsWithDoctorOrItsSpecialties(
+      userId,
+      medicalProfile.value.id,
+    )
+
+    if (response.success) {
+      reports.value = response.data
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: response.error,
+      })
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+async function loadPatientPrescriptions() {
+  loading.value = true
+
+  try {
+    const response = await prescriptionStore.getPatientPrescriptionsWithDoctorOrItsSpecialties(
+      userId,
+      medicalProfile.value.id,
+    )
+
+    if (response.success) {
+      prescriptions.value = response.data
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: response.error,
+      })
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+async function loadPatientMedicalTests() {
+  loading.value = true
+
+  try {
+    const response = await medicalTestStore.getPatientMedicalTestsWithDoctorOrItsSpecialties(
+      userId,
+      medicalProfile.value.id,
+    )
+
+    if (response.success) {
+      medicalTests.value = response.data
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: response.error,
+      })
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+// Métodos INFORMES
+async function openNewReportDialog() {
+  Dialog.create({
+    component: ReportFormDialog,
+    componentProps: {
+      specialties: medicalProfile.value.specialties,
+      persistent: true,
+    },
+  }).onOk(async (data) => {
+    if (data) {
+      // Especificamos el ID del informe y sus datos asociados
+      data.doctor = medicalProfile.value.id
+      data.patient = userId
+
+      // Petición API
+      const response = await reportStore.addReport(data)
+
+      if (response.success) {
+        Notify.create({
+          type: 'positive',
+          message: 'Informe creado correctamente',
+        })
+
+        reports.value.push(response.data)
+      } else {
+        Notify.create({
+          type: 'negative',
+          message: 'Error al crear el informe: ' + response.error,
+        })
+      }
+    }
+  })
+}
+
+async function showReportDialog(report: Report) {
+  Dialog.create({
+    component: ReportFormDialog,
+    componentProps: {
+      report: report,
+      readonly: true,
+    },
+  })
+}
+
+async function editReportDialog(report: Report) {
+  Dialog.create({
+    component: ReportFormDialog,
+    componentProps: {
+      specialties: medicalProfile.value.specialties,
+      persistent: true,
+      report: { ...report },
+    },
+  }).onOk(async (data) => {
+    if (data) {
+      // Especificamos el ID del informe y sus datos asociados
+      data.doctor = medicalProfile.value.id
+      data.patient = userId
+
+      // Petición API
+      const response = await reportStore.updateReport(data)
+
+      if (response.success) {
+        Notify.create({
+          type: 'positive',
+          message: 'Informe actualizado correctamente',
+        })
+
+        const index = reports.value.findIndex((r) => r.id === report.id)
+        if (index !== -1) {
+          reports.value[index] = response.data
+        }
+      } else {
+        Notify.create({
+          type: 'negative',
+          message: 'Error al actualizar el informe: ' + response.error,
+        })
+      }
+    }
+  })
+}
+
+async function deleteReportDialog(report: Report) {
+  Dialog.create({
+    title: 'Eliminar informe',
+    message: '¿Estás seguro de que quieres eliminar este informe?',
+    persistent: true,
+    cancel: true,
+  }).onOk(async () => {
+    const response = await reportStore.deleteReport(report.id)
+
+    if (response.success) {
+      Notify.create({
+        type: 'positive',
+        message: 'Informe eliminado correctamente',
+      })
+
+      reports.value = reports.value.filter((r) => r.id !== report.id)
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: 'Error al eliminar el informe: ' + response.error,
+      })
+    }
+  })
+}
+
+// Métodos RECETAS
+async function openNewPrescriptionDialog() {
+  Dialog.create({
+    component: PrescriptionFormDialog,
+    componentProps: {
+      specialties: medicalProfile.value.specialties,
+      persistent: true,
+    },
+  }).onOk(async (data) => {
+    if (data) {
+      // Especificamos el ID del informe y sus datos asociados
+      data.doctor = medicalProfile.value.id
+      data.patient = userId
+
+      // Petición API
+      const response = await prescriptionStore.addPrescription(data)
+
+      if (response.success) {
+        Notify.create({
+          type: 'positive',
+          message: 'Receta creada correctamente',
+        })
+
+        prescriptions.value.push(response.data)
+      } else {
+        Notify.create({
+          type: 'negative',
+          message: response.error,
+        })
+      }
+    }
+  })
+}
+
+async function updatePrescriptionDialog(prescription: Prescription) {
+  Dialog.create({
+    component: PrescriptionFormDialog,
+    componentProps: {
+      specialties: medicalProfile.value.specialties,
+      prescription: { ...prescription },
+      persistent: true,
+    },
+  }).onOk(async (data) => {
+    if (data) {
+      // Especificamos el ID del informe y sus datos asociados
+      data.doctor = medicalProfile.value.id
+      data.patient = userId
+
+      // Petición API
+      const response = await prescriptionStore.updatePrescription(data)
+
+      if (response.success) {
+        Notify.create({
+          type: 'positive',
+          message: 'Receta actualizada correctamente',
+        })
+
+        const index = prescriptions.value.findIndex((r) => r.id === prescription.id)
+        if (index !== -1) {
+          prescriptions.value[index] = response.data
+        }
+      } else {
+        Notify.create({
+          type: 'negative',
+          message: response.error,
+        })
+      }
+    }
+  })
+}
+
+async function showPrescriptionDialog(prescription: Prescription) {
+  Dialog.create({
+    component: PrescriptionFormDialog,
+    componentProps: {
+      prescription: prescription,
+      readonly: true,
+    },
+  })
+}
+
+async function deletePrescriptionDialog(prescription: Prescription) {
+  Dialog.create({
+    title: 'Eliminar receta',
+    message: '¿Estás seguro de que quieres eliminar esta receta?',
+    persistent: true,
+    cancel: true,
+  }).onOk(async () => {
+    const response = await prescriptionStore.deletePrescription(prescription.id)
+
+    if (response.success) {
+      Notify.create({
+        type: 'positive',
+        message: 'Receta eliminada correctamente',
+      })
+
+      prescriptions.value = prescriptions.value.filter((r) => r.id !== prescription.id)
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: response.error,
+      })
+    }
+  })
+}
+
+// Métodos PRUEBAS MÉDICAS
+async function openNewMedicalTestDialog() {
+  Dialog.create({
+    component: MedicalTestFormDialog,
+    componentProps: {
+      specialties: medicalProfile.value.specialties,
+      persistent: true,
+    },
+  }).onOk(async (data) => {
+    if (data) {
+      // Especificamos el ID del informe y sus datos asociados
+      data.medicalTest.doctor = medicalProfile.value.id
+      data.medicalTest.patient = userId
+
+      // Petición API
+      const response = await medicalTestStore.addMedicalTest(data.medicalTest, data.files)
+
+      if (response.success) {
+        Notify.create({
+          type: 'positive',
+          message: 'Informe creado correctamente',
+        })
+
+        medicalTests.value.push(response.data)
+      } else {
+        Notify.create({
+          type: 'negative',
+          message: 'Error al crear el informe: ' + response.error,
+        })
+      }
+    }
+  })
+}
+
+async function showMedicalTestDialog(medicalTest: MedicalTest) {
+  Dialog.create({
+    component: MedicalTestFormDialog,
+    componentProps: {
+      medicalTest: medicalTest,
+      readonly: true,
+      download: attachmentStore.downloadAttachment,
+    },
+  })
+}
+
+async function deleteMedicalTestDialog(medicalTest: MedicalTest) {
+  Dialog.create({
+    title: 'Eliminar prueba médica',
+    message: '¿Estás seguro de que quieres eliminar esta prueba médica?',
+    persistent: true,
+    cancel: true,
+  }).onOk(async () => {
+    const response = await medicalTestStore.deleteMedicalTest(medicalTest.id)
+
+    if (response.success) {
+      Notify.create({
+        type: 'positive',
+        message: 'Prueba médica eliminada correctamente',
+      })
+      medicalTests.value = medicalTests.value.filter((r) => r.id !== medicalTest.id)
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: 'Error al eliminar la prueba médica: ' + response.error,
+      })
+    }
+  })
+}
+
+// FIN MÉTODOS ESPECÍFICOS
 
 onMounted(async () => {
   await loadPatientData()
   await loadPatientAppointments()
+  await loadPatientReports()
+  await loadPatientPrescriptions()
+  await loadPatientMedicalTests()
 })
 </script>
 
@@ -143,28 +518,46 @@ onMounted(async () => {
 
             <!-- Tab historial médico -->
             <q-tab-panel name="history">
-              <q-card flat bordered>
-                <q-card-section>
-                  <div class="row items-center">
-                    <q-icon name="medical_information" class="q-mr-sm" />
-                    <div class="text-h6">Historial médico</div>
-                  </div>
-                  <q-separator class="q-my-sm" />
+              <div class="row q-col-gutter-md">
+                <div class="col-12 col-md-6">
+                  <ReportList
+                    :reports="reports"
+                    @report:new="openNewReportDialog()"
+                    @report:show="showReportDialog($event)"
+                    @report:download_pdf="reportStore.downloadReportPdf($event)"
+                    @report:edit="editReportDialog($event)"
+                    @report:delete="deleteReportDialog($event)"
+                  />
+                </div>
 
-                  <!-- Aquí iría el historial médico del paciente cuando esté disponible -->
-                  <div class="text-center q-py-lg text-grey">
-                    <q-icon name="history" size="4em" />
-                    <p>El historial médico estará disponible próximamente</p>
-                  </div>
-                </q-card-section>
-              </q-card>
+                <div class="col-12 col-md-6">
+                  <MedicalTestList
+                    :medical-tests="medicalTests"
+                    @medicaltest:new="openNewMedicalTestDialog()"
+                    @medicaltest:show="showMedicalTestDialog($event)"
+                    @medicaltest:download_pdf="medicalTestStore.downloadMedicalTestPdf($event)"
+                    @medicaltest:delete="deleteMedicalTestDialog($event)"
+                  />
+                </div>
+
+                <div class="col-12">
+                  <PrescriptionList
+                    :prescriptions="prescriptions"
+                    @prescription:new="openNewPrescriptionDialog()"
+                    @prescription:show="showPrescriptionDialog($event)"
+                    @prescription:download_pdf="prescriptionStore.downloadPrescriptionPdf($event)"
+                    @prescription:edit="updatePrescriptionDialog($event)"
+                    @prescription:delete="deletePrescriptionDialog($event)"
+                  />
+                </div>
+              </div>
             </q-tab-panel>
 
             <!-- Tab histórico de citas -->
             <q-tab-panel name="appointments">
               <AppointmentsHistory
                 :appointments="appointments"
-                :loading="appointmentsLoading"
+                :loading="loading"
                 @appointment:show="
                   $router.push({
                     name: 'professional-appointment',

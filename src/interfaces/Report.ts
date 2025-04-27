@@ -1,9 +1,11 @@
 import type { MedicalProfile } from './MedicalProfile'
+import type { Specialty } from './Specialty'
 import type { User } from './User'
 
 export interface Report {
   id: number
   type: string
+  specialty: Specialty
   appointmentId: number
   doctor: MedicalProfile
   patient: User

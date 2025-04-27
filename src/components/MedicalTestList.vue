@@ -61,12 +61,7 @@ defineEmits([
                   round
                   @click="$emit('medicaltest:download_pdf', medicalTest)"
                 />
-                <q-btn
-                  icon="delete"
-                  flat
-                  round
-                  @click="$emit('medicaltest:delete', medicalTest.id)"
-                />
+                <q-btn icon="delete" flat round @click="$emit('medicaltest:delete', medicalTest)" />
               </div>
             </q-item-section>
           </q-item>

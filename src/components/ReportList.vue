@@ -47,7 +47,7 @@ defineEmits(['report:new', 'report:show', 'report:download_pdf', 'report:edit', 
                 <q-btn icon="visibility" flat round @click="$emit('report:show', report)" />
                 <q-btn icon="download" flat round @click="$emit('report:download_pdf', report)" />
                 <q-btn icon="edit" flat round @click="$emit('report:edit', report)" />
-                <q-btn icon="delete" flat round @click="$emit('report:delete', report.id)" />
+                <q-btn icon="delete" flat round @click="$emit('report:delete', report)" />
               </div>
             </q-item-section>
           </q-item>

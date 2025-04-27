@@ -14,7 +14,7 @@ defineProps({
   <q-card flat bordered>
     <q-card-section>
       <div class="row items-center">
-        <HeFilledPerson class="q-mr-sm" />
+        <q-icon name="info" class="q-mr-sm" />
         <div class="text-h6">Información del paciente</div>
       </div>
       <q-separator class="q-my-sm" />
@@ -22,7 +22,7 @@ defineProps({
       <q-item>
         <q-item-section>
           <q-item-label>Nombre</q-item-label>
-          <q-item-label caption> {{ patient.nombre }} {{ patient.apellidos }} </q-item-label>
+          <q-item-label caption>{{ patient.nombre }} {{ patient.apellidos }}</q-item-label>
         </q-item-section>
       </q-item>
 
