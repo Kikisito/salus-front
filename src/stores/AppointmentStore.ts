@@ -47,7 +47,7 @@ export const useAppointmentStore = defineStore('appointmentStore', {
     async deleteAppointment(appointment: Appointment): Promise<ServiceAnswer<Appointment>> {
       return handleRequest(
         async () => {
-          const response = await api.delete('/appointments/' + appointment.id)
+          const response = await api.delete(`/appointments/${appointment.id}`)
           const appointmentDeleted = await response.data
           this.appointments = this.appointments.filter((a) => a.id !== appointment.id)
           return appointmentDeleted
