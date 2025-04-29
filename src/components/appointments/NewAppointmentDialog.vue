@@ -12,10 +12,10 @@ const { dialogRef, onDialogOK } = useDialogPluginComponent()
     <q-card class="q-dialog-plugin">
       <q-toolbar>
         <q-avatar>
-          <q-icon name="domain" />
+          <q-icon name="event" />
         </q-avatar>
 
-        <q-toolbar-title>Crear usuario</q-toolbar-title>
+        <q-toolbar-title>Nueva cita</q-toolbar-title>
 
         <q-btn flat round dense icon="close" v-close-popup />
       </q-toolbar>
