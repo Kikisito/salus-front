@@ -193,12 +193,8 @@ onMounted(async () => {
                   </q-item-section>
 
                   <q-item-section side top>
-                    <q-btn outline size="sm">
-                      <q-icon
-                        class="cursor-pointer"
-                        name="calendar_month"
-                        @click="addToCalendar()"
-                      />
+                    <q-btn outline size="sm" @click="addToCalendar()">
+                      <q-icon class="cursor-pointer" name="calendar_month" />
                     </q-btn>
                   </q-item-section>
                 </q-item>
@@ -244,8 +240,8 @@ onMounted(async () => {
                   </q-item-section>
 
                   <q-item-section side top>
-                    <q-btn outline size="sm">
-                      <q-icon class="cursor-pointer" name="open_in_new" @click="openLocation()" />
+                    <q-btn outline size="sm" @click="openLocation()">
+                      <q-icon class="cursor-pointer" name="open_in_new" />
                     </q-btn>
                   </q-item-section>
                 </q-item>
