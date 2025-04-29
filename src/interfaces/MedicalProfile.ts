@@ -5,5 +5,7 @@ export interface MedicalProfile {
   id: number
   user: User
   license: string
+  workEmail: string
+  workPhone: string
   specialties: Specialty[]
 }

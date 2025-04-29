@@ -9,7 +9,61 @@ export const useAppointmentStore = defineStore('appointmentStore', {
     appointments: [] as Appointment[],
   }),
 
+  persist: {
+    storage: localStorage,
+    pick: ['appointments'],
+  },
+
   actions: {
+    async getAppointments(): Promise<ServiceAnswer<Appointment[]>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get('/appointments/@me')
+          const appointments = await response.data
+          this.appointments = appointments
+          return appointments
+        },
+        (error) => {
+          console.error(error)
+          return 'Ha ocurrido un error al obtener las citas'
+        },
+      )
+    },
+
+    async getPastAppointments(): Promise<ServiceAnswer<Appointment[]>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get('/appointments/@me/past')
+          const appointments = await response.data
+          return appointments
+        },
+        (error) => {
+          console.error(error)
+          return 'Ha ocurrido un error al obtener las citas'
+        },
+      )
+    },
+
+    async deleteAppointment(appointment: Appointment): Promise<ServiceAnswer<Appointment>> {
+      return handleRequest(
+        async () => {
+          const response = await api.delete('/appointments/' + appointment.id)
+          const appointmentDeleted = await response.data
+          this.appointments = this.appointments.filter((a) => a.id !== appointment.id)
+          return appointmentDeleted
+        },
+        (error) => {
+          if (error.status === 401) {
+            return 'No tienes permisos para realizar esta acción. Es posible que queden menos de 24 horas para la cita.'
+          } else {
+            console.error(error)
+            return 'Ha ocurrido un error al eliminar la cita'
+          }
+        },
+      )
+    },
+
+    // Apartados profesional y administración
     async getAppointment(id: number): Promise<ServiceAnswer<Appointment>> {
       return handleRequest(
         async () => {

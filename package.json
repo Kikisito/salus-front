@@ -31,8 +31,7 @@
     "vee-validate": "^4.15.0",
     "vue": "^3.4.18",
     "vue-i18n": "^9.2.2",
-    "vue-router": "^4.0.12",
-    "vue3-openlayers": "^11.3.0"
+    "vue-router": "^4.0.12"
   },
   "devDependencies": {
     "@electron/packager": "^18.3.6",
