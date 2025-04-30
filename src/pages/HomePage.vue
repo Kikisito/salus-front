@@ -1,25 +1,16 @@
 <script setup lang="ts">
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { storeToRefs } from 'pinia'
 import PreviaCita from 'src/components/PreviaCita.vue'
 import PreviaMensaje from 'src/components/PreviaMensaje.vue'
+import { useAppointmentStore } from 'src/stores/AppointmentStore'
+import { onMounted } from 'vue'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const citas = [
-  {
-    id: 1,
-    especialidad: 'Alergología',
-    doctor: 'Dr. María Hernández',
-    fecha: '10 de diciembre de 2024',
-    hora: '13:00',
-  },
-  {
-    id: 2,
-    especialidad: 'Fisiología',
-    doctor: 'Dr. Juan Martínez',
-    fecha: 'Hoy',
-    hora: '9:16',
-  },
-]
+const appointmentStore = useAppointmentStore()
+const { appointments } = storeToRefs(appointmentStore)
+
+onMounted(async () => {
+  await appointmentStore.getAppointments()
+})
 
 const mensajes = [
   {
@@ -49,10 +40,19 @@ const mensajes = [
       <div class="col-12 col-md-6">
         <div class="section-header">
           <div class="text-h6">Próximas citas</div>
-          <div class="text-subtitle">Conversaciones con tus médicos</div>
+          <div class="text-subtitle">Consulta tus próximas citas</div>
         </div>
 
-        <!--<PreviaCita v-for="cita in citas" :key="cita.id" :appointment="cita" />-->
+        <PreviaCita
+          v-for="appointment in appointments"
+          :key="appointment.id"
+          :appointment="appointment"
+          @appointment:show="$router.push({ name: 'appointment', params: { id: $event.id } })"
+        />
+
+        <div v-if="appointments.length === 0" class="q-mt-md q-ml-md q-mb-md">
+          <span> No tienes citas programadas. </span>
+        </div>
 
         <q-btn
           label="Ver todas mis citas"

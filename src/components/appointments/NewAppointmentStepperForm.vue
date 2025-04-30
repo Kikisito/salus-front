@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+// eslint-disable
 import { ref, onMounted } from 'vue'
 import { Notify } from 'quasar'
 import { formattedAppointmentType } from 'src/helpers/formattedAppointmentType'
