@@ -2,7 +2,10 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
 import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
+import type { MedicalCenter } from 'src/interfaces/MedicalCenter'
+import type { MedicalProfile } from 'src/interfaces/MedicalProfile'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
+import type { Specialty } from 'src/interfaces/Specialty'
 
 export const useAppointmentSlotStore = defineStore('appointmentSlotStore', {
   state: () => ({
@@ -19,6 +22,27 @@ export const useAppointmentSlotStore = defineStore('appointmentSlotStore', {
           const response = await api.get('/appointment-slots/' + doctorId + '/' + date + '/weekly')
           this.slots = await response.data
 
+          return this.slots
+        },
+        (error) => {
+          console.error(error)
+          return 'Ha ocurrido un error al obtener los huecos de citas'
+        },
+      )
+    },
+
+    async getDoctorAndSpecialtyAvailableAppointmentSlots(
+      medicalCenter: MedicalCenter,
+      specialty: Specialty,
+      doctor: MedicalProfile,
+      afterDate: Date,
+    ): Promise<ServiceAnswer<AppointmentSlot[]>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get(
+            `/appointment-slots/medical-center/${medicalCenter.id}/specialty/${specialty.id}/doctor/${doctor.id}/after/${afterDate.toISOString().split('T')[0]}`,
+          )
+          this.slots = await response.data
           return this.slots
         },
         (error) => {

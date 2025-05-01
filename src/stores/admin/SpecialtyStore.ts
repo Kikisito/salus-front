@@ -3,6 +3,7 @@ import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
 import type { Specialty } from 'src/interfaces/Specialty'
 import type { ServiceAnswer } from 'src/interfaces/ServiceAnswer'
+import type { MedicalCenter } from 'src/interfaces/MedicalCenter'
 
 export const useSpecialtyStore = defineStore('specialties', {
   state: () => ({
@@ -37,6 +38,35 @@ export const useSpecialtyStore = defineStore('specialties', {
       return handleRequest(
         async () => {
           const response = await api.get('/specialties/search/' + search + '/' + page + '/' + limit)
+          this.count = await response.data.count
+          this.specialties = await response.data.specialties
+
+          return this.specialties
+        },
+        (error) => {
+          throw error
+        },
+      )
+    },
+
+    async searchSpecialtiesInMedicalCenter(
+      medicalCenter: MedicalCenter,
+      search: string,
+      page: number = 0,
+      limit: number = 10,
+    ): Promise<ServiceAnswer<Specialty[]>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get(
+            '/specialties/search/' +
+              search +
+              '/' +
+              page +
+              '/' +
+              limit +
+              '/medical-center/' +
+              medicalCenter.id,
+          )
           this.count = await response.data.count
           this.specialties = await response.data.specialties
 

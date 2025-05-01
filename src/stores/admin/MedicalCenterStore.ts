@@ -3,6 +3,7 @@ import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
 import type { MedicalCenter } from 'src/interfaces/MedicalCenter'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
+import type { Specialty } from 'src/interfaces/Specialty'
 
 export const useMedicalCenterStore = defineStore('medicalCenterStore', {
   state: () => ({
@@ -40,6 +41,50 @@ export const useMedicalCenterStore = defineStore('medicalCenterStore', {
             '/medical-centers/search/' + search + '/' + page + '/' + limit,
           )
 
+          this.count = await response.data.count
+          this.medicalCenters = await response.data.medicalCenters
+          return this.medicalCenters
+        },
+        (error) => {
+          throw error
+        },
+      )
+    },
+
+    async getAvailableMedicalCenters(
+      specialty: Specialty,
+      date: string,
+      page: number = 0,
+      limit: number = 10,
+    ): Promise<ServiceAnswer<MedicalCenter[]>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get(
+            `/medical-centers/specialty/${specialty.id}/available-after/${date}/page/${page}/limit/${limit}`,
+          )
+          this.count = await response.data.count
+          this.medicalCenters = await response.data.medicalCenters
+
+          return this.medicalCenters
+        },
+        (error) => {
+          throw error
+        },
+      )
+    },
+
+    async searchAvailableMedicalCenters(
+      search: string,
+      specialty: Specialty,
+      date: string,
+      page: number = 0,
+      limit: number = 10,
+    ): Promise<ServiceAnswer<MedicalCenter[]>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get(
+            `/medical-centers/specialty/${specialty.id}/available-after/${date}/search/${search}/page/${page}/limit/${limit}`,
+          )
           this.count = await response.data.count
           this.medicalCenters = await response.data.medicalCenters
           return this.medicalCenters

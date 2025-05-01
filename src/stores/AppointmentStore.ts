@@ -2,6 +2,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
 import type { Appointment } from 'src/interfaces/Appointment'
+import type { AppointmentRequest } from 'src/interfaces/AppointmentRequest'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
 
 export const useAppointmentStore = defineStore('appointmentStore', {
@@ -15,6 +16,23 @@ export const useAppointmentStore = defineStore('appointmentStore', {
   },
 
   actions: {
+    async createUserSessionAppointment(
+      appointmentRequest: AppointmentRequest,
+    ): Promise<ServiceAnswer<Appointment>> {
+      return handleRequest(
+        async () => {
+          const response = await api.post('/appointments/@me/new', appointmentRequest)
+          const appointment = await response.data
+          this.appointments.push(appointment)
+          return appointment
+        },
+        (error) => {
+          console.error(error)
+          return 'Ha ocurrido un error al crear la cita'
+        },
+      )
+    },
+
     async getAppointments(): Promise<ServiceAnswer<Appointment[]>> {
       return handleRequest(
         async () => {

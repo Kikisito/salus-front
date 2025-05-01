@@ -1,8 +1,10 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
+import type { MedicalCenter } from 'src/interfaces/MedicalCenter'
 import type { MedicalProfile } from 'src/interfaces/MedicalProfile'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
+import type { Specialty } from 'src/interfaces/Specialty'
 
 export const useDoctorStore = defineStore('doctorStore', {
   state: () => ({
@@ -47,6 +49,28 @@ export const useDoctorStore = defineStore('doctorStore', {
         },
         (error) => {
           throw error
+        },
+      )
+    },
+
+    async getAvailableDoctors(
+      medicalCenter: MedicalCenter,
+      specialty: Specialty,
+      availableAfter: string,
+    ) {
+      return handleRequest(
+        async () => {
+          const response = await api.get(
+            `/doctor-profiles/medical-center/${medicalCenter.id}/specialty/${specialty.id}/available-after/${availableAfter}`,
+          )
+          return response.data
+        },
+        (error) => {
+          if (error.status === 404) {
+            return 'No se han encontrado médicos disponibles'
+          } else {
+            return 'Error al buscar médicos disponibles'
+          }
         },
       )
     },

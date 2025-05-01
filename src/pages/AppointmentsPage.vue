@@ -4,17 +4,148 @@ import { Dialog, Notify } from 'quasar'
 import NewAppointmentDialog from 'src/components/appointments/NewAppointmentDialog.vue'
 import PreviaCita from 'src/components/PreviaCita.vue'
 import type { Appointment } from 'src/interfaces/Appointment'
+import type { AppointmentRequest } from 'src/interfaces/AppointmentRequest'
+import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
+import type { MedicalCenter } from 'src/interfaces/MedicalCenter'
+import type { MedicalProfile } from 'src/interfaces/MedicalProfile'
+import type { Specialty } from 'src/interfaces/Specialty'
+import { useDoctorStore } from 'src/stores/admin/DoctorStore'
+import { useMedicalCenterStore } from 'src/stores/admin/MedicalCenterStore'
+import { useSpecialtyStore } from 'src/stores/admin/SpecialtyStore'
+import { useAppointmentSlotStore } from 'src/stores/AppointmentSlotStore'
 import { useAppointmentStore } from 'src/stores/AppointmentStore'
+import { useUserStore } from 'src/stores/UserStore'
 import { onMounted, ref } from 'vue'
+
+const userStore = useUserStore()
+const { user } = storeToRefs(userStore)
 
 const appointmentStore = useAppointmentStore()
 const { appointments } = storeToRefs(appointmentStore)
 const pastAppointments = ref<Appointment[]>([])
 
+const medicalCenterStore = useMedicalCenterStore()
+const specialtyStore = useSpecialtyStore()
+const doctorStore = useDoctorStore()
+const appointmentSlotStore = useAppointmentSlotStore()
+
+async function getSpecialties(search?: string): Promise<Specialty[]> {
+  let response
+  if (search) {
+    response = await specialtyStore.searchSpecialties(search)
+  } else {
+    response = await specialtyStore.getAllSpecialties(0, 50)
+  }
+
+  if (response.success) {
+    return response.data
+  } else {
+    Notify.create({
+      message: 'Error al cargar las especialidades',
+      color: 'negative',
+    })
+    return []
+  }
+}
+
+async function getMedicalCenters(specialty: Specialty, search?: string): Promise<MedicalCenter[]> {
+  let response
+
+  if (search) {
+    response = await medicalCenterStore.searchAvailableMedicalCenters(
+      search,
+      specialty,
+      new Date().toISOString().split('T')[0]!,
+    )
+  } else {
+    response = await medicalCenterStore.getAvailableMedicalCenters(
+      specialty,
+      new Date().toISOString().split('T')[0]!,
+    )
+  }
+
+  if (response.success) {
+    return response.data
+  } else {
+    Notify.create({
+      message: 'Error al cargar los centros médicos',
+      color: 'negative',
+    })
+    return []
+  }
+}
+
+async function getDoctors(
+  medicalCenter: MedicalCenter,
+  specialty: Specialty,
+): Promise<MedicalProfile[]> {
+  const response = await doctorStore.getAvailableDoctors(
+    medicalCenter,
+    specialty,
+    new Date().toISOString().split('T')[0]!,
+  )
+
+  if (response.success) {
+    return response.data
+  } else {
+    Notify.create({
+      type: 'negative',
+      message: 'Error al cargar los médicos',
+    })
+    return []
+  }
+}
+
+async function getAppointmentSlots(
+  medicalCenter: MedicalCenter,
+  specialty: Specialty,
+  doctor: MedicalProfile,
+  afterDate: Date,
+): Promise<AppointmentSlot[]> {
+  const response = await appointmentSlotStore.getDoctorAndSpecialtyAvailableAppointmentSlots(
+    medicalCenter,
+    specialty,
+    doctor,
+    afterDate,
+  )
+
+  if (response.success) {
+    return response.data
+  } else {
+    Notify.create({
+      type: 'negative',
+      message: 'Error al cargar los horarios disponibles',
+    })
+    return []
+  }
+}
+
 async function newAppointment() {
   Dialog.create({
     component: NewAppointmentDialog,
-    componentProps: {},
+    componentProps: {
+      getMedicalCenters: getMedicalCenters,
+      getSpecialties: getSpecialties,
+      getDoctors: getDoctors,
+      getAvailableSlots: getAppointmentSlots,
+    },
+  }).onOk(async (request: AppointmentRequest) => {
+    request.patient = user.value!.id!
+
+    const response = await appointmentStore.createUserSessionAppointment(request)
+
+    if (response.success) {
+      Notify.create({
+        type: 'positive',
+        message: 'Cita creada con éxito',
+      })
+      await appointmentStore.getAppointments()
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: 'Error al crear la cita',
+      })
+    }
   })
 }
 

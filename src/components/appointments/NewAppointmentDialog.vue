@@ -1,6 +1,43 @@
 <script lang="ts" setup>
 import { useDialogPluginComponent } from 'quasar'
 import NewAppointmentStepperForm from './NewAppointmentStepperForm.vue'
+import type { PropType } from 'vue'
+import type { MedicalCenter } from 'src/interfaces/MedicalCenter'
+import type { Specialty } from 'src/interfaces/Specialty'
+import type { MedicalProfile } from 'src/interfaces/MedicalProfile'
+import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
+
+defineProps({
+  getSpecialties: {
+    type: Function as PropType<(search?: string) => Promise<Specialty[]>>,
+    required: true,
+  },
+  getMedicalCenters: {
+    type: Function as PropType<(specialty: Specialty, search?: string) => Promise<MedicalCenter[]>>,
+    required: true,
+  },
+  getDoctors: {
+    type: Function as PropType<
+      (
+        medicalCenter: MedicalCenter,
+        specialty: Specialty,
+        search?: string,
+      ) => Promise<MedicalProfile[]>
+    >,
+    required: true,
+  },
+  getAvailableSlots: {
+    type: Function as PropType<
+      (
+        medicalCenter: MedicalCenter,
+        specialty: Specialty,
+        doctor: MedicalProfile,
+        date: Date,
+      ) => Promise<AppointmentSlot[]>
+    >,
+    required: true,
+  },
+})
 
 defineEmits([...useDialogPluginComponent.emits])
 
@@ -22,6 +59,10 @@ const { dialogRef, onDialogOK } = useDialogPluginComponent()
 
       <q-card-section>
         <NewAppointmentStepperForm
+          :get-specialties="getSpecialties"
+          :get-medical-centers="getMedicalCenters"
+          :get-doctors="getDoctors"
+          :get-available-slots="getAvailableSlots"
           @form:cancel="dialogRef?.hide()"
           @form:submit="onDialogOK($event)"
         />
