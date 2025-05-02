@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import UsersList from 'src/components/UsersList.vue'
 import { storeToRefs } from 'pinia'
-import { useUsersStore } from 'src/stores/admin/UsersStore'
+import { useUsersStore } from 'src/stores/UsersStore'
 import RegisterUserDialog from 'src/components/admin/users/RegisterUserDialog.vue'
 import { Dialog, Loading, Notify } from 'quasar'
 import { ref } from 'vue'

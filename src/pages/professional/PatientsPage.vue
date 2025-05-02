@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import UsersList from 'src/components/UsersList.vue'
 import { storeToRefs } from 'pinia'
-import { useUsersStore } from 'src/stores/admin/UsersStore'
+import { useUsersStore } from 'src/stores/UsersStore'
 import { ref } from 'vue'
 import { useUserStore } from 'src/stores/UserStore'
 

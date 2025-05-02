@@ -3,8 +3,8 @@ import { storeToRefs } from 'pinia'
 import { Loading, Notify, useDialogPluginComponent } from 'quasar'
 import type { Specialty } from 'src/interfaces/Specialty'
 import type { MedicalProfile } from 'src/interfaces/MedicalProfile'
-import { useDoctorStore } from 'src/stores/admin/DoctorStore'
-import { useSpecialtyStore } from 'src/stores/admin/SpecialtyStore'
+import { useDoctorStore } from 'src/stores/DoctorStore'
+import { useSpecialtyStore } from 'src/stores/SpecialtyStore'
 import { onMounted, ref, toRef, type PropType } from 'vue'
 
 const props = defineProps({

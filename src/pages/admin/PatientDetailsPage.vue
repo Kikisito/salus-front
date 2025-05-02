@@ -3,7 +3,7 @@ import UserDetails from 'src/components/UserDetails.vue'
 
 import { useRoute, useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
-import { useUsersStore } from 'src/stores/admin/UsersStore'
+import { useUsersStore } from 'src/stores/UsersStore'
 import { storeToRefs } from 'pinia'
 import DireccionDetails from 'src/components/DireccionDetails.vue'
 import { Dialog, Notify } from 'quasar'

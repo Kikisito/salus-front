@@ -9,9 +9,9 @@ import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
 import type { MedicalCenter } from 'src/interfaces/MedicalCenter'
 import type { MedicalProfile } from 'src/interfaces/MedicalProfile'
 import type { Specialty } from 'src/interfaces/Specialty'
-import { useDoctorStore } from 'src/stores/admin/DoctorStore'
-import { useMedicalCenterStore } from 'src/stores/admin/MedicalCenterStore'
-import { useSpecialtyStore } from 'src/stores/admin/SpecialtyStore'
+import { useDoctorStore } from 'src/stores/DoctorStore'
+import { useMedicalCenterStore } from 'src/stores/MedicalCenterStore'
+import { useSpecialtyStore } from 'src/stores/SpecialtyStore'
 import { useAppointmentSlotStore } from 'src/stores/AppointmentSlotStore'
 import { useAppointmentStore } from 'src/stores/AppointmentStore'
 import { useUserStore } from 'src/stores/UserStore'
@@ -52,16 +52,9 @@ async function getMedicalCenters(specialty: Specialty, search?: string): Promise
   let response
 
   if (search) {
-    response = await medicalCenterStore.searchAvailableMedicalCenters(
-      search,
-      specialty,
-      new Date().toISOString().split('T')[0]!,
-    )
+    response = await medicalCenterStore.searchAvailableMedicalCenters(search, specialty)
   } else {
-    response = await medicalCenterStore.getAvailableMedicalCenters(
-      specialty,
-      new Date().toISOString().split('T')[0]!,
-    )
+    response = await medicalCenterStore.getAvailableMedicalCenters(specialty)
   }
 
   if (response.success) {
@@ -79,11 +72,7 @@ async function getDoctors(
   medicalCenter: MedicalCenter,
   specialty: Specialty,
 ): Promise<MedicalProfile[]> {
-  const response = await doctorStore.getAvailableDoctors(
-    medicalCenter,
-    specialty,
-    new Date().toISOString().split('T')[0]!,
-  )
+  const response = await doctorStore.getAvailableDoctors(medicalCenter, specialty)
 
   if (response.success) {
     return response.data
@@ -100,13 +89,11 @@ async function getAppointmentSlots(
   medicalCenter: MedicalCenter,
   specialty: Specialty,
   doctor: MedicalProfile,
-  afterDate: Date,
 ): Promise<AppointmentSlot[]> {
   const response = await appointmentSlotStore.getDoctorAndSpecialtyAvailableAppointmentSlots(
     medicalCenter,
     specialty,
     doctor,
-    afterDate,
   )
 
   if (response.success) {

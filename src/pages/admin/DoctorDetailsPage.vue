@@ -4,13 +4,13 @@ import { QCalendarDay } from '@quasar/quasar-ui-qcalendar'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useDoctorStore } from 'src/stores/admin/DoctorStore'
+import { useDoctorStore } from 'src/stores/DoctorStore'
 import { Dialog, Loading, Notify } from 'quasar'
 import DoctorSpecialtiesDialog from 'src/components/admin/doctors/DoctorSpecialtiesDialog.vue'
-import { useScheduleStore } from 'src/stores/admin/ScheduleStore'
+import { useScheduleStore } from 'src/stores/ScheduleStore'
 import type { MedicalAgenda } from 'src/interfaces/MedicalAgenda'
 import ScheduleEntryForm from 'src/components/admin/doctors/ScheduleEntryForm.vue'
-import { useRoomStore } from 'src/stores/admin/RoomStore'
+import { useRoomStore } from 'src/stores/RoomStore'
 
 const route = useRoute()
 const router = useRouter()

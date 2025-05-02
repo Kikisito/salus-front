@@ -5,6 +5,7 @@ import { ref, type PropType } from 'vue'
 import type { Prescription } from 'src/interfaces/Prescription'
 import type { Medication } from 'src/interfaces/Medication'
 import type { Specialty } from 'src/interfaces/Specialty'
+import dateToApiDate from 'src/helpers/dateToApiDate'
 
 const props = defineProps({
   prescription: {
@@ -38,7 +39,7 @@ if (!prescription.value.medications) {
 
 // Medicamento auxiliar para agregar a la receta local
 const newMedication = ref<Partial<Medication>>({
-  startDate: new Date().toISOString().split('T')[0]!,
+  startDate: dateToApiDate(new Date()),
 })
 
 // Añadir un medicamento a la receta
@@ -63,7 +64,7 @@ function addMedication() {
 
   // Resetear formulario de medicamentos
   newMedication.value = {
-    startDate: new Date().toISOString().split('T')[0]!,
+    startDate: dateToApiDate(new Date()),
   }
 }
 

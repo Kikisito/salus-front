@@ -4,7 +4,7 @@ import { ref, onMounted } from 'vue'
 import { Dialog, Notify } from 'quasar'
 
 import { useAppointmentStore } from 'src/stores/AppointmentStore'
-import { useUsersStore } from 'src/stores/admin/UsersStore'
+import { useUsersStore } from 'src/stores/UsersStore'
 import { useUserStore } from 'src/stores/UserStore'
 import { storeToRefs } from 'pinia'
 import { useReportStore } from 'src/stores/ReportStore'

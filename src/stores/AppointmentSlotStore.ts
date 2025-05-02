@@ -35,12 +35,11 @@ export const useAppointmentSlotStore = defineStore('appointmentSlotStore', {
       medicalCenter: MedicalCenter,
       specialty: Specialty,
       doctor: MedicalProfile,
-      afterDate: Date,
     ): Promise<ServiceAnswer<AppointmentSlot[]>> {
       return handleRequest(
         async () => {
           const response = await api.get(
-            `/appointment-slots/medical-center/${medicalCenter.id}/specialty/${specialty.id}/doctor/${doctor.id}/after/${afterDate.toISOString().split('T')[0]}`,
+            `/appointment-slots/medical-center/${medicalCenter.id}/specialty/${specialty.id}/doctor/${doctor.id}/available`,
           )
           this.slots = await response.data
           return this.slots

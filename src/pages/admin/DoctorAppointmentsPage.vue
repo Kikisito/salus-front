@@ -2,13 +2,13 @@
 import { useRoute } from 'vue-router'
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useDoctorStore } from 'src/stores/admin/DoctorStore'
+import { useDoctorStore } from 'src/stores/DoctorStore'
 import { date, Dialog, Loading, Notify } from 'quasar'
 import { useAppointmentSlotStore } from 'src/stores/AppointmentSlotStore'
 import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
 import AppointmentSlotDialog from 'src/components/admin/appointment-slots/AppointmentSlotDialog.vue'
 import { useAppointmentStore } from 'src/stores/AppointmentStore'
-import { useRoomStore } from 'src/stores/admin/RoomStore'
+import { useRoomStore } from 'src/stores/RoomStore'
 import AppointmentsCalendar from 'src/components/AppointmentsCalendar.vue'
 
 const route = useRoute()

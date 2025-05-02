@@ -53,14 +53,13 @@ export const useMedicalCenterStore = defineStore('medicalCenterStore', {
 
     async getAvailableMedicalCenters(
       specialty: Specialty,
-      date: string,
       page: number = 0,
       limit: number = 10,
     ): Promise<ServiceAnswer<MedicalCenter[]>> {
       return handleRequest(
         async () => {
           const response = await api.get(
-            `/medical-centers/specialty/${specialty.id}/available-after/${date}/page/${page}/limit/${limit}`,
+            `/medical-centers/specialty/${specialty.id}/available/page/${page}/limit/${limit}`,
           )
           this.count = await response.data.count
           this.medicalCenters = await response.data.medicalCenters
@@ -76,14 +75,13 @@ export const useMedicalCenterStore = defineStore('medicalCenterStore', {
     async searchAvailableMedicalCenters(
       search: string,
       specialty: Specialty,
-      date: string,
       page: number = 0,
       limit: number = 10,
     ): Promise<ServiceAnswer<MedicalCenter[]>> {
       return handleRequest(
         async () => {
           const response = await api.get(
-            `/medical-centers/specialty/${specialty.id}/available-after/${date}/search/${search}/page/${page}/limit/${limit}`,
+            `/medical-centers/specialty/${specialty.id}/available/search/${search}/page/${page}/limit/${limit}`,
           )
           this.count = await response.data.count
           this.medicalCenters = await response.data.medicalCenters

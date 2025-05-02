@@ -207,6 +207,8 @@ async function submitMedicalCenter() {
       medicalCenterError.value = true
       medicalCenterSelect.value.validate()
 
+      console.log('medicalCenterError', medicalCenterError.value)
+
       Notify.create({
         type: 'negative',
         message:
@@ -357,6 +359,7 @@ async function submitForm() {
 
       <q-select
         v-model="selectedCenter"
+        ref="medicalCenterSelect"
         :options="medicalCenters"
         option-value="value"
         option-label="name"

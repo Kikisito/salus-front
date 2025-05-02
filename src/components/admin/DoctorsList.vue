@@ -5,7 +5,7 @@ import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 
 import type { QTableColumn } from 'quasar'
-import { useDoctorStore } from 'src/stores/admin/DoctorStore'
+import { useDoctorStore } from 'src/stores/DoctorStore'
 
 const doctorStore = useDoctorStore()
 const { doctors, count } = storeToRefs(doctorStore)

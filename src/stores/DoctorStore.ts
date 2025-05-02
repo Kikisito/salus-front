@@ -53,15 +53,11 @@ export const useDoctorStore = defineStore('doctorStore', {
       )
     },
 
-    async getAvailableDoctors(
-      medicalCenter: MedicalCenter,
-      specialty: Specialty,
-      availableAfter: string,
-    ) {
+    async getAvailableDoctors(medicalCenter: MedicalCenter, specialty: Specialty) {
       return handleRequest(
         async () => {
           const response = await api.get(
-            `/doctor-profiles/medical-center/${medicalCenter.id}/specialty/${specialty.id}/available-after/${availableAfter}`,
+            `/doctor-profiles/medical-center/${medicalCenter.id}/specialty/${specialty.id}/available`,
           )
           return response.data
         },
