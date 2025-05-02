@@ -1,53 +1,28 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
+import { Notify } from 'quasar'
 import PreviaReceta from 'src/components/PreviaReceta.vue'
+import { usePrescriptionStore } from 'src/stores/PrescriptionStore'
+import { useUserStore } from 'src/stores/UserStore'
+import { onMounted } from 'vue'
 
-const recetas = [
-  {
-    id: 1,
-    especialidad: 'Fisiología',
-    doctor: 'Dr. Juan Martínez',
-    fecha_receta: new Date('2025-02-16'),
-    fecha_inicio: new Date('2025-02-16'),
-    fecha_fin: new Date('2025-03-16'),
-    medicamentos: [
-      {
-        nombre: 'Paracetamol',
-        pauta: '1 comprimido cada 8 horas',
-        fecha_fin: new Date('2025-03-16'),
-      },
-      {
-        nombre: 'Ibuprofeno',
-        pauta: '1 comprimido cada 12 horas',
-        fecha_fin: new Date('2025-03-01'),
-      },
-      {
-        nombre: 'Omeprazol',
-        pauta: '1 comprimido cada 24 horas',
-        fecha_fin: new Date('2025-02-16'),
-      },
-    ],
-  },
-  {
-    id: 2,
-    especialidad: 'Cardiología',
-    doctor: 'Dra. María Pérez',
-    fecha_receta: new Date('2025-02-10'),
-    fecha_inicio: new Date('2025-02-10'),
-    fecha_fin: new Date('2025-02-16'),
-    medicamentos: [
-      {
-        nombre: 'Aspirina',
-        pauta: '1 comprimido cada 24 horas',
-        fecha_fin: new Date('2025-02-16'),
-      },
-      {
-        nombre: 'Enalapril',
-        pauta: '1 comprimido cada 12 horas',
-        fecha_fin: new Date('2025-02-01'),
-      },
-    ],
-  },
-]
+const userStore = useUserStore()
+const { user } = storeToRefs(userStore)
+
+const prescriptionStore = usePrescriptionStore()
+const { prescriptions } = storeToRefs(prescriptionStore)
+
+onMounted(async () => {
+  if (user.value) {
+    await prescriptionStore.getUserPrescriptions(user.value.id)
+  } else {
+    console.error('No se pudo obtener el ID del usuario')
+    Notify.create({
+      type: 'negative',
+      message: 'No se han podido cargar los informes médicos',
+    })
+  }
+})
 </script>
 
 <template>
@@ -58,7 +33,21 @@ const recetas = [
           <div class="text-h6">Recetas</div>
           <div class="text-subtitle">Visualiza todas tus recetas</div>
         </div>
-        <PreviaReceta v-for="receta in recetas" :key="receta.id" :receta="receta" />
+
+        <PreviaReceta
+          v-for="prescription in prescriptions"
+          :key="prescription.id"
+          :prescription="prescription"
+          @prescription:download="prescriptionStore.downloadPrescriptionPdf(prescription)"
+        />
+
+        <div v-if="prescriptions.length === 0" class="q-mt-md">
+          <q-card flat bordered>
+            <q-card-section>
+              <div class="text-body1">No tienes recetas disponibles.</div>
+            </q-card-section>
+          </q-card>
+        </div>
       </div>
     </div>
   </q-page>

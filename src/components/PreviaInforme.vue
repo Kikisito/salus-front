@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { HeFilledRegisterBook } from '@kalimahapps/vue-icons'
 import type { Report } from 'src/interfaces/Report'
 import type { PropType } from 'vue'
 import { ref } from 'vue'
@@ -21,7 +20,7 @@ const expanded = ref(false)
     <q-expansion-item v-model="expanded" expand-separator>
       <template v-slot:header>
         <q-item-section avatar>
-          <HeFilledRegisterBook class="text-h4" />
+          <q-icon name="description" />
         </q-item-section>
 
         <q-item-section>
