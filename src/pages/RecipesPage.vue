@@ -19,7 +19,7 @@ onMounted(async () => {
     console.error('No se pudo obtener el ID del usuario')
     Notify.create({
       type: 'negative',
-      message: 'No se han podido cargar los informes médicos',
+      message: 'No se han podido cargar las recetas',
     })
   }
 })
