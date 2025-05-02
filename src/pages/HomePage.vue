@@ -72,7 +72,12 @@ const mensajes = [
 
             <PreviaMensaje v-for="mensaje in mensajes" :key="mensaje.id" :mensaje="mensaje" />
 
-            <q-btn label="Ver todos mis mensajes" flat bordered />
+            <q-btn
+              label="Ver todos mis mensajes"
+              flat
+              bordered
+              @click="$router.push({ name: 'chats' })"
+            />
           </div>
         </div>
       </div>
