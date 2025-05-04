@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import PreviaCita from 'src/components/PreviaCita.vue'
-import PreviaMensaje from 'src/components/PreviaMensaje.vue'
 import { useAppointmentStore } from 'src/stores/AppointmentStore'
 import { onMounted } from 'vue'
 
@@ -11,27 +10,6 @@ const { appointments } = storeToRefs(appointmentStore)
 onMounted(async () => {
   await appointmentStore.getAppointments()
 })
-
-const mensajes = [
-  {
-    id: 1,
-    doctor: 'Dr. Juan Martínez',
-    especialidad: 'Fisiología',
-    hora: '9:16',
-    mensaje: '¡Hola! ¿Cómo te encuentras?',
-    avatar:
-      'https://this-person-does-not-exist.com/img/avatar-genfe80258a028351a2c3d02625c5ee034a.jpg',
-  },
-  {
-    id: 2,
-    doctor: 'Dr. María Hernández',
-    especialidad: 'Alergología',
-    hora: 'Ayer',
-    mensaje: '¡Hola! ¿Cómo te encuentras?',
-    avatar:
-      'https://this-person-does-not-exist.com/img/avatar-genb334052d7d54966fb8382d481530fb2d.jpg',
-  },
-]
 </script>
 
 <template>
@@ -70,7 +48,7 @@ const mensajes = [
               <div class="text-subtitle">Conversaciones con tus médicos</div>
             </div>
 
-            <PreviaMensaje v-for="mensaje in mensajes" :key="mensaje.id" :mensaje="mensaje" />
+            <!--<PreviaMensaje v-for="mensaje in mensajes" :key="mensaje.id" :mensaje="mensaje" />-->
 
             <q-btn
               label="Ver todos mis mensajes"

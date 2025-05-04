@@ -4,7 +4,7 @@ import type { Chat } from 'src/interfaces/Chat'
 import type { ChatMessage } from 'src/interfaces/ChatMessage'
 import { useChatStore } from 'src/stores/ChatStore'
 import { useUserStore } from 'src/stores/UserStore'
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from 'src/stores/AuthStore'
 import ChatComponent from 'src/components/ChatComponent.vue'
@@ -13,13 +13,13 @@ import { connectWebSocket } from 'src/services/websocket'
 import type { Client } from '@stomp/stompjs'
 
 const route = useRoute()
-const doctorId = Number(route.params.id)
+const userId = Number(route.params.id)
 
 const authStore = useAuthStore()
 const { token } = storeToRefs(authStore)
 
 const userStore = useUserStore()
-const { user } = storeToRefs(userStore)
+const { medicalProfile } = storeToRefs(userStore)
 
 const chatStore = useChatStore()
 const activeChat = ref<Chat | null>(null)
@@ -48,13 +48,13 @@ async function sendMessage() {
   const newMessage: ChatMessage = {
     id: -1,
     chatId: activeChat.value!.id,
-    senderType: 'PATIENT',
+    senderType: 'DOCTOR',
     content: messageInput.value,
     createdAt: new Date().toString(),
     read: false,
   }
 
-  const response = await chatStore.sendMessage(user.value!.id, doctorId, newMessage.content)
+  const response = await chatStore.sendMessage(userId, medicalProfile.value.id, newMessage.content)
   if (response.success) {
     messages.value.push(newMessage)
     messageInput.value = ''
@@ -70,17 +70,10 @@ async function sendMessage() {
   messageInputLoading.value = false
 }
 
-const doctorName = computed(() => {
-  if (activeChat.value && activeChat.value.doctor) {
-    return `${activeChat.value.doctor.user?.sexo === 'Mujer' ? 'Dra.' : 'Dr.'} ${activeChat.value.doctor.user?.nombre} ${activeChat.value.doctor.user?.apellidos}`
-  }
-  return ''
-})
-
 onMounted(async () => {
-  if (user.value) {
+  if (medicalProfile.value) {
     // Cargamos el chat activo
-    const chatInfoResponse = await chatStore.getChatInfo(user.value.id, doctorId)
+    const chatInfoResponse = await chatStore.getChatInfo(userId, medicalProfile.value.id)
     if (chatInfoResponse.success) {
       activeChat.value = chatInfoResponse.data
     } else {
@@ -88,7 +81,7 @@ onMounted(async () => {
     }
 
     // Cargamos los mensajes del chat
-    const messagesResponse = await chatStore.getChatMessages(user.value.id, doctorId)
+    const messagesResponse = await chatStore.getChatMessages(userId, medicalProfile.value.id)
 
     if (messagesResponse.success) {
       messages.value = messagesResponse.data
@@ -125,15 +118,17 @@ onUnmounted(async () => {
           <q-btn flat round icon="arrow_back" @click="$router.back()" />
           <div>
             <div class="text-h6">Mensajes</div>
-            <div class="text-subtitle">Conversación con {{ doctorName }}</div>
+            <div class="text-subtitle">
+              Conversación con {{ activeChat?.patient.nombre }} {{ activeChat?.patient.apellidos }}
+            </div>
           </div>
         </div>
 
         <q-scroll-area ref="scrollAreaRef">
           <ChatComponent
             v-model:messages="messages"
-            recipient-type="PATIENT"
-            :chatting-with="doctorName"
+            recipient-type="DOCTOR"
+            :chatting-with="`${activeChat?.patient.nombre} ${activeChat?.patient.apellidos}`"
           />
         </q-scroll-area>
 

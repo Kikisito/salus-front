@@ -88,6 +88,21 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/professional/IndexPage.vue'),
       },
       {
+        path: 'chats',
+        children: [
+          {
+            name: 'professional-chats',
+            path: '',
+            component: () => import('pages/professional/ChatsPage.vue'),
+          },
+          {
+            name: 'professional-chat',
+            path: ':id',
+            component: () => import('pages/professional/ChatPage.vue'),
+          },
+        ],
+      },
+      {
         path: 'agenda',
         children: [
           {
