@@ -39,9 +39,17 @@ onMounted(async () => {
   <q-page padding>
     <div class="row justify-evenly">
       <div class="col-12 col-md-6">
-        <div class="section-header">
-          <div class="text-h6">Mensajes</div>
-          <div class="text-subtitle">Consulta las conversaciones con tus pacientes</div>
+        <div class="section-header row justify-between items-center">
+          <div>
+            <div class="text-h6">Mensajes</div>
+            <div class="text-subtitle">Consulta las conversaciones con tus pacientes</div>
+          </div>
+          <q-btn
+            color="primary"
+            icon="add_comment"
+            label="Nuevo chat"
+            @click="$router.push({ name: 'professional-patients' })"
+          />
         </div>
 
         <PreviaMensaje

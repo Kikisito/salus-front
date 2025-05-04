@@ -69,6 +69,15 @@ async function onRequest(props: any) {
                 $router.push({ name: 'professional-patient-details', params: { id: props.row.id } })
               "
             />
+
+            <q-btn
+              class="q-ml-sm"
+              icon="chat"
+              color="blue"
+              size="sm"
+              round
+              @click="$router.push({ name: 'professional-chat', params: { id: props.row.id } })"
+            />
           </template>
         </UsersList>
       </div>

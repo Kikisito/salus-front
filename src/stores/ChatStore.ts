@@ -47,7 +47,15 @@ export const useChatStore = defineStore('chatStore', {
           return chat
         },
         (error) => {
-          throw error
+          if (error.status === 404) {
+            return 'El chat al que intentas acceder no existe'
+          } else if (error.status === 409) {
+            return 'No puedes crear un chat contigo mismo'
+          } else if (error.status === 403 || error.status === 401) {
+            return 'No tienes permiso para acceder a este chat'
+          } else {
+            return 'Error inesperado al obtener la información del chat'
+          }
         },
       )
     },

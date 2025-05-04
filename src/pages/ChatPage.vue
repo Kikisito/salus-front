@@ -5,7 +5,7 @@ import type { ChatMessage } from 'src/interfaces/ChatMessage'
 import { useChatStore } from 'src/stores/ChatStore'
 import { useUserStore } from 'src/stores/UserStore'
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from 'src/stores/AuthStore'
 import ChatComponent from 'src/components/ChatComponent.vue'
 import { Notify } from 'quasar'
@@ -13,6 +13,8 @@ import { connectWebSocket } from 'src/services/websocket'
 import type { Client } from '@stomp/stompjs'
 
 const route = useRoute()
+const router = useRouter()
+
 const doctorId = Number(route.params.id)
 
 const authStore = useAuthStore()
@@ -85,6 +87,11 @@ onMounted(async () => {
       activeChat.value = chatInfoResponse.data
     } else {
       console.error('No se ha podido obtener el chat')
+      Notify.create({
+        type: 'negative',
+        message: chatInfoResponse.error,
+      })
+      router.push({ name: 'chats' })
     }
 
     // Cargamos los mensajes del chat

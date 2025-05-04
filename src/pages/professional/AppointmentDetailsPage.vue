@@ -447,6 +447,15 @@ onMounted(async () => {
           <q-space />
 
           <q-btn
+            color="primary"
+            icon="chat"
+            label="Abrir chat"
+            @click="
+              $router.push({ name: 'professional-chat', params: { id: appointment.patient.id } })
+            "
+          />
+
+          <q-btn
             color="negative"
             label="Finalizar cita"
             icon="check_circle"

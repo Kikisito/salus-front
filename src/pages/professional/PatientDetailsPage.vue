@@ -464,10 +464,20 @@ onMounted(async () => {
       <div class="col-12 col-md-9">
         <div class="section-header row items-center">
           <q-btn flat round icon="arrow_back" @click="$router.back()" />
-          <div v-if="patient">
-            <div class="text-h6">{{ patient.nombre }} {{ patient.apellidos }}</div>
-            <div class="text-subtitle">Perfil del paciente</div>
-          </div>
+          <template v-if="patient">
+            <div>
+              <div class="text-h6">{{ patient.nombre }} {{ patient.apellidos }}</div>
+              <div class="text-subtitle">Perfil del paciente</div>
+            </div>
+
+            <q-btn
+              class="q-ml-auto"
+              color="primary"
+              icon="chat"
+              label="Abrir chat"
+              @click="$router.push({ name: 'professional-chat', params: { id: patient.id } })"
+            />
+          </template>
         </div>
 
         <template v-if="loading">
