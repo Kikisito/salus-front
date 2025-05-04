@@ -18,7 +18,10 @@ const { slots } = storeToRefs(appointmentSlotStore)
 const slotsLoaded = ref(false)
 
 onMounted(async () => {
-  await appointmentSlotStore.getDoctorAppointmentSlots(medicalProfile.value.id, '2025-04-23')
+  await appointmentSlotStore.getDoctorAppointmentSlots(
+    medicalProfile.value.id,
+    date.formatDate(new Date(), 'YYYY-MM-DD'),
+  )
   slotsLoaded.value = true
 })
 
