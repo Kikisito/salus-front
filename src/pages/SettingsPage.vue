@@ -6,8 +6,10 @@ import { useUserStore } from 'src/stores/UserStore'
 
 import type { PasswordChangeRequest } from 'src/interfaces/PasswordChangeRequest'
 import formatLocaleTimeAgo from 'src/helpers/formatLocaleTimeAgo'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useAuthStore } from 'src/stores/AuthStore'
+
+const loading = ref(true)
 
 const authStore = useAuthStore()
 const userStore = useUserStore()
@@ -16,6 +18,7 @@ onMounted(async () => {
   // Actualizamos los datos del usuario cada vez que se carga la página
   // Así, si se cambian los datos desde otro sitio, se reflejarán
   await userStore.getCurrentUser()
+  loading.value = false
 })
 
 const changePassword = async (values: PasswordChangeRequest) => {
@@ -69,7 +72,7 @@ const closeAllSessions = async () => {
 
 <template>
   <q-page padding>
-    <div class="row justify-evenly">
+    <div v-if="!loading" class="row justify-evenly">
       <div class="col-12 col-md-6">
         <div class="section-header row items-center">
           <div class="text-h6">Ajustes</div>
@@ -147,6 +150,13 @@ const closeAllSessions = async () => {
             </span>
           </q-card-section>
         </q-card>
+      </div>
+    </div>
+
+    <div v-else class="q-pa-md">
+      <div class="text-center q-pa-xl">
+        <q-spinner size="3em" color="primary" />
+        <div class="text-subtitle1 q-mt-md">Cargando...</div>
       </div>
     </div>
   </q-page>

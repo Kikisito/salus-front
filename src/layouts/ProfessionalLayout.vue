@@ -8,6 +8,7 @@ const authStore = useAuthStore()
 const userStore = useUserStore()
 const { medicalProfile } = storeToRefs(userStore)
 
+const loading = ref(true)
 const drawer = ref(false)
 const miniState = ref(true)
 
@@ -26,6 +27,7 @@ const menuItems = [
 
 onMounted(async () => {
   await userStore.getCurrentMedicalProfile()
+  loading.value = false
 })
 </script>
 
@@ -71,7 +73,11 @@ onMounted(async () => {
     </q-drawer>
 
     <q-page-container>
-      <q-page v-if="!medicalProfile || !medicalProfile.user" padding>
+      <q-page v-if="loading" class="flex flex-center">
+        <q-spinner color="primary" />
+      </q-page>
+
+      <q-page v-else-if="!medicalProfile || !medicalProfile.user" padding>
         <q-banner inline-actions class="text-white bg-red">
           <template v-slot:avatar>
             <q-icon name="error" />

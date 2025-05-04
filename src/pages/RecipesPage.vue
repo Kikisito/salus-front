@@ -4,7 +4,9 @@ import { Notify } from 'quasar'
 import PreviaReceta from 'src/components/PreviaReceta.vue'
 import { usePrescriptionStore } from 'src/stores/PrescriptionStore'
 import { useUserStore } from 'src/stores/UserStore'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
+
+const loading = ref(true)
 
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
@@ -22,12 +24,14 @@ onMounted(async () => {
       message: 'No se han podido cargar las recetas',
     })
   }
+
+  loading.value = false
 })
 </script>
 
 <template>
   <q-page padding>
-    <div class="row justify-evenly">
+    <div v-if="!loading" class="row justify-evenly">
       <div class="col-12 col-md-6">
         <div class="section-header">
           <div class="text-h6">Recetas</div>
@@ -48,6 +52,13 @@ onMounted(async () => {
             </q-card-section>
           </q-card>
         </div>
+      </div>
+    </div>
+
+    <div v-else class="q-pa-md">
+      <div class="text-center q-pa-xl">
+        <q-spinner size="3em" color="primary" />
+        <div class="text-subtitle1 q-mt-md">Cargando...</div>
       </div>
     </div>
   </q-page>

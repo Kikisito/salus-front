@@ -20,6 +20,8 @@ import { onMounted, ref } from 'vue'
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 
+const loading = ref(true)
+
 const appointmentStore = useAppointmentStore()
 const { appointments } = storeToRefs(appointmentStore)
 const pastAppointments = ref<Appointment[]>([])
@@ -150,13 +152,15 @@ async function showPastAppointments() {
 }
 
 onMounted(async () => {
-  await appointmentStore.getAppointments()
+  await appointmentStore.getAppointments().finally(() => {
+    loading.value = false
+  })
 })
 </script>
 
 <template>
   <q-page padding>
-    <div class="row justify-evenly">
+    <div v-if="!loading" class="row justify-evenly">
       <div class="col-12 col-md-6">
         <div class="section-header">
           <div class="text-h6">Tus próximas citas</div>
@@ -216,10 +220,17 @@ onMounted(async () => {
           />
         </template>
       </div>
+
+      <q-page-sticky position="bottom-right" :offset="[18, 18]">
+        <q-btn fab icon="add" class="bg-primary text-white" @click="newAppointment()" />
+      </q-page-sticky>
     </div>
 
-    <q-page-sticky position="bottom-right" :offset="[18, 18]">
-      <q-btn fab icon="add" class="bg-primary text-white" @click="newAppointment()" />
-    </q-page-sticky>
+    <div v-else class="q-pa-md">
+      <div class="text-center q-pa-xl">
+        <q-spinner size="3em" color="primary" />
+        <div class="text-subtitle1 q-mt-md">Cargando...</div>
+      </div>
+    </div>
   </q-page>
 </template>

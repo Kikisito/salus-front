@@ -12,6 +12,8 @@ import { useUserStore } from 'src/stores/UserStore'
 import type { Direccion } from 'src/interfaces/Direccion'
 import type { User } from 'src/interfaces/User'
 
+const loading = ref(true)
+
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 
@@ -22,6 +24,7 @@ onMounted(async () => {
   // Actualizamos los datos del usuario cada vez que se carga la página
   // Así, si se cambian los datos desde otro sitio, se reflejarán
   await userStore.getCurrentUser()
+  loading.value = false
 })
 
 const updateProfile = async (user: User) => {
@@ -64,7 +67,7 @@ const setDireccion = async (direccion: Direccion) => {
 
 <template>
   <q-page padding>
-    <div class="row justify-evenly">
+    <div v-if="!loading" class="row justify-evenly">
       <div class="col-12 col-md-6">
         <div class="section-header row items-center">
           <div class="text-h6">Mi perfil</div>
@@ -129,19 +132,26 @@ const setDireccion = async (direccion: Direccion) => {
           </q-card-section>
         </q-card>
       </div>
+
+      <ProfileChangeUserDataModal
+        v-model:show="showUserDataModal"
+        :user="user"
+        @form:submit="updateProfile($event)"
+      />
+
+      <DireccionModal
+        v-model:show="showDireccionModal"
+        :direccion="user?.direccion"
+        @form:submit="setDireccion($event)"
+      />
     </div>
 
-    <ProfileChangeUserDataModal
-      v-model:show="showUserDataModal"
-      :user="user"
-      @form:submit="updateProfile($event)"
-    />
-
-    <DireccionModal
-      v-model:show="showDireccionModal"
-      :direccion="user?.direccion"
-      @form:submit="setDireccion($event)"
-    />
+    <div v-else class="q-pa-md">
+      <div class="text-center q-pa-xl">
+        <q-spinner size="3em" color="primary" />
+        <div class="text-subtitle1 q-mt-md">Cargando...</div>
+      </div>
+    </div>
   </q-page>
 </template>
 
