@@ -56,6 +56,22 @@ export const useUserStore = defineStore('userStore', {
       })
     },
 
+    async getMedicalProfile(doctorId: number): Promise<ServiceAnswer<MedicalProfile>> {
+      return handleRequest(
+        async () => {
+          const response = await api.get(`/doctor-profiles/${doctorId}`)
+          this.medicalProfile = await response.data
+
+          return this.medicalProfile
+        },
+        (error) => {
+          if (error.status === 404) {
+            return 'No se ha encontrado el perfil médico'
+          }
+        },
+      )
+    },
+
     async updateProfile(newData: User): Promise<ServiceAnswer<User | null>> {
       return handleRequest(
         async () => {

@@ -7,7 +7,6 @@ import { date, Dialog, Loading, Notify } from 'quasar'
 import { useAppointmentSlotStore } from 'src/stores/AppointmentSlotStore'
 import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
 import AppointmentSlotDialog from 'src/components/admin/appointment-slots/AppointmentSlotDialog.vue'
-import { useAppointmentStore } from 'src/stores/AppointmentStore'
 import { useRoomStore } from 'src/stores/RoomStore'
 import AppointmentsCalendar from 'src/components/AppointmentsCalendar.vue'
 
@@ -21,45 +20,8 @@ const { inspectedDoctor } = storeToRefs(doctorStore)
 const appointmentSlotStore = useAppointmentSlotStore()
 const { slots } = storeToRefs(appointmentSlotStore)
 
-const appointmentStore = useAppointmentStore()
-
 const rawDoctorId: string = route.params.id as string
 const doctorId = parseInt(rawDoctorId)
-
-async function showAppointmentSlot(appointmentSlot: AppointmentSlot) {
-  Loading.show({
-    message: 'Cargando información del turno...',
-  })
-
-  let appointment = null
-  if (appointmentSlot.appointmentId) {
-    const response = await appointmentStore.getAppointment(appointmentSlot.appointmentId)
-
-    if (!response.success) {
-      Notify.create({
-        type: 'negative',
-        message: 'Error al cargar la cita. Algunos datos se mostrarán incompletos.',
-      })
-      Loading.hide()
-      return
-    } else {
-      appointment = response.data
-    }
-  }
-
-  Dialog.create({
-    component: AppointmentSlotDialog,
-    componentProps: {
-      appointmentSlot: appointmentSlot,
-      appointment: appointment,
-      getRooms: roomStore.getAllRooms,
-      searchRooms: roomStore.searchRooms,
-    },
-    persistent: true,
-  })
-
-  Loading.hide()
-}
 
 async function createAppointmentDialog() {
   Dialog.create({
@@ -202,7 +164,12 @@ onMounted(async () => {
 
               <AppointmentsCalendar
                 v-model:appointment-slots="slots"
-                @appointment-slot:click="showAppointmentSlot($event)"
+                @appointment-slot:click="
+                  $router.push({
+                    name: 'admin-doctor-appointment',
+                    params: { id: inspectedDoctor.id, appointmentId: $event.appointmentId },
+                  })
+                "
                 @appointment-slot:context="deleteAppointmentSlot($event)"
                 @update:model-value="getData($event)"
               />

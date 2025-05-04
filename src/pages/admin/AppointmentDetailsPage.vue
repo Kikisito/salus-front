@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { storeToRefs } from 'pinia'
 import { Dialog, Notify } from 'quasar'
 import AppointmentData from 'src/components/AppointmentData.vue'
 import MedicalTestList from 'src/components/MedicalTestList.vue'
@@ -11,6 +10,7 @@ import PrescriptionFormDialog from 'src/components/professional/PrescriptionForm
 import ReportFormDialog from 'src/components/professional/ReportFormDialog.vue'
 import ReportList from 'src/components/ReportList.vue'
 import type { Appointment } from 'src/interfaces/Appointment'
+import type { MedicalProfile } from 'src/interfaces/MedicalProfile'
 import type { MedicalTest } from 'src/interfaces/MedicalTest'
 import type { Prescription } from 'src/interfaces/Prescription'
 import type { Report } from 'src/interfaces/Report'
@@ -25,10 +25,13 @@ import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
-const appointmentId = parseInt(route.params.id as string)
+const doctorId = parseInt(route.params.id as string)
+const appointmentId = parseInt(route.params.appointmentId as string)
+
+const loading = ref(true)
 
 const doctorStore = useUserStore()
-const { medicalProfile } = storeToRefs(doctorStore)
+const medicalProfile = ref(null as unknown as MedicalProfile)
 
 const appointmentStore = useAppointmentStore()
 const reportStore = useReportStore()
@@ -69,7 +72,7 @@ async function loadAppointment() {
       type: 'negative',
       message: 'ID de cita no válido',
     })
-    router.push({ name: 'professional-agenda' })
+    router.push({ name: 'admin-doctor-appointments', params: { id: doctorId } })
     return
   }
 
@@ -83,7 +86,7 @@ async function loadAppointment() {
         type: 'negative',
         message: 'Error al cargar los datos de la cita: ' + response.error,
       })
-      //router.push({ name: 'professional-agenda' })
+      router.push({ name: 'admin-doctor-appointments', params: { id: doctorId } })
     }
   } catch (error) {
     console.error('Error al cargar la cita:', error)
@@ -92,11 +95,6 @@ async function loadAppointment() {
       message: 'Error al cargar la cita',
     })
   }
-}
-
-async function setAppointmentCompleted() {
-  setAppointmentStatus(appointment.value.id, 'COMPLETED')
-  router.push({ name: 'professional-agenda' })
 }
 
 async function setAppointmentStatus(appointmentId: number, status: string) {
@@ -120,6 +118,35 @@ async function setAppointmentStatus(appointmentId: number, status: string) {
       message: 'Error al actualizar el estado de la cita',
     })
   }
+}
+
+async function cancelAppointment() {
+  Dialog.create({
+    title: 'Cancelar cita',
+    message: '¿Estás seguro de que quieres cancelar esta cita?',
+    persistent: true,
+    cancel: true,
+  }).onOk(async () => {
+    try {
+      const response = await appointmentStore.deleteAppointment(appointment.value)
+
+      Notify.create({
+        type: response.success ? 'positive' : 'negative',
+        message: response.success ? 'Cita cancelada correctamente' : response.error,
+      })
+
+      router.push({
+        name: 'admin-doctor-appointments',
+        params: { id: doctorId },
+      })
+    } catch (error) {
+      console.error('Error al cancelar la cita:', error)
+      Notify.create({
+        type: 'negative',
+        message: 'Error al cancelar la cita',
+      })
+    }
+  })
 }
 
 // Métodos INFORMES
@@ -413,18 +440,34 @@ async function deleteMedicalTestDialog(medicalTest: MedicalTest) {
 }
 
 onMounted(async () => {
+  // Cargamos el perfil médico del usuario
+  const doctorResponse = await doctorStore.getMedicalProfile(doctorId)
+  if (doctorResponse.success) {
+    medicalProfile.value = doctorResponse.data
+  } else {
+    Notify.create({
+      type: 'negative',
+      message: 'Error al cargar el perfil médico: ' + doctorResponse.error,
+    })
+    router.push({ name: 'admin-doctor-appointments', params: { id: doctorId } })
+  }
+
+  // Cargamos la cita
   await loadAppointment()
+
+  loading.value = false
 })
 </script>
 
 <template>
   <q-page padding>
-    <div class="row justify-evenly">
+    <div v-if="!loading" class="row justify-evenly">
       <div class="col-12 col-md-9">
         <div class="section-header row items-center">
           <q-btn flat round icon="arrow_back" @click="$router.back()" />
           <div>
             <div class="text-h6">
+              {{ medicalProfile.user.sexo === 'Mujer' ? 'Dra.' : 'Dr.' }}
               {{ medicalProfile.user.nombre }} {{ medicalProfile.user.apellidos }}
             </div>
             <div class="text-subtitle">Número de colegiado: {{ medicalProfile.license }}</div>
@@ -446,22 +489,7 @@ onMounted(async () => {
 
           <q-space />
 
-          <q-btn
-            color="primary"
-            icon="chat"
-            label="Abrir chat"
-            @click="
-              $router.push({ name: 'professional-chat', params: { id: appointment.patient.id } })
-            "
-          />
-
-          <q-btn
-            color="negative"
-            label="Finalizar cita"
-            icon="check_circle"
-            :disable="appointment?.status !== 'PENDING'"
-            @click="setAppointmentCompleted()"
-          />
+          <q-btn color="red" icon="cancel" label="Cancelar cita" @click="cancelAppointment()" />
         </div>
 
         <template v-if="appointment">
@@ -531,6 +559,13 @@ onMounted(async () => {
           <q-spinner size="3em" color="primary" />
           <div class="text-subtitle1 q-mt-md">Cargando datos de la cita...</div>
         </div>
+      </div>
+    </div>
+
+    <div v-else class="q-pa-md">
+      <div class="text-center q-pa-xl">
+        <q-spinner size="3em" color="primary" />
+        <div class="text-subtitle1 q-mt-md">Cargando...</div>
       </div>
     </div>
   </q-page>
