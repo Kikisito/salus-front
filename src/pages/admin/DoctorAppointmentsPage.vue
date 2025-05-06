@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDoctorStore } from 'src/stores/DoctorStore'
@@ -9,8 +9,15 @@ import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
 import AppointmentSlotDialog from 'src/components/admin/appointment-slots/AppointmentSlotDialog.vue'
 import { useRoomStore } from 'src/stores/RoomStore'
 import AppointmentsCalendar from 'src/components/AppointmentsCalendar.vue'
+import { useAppointmentStore } from 'src/stores/AppointmentStore'
+import type { AppointmentRequest } from 'src/interfaces/AppointmentRequest'
+import AssignAppointmentDialog from 'src/components/admin/appointment-slots/AssignAppointmentDialog.vue'
+import { useUsersStore } from 'src/stores/UsersStore'
 
 const route = useRoute()
+const router = useRouter()
+
+const usersStore = useUsersStore()
 
 const roomStore = useRoomStore()
 
@@ -19,6 +26,8 @@ const { inspectedDoctor } = storeToRefs(doctorStore)
 
 const appointmentSlotStore = useAppointmentSlotStore()
 const { slots } = storeToRefs(appointmentSlotStore)
+
+const appointmentStore = useAppointmentStore()
 
 const rawDoctorId: string = route.params.id as string
 const doctorId = parseInt(rawDoctorId)
@@ -76,6 +85,50 @@ async function deleteAppointmentSlot(appointmentSlot: AppointmentSlot) {
       })
     }
   })
+}
+
+async function manageAppointmentSlot(appointmentSlot: AppointmentSlot) {
+  if (appointmentSlot.appointmentId) {
+    router.push({
+      name: 'admin-doctor-appointment',
+      params: { id: inspectedDoctor.value?.id, appointmentId: appointmentSlot.appointmentId },
+    })
+  } else {
+    Dialog.create({
+      component: AssignAppointmentDialog,
+      componentProps: {
+        getAllUsers: usersStore.getAllUsers,
+        searchUsers: usersStore.searchFromAllUsers,
+        persistent: true,
+      },
+    }).onOk(async (data: AppointmentRequest) => {
+      if (data) {
+        // Asignamos el ID del hueco a la petición y mandamos
+        data.appointmentSlot = appointmentSlot.id
+        const response = await appointmentStore.createAppointment(data)
+
+        if (response.success) {
+          Notify.create({
+            type: 'positive',
+            message: 'El hueco de cita se ha actualizado correctamente.',
+          })
+
+          // Actualizamos el hueco de cita local
+          slots.value = slots.value.map((slot) => {
+            if (slot.id === appointmentSlot.id) {
+              return { ...slot, appointmentId: response.data.id }
+            }
+            return slot
+          })
+        } else {
+          Notify.create({
+            type: 'negative',
+            message: response.error || 'Error al actualizar el hueco de cita.',
+          })
+        }
+      }
+    })
+  }
 }
 
 async function getData(d: string = new Date().toISOString()) {
@@ -164,12 +217,7 @@ onMounted(async () => {
 
               <AppointmentsCalendar
                 v-model:appointment-slots="slots"
-                @appointment-slot:click="
-                  $router.push({
-                    name: 'admin-doctor-appointment',
-                    params: { id: inspectedDoctor.id, appointmentId: $event.appointmentId },
-                  })
-                "
+                @appointment-slot:click="manageAppointmentSlot($event)"
                 @appointment-slot:context="deleteAppointmentSlot($event)"
                 @update:model-value="getData($event)"
               />

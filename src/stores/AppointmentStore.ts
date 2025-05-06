@@ -16,12 +16,12 @@ export const useAppointmentStore = defineStore('appointmentStore', {
   },
 
   actions: {
-    async createUserSessionAppointment(
+    async createAppointment(
       appointmentRequest: AppointmentRequest,
     ): Promise<ServiceAnswer<Appointment>> {
       return handleRequest(
         async () => {
-          const response = await api.post('/appointments/@me/new', appointmentRequest)
+          const response = await api.post('/appointments/new', appointmentRequest)
           const appointment = await response.data
           this.appointments.push(appointment)
           return appointment
