@@ -11,6 +11,17 @@ import type { Direccion } from 'src/interfaces/Direccion'
 import type { User } from 'src/interfaces/User'
 import ProfileChangeUserDataModal from 'src/components/ProfileChangeUserDataModal.vue'
 import DireccionModal from 'src/components/DireccionModal.vue'
+import NewAppointmentDialog from 'src/components/appointments/NewAppointmentDialog.vue'
+import { useMedicalCenterStore } from 'src/stores/MedicalCenterStore'
+import { useSpecialtyStore } from 'src/stores/SpecialtyStore'
+import { useDoctorStore } from 'src/stores/DoctorStore'
+import { useAppointmentSlotStore } from 'src/stores/AppointmentSlotStore'
+import type { Specialty } from 'src/interfaces/Specialty'
+import type { MedicalCenter } from 'src/interfaces/MedicalCenter'
+import type { MedicalProfile } from 'src/interfaces/MedicalProfile'
+import type { AppointmentSlot } from 'src/interfaces/AppointmentSlot'
+import type { AppointmentRequest } from 'src/interfaces/AppointmentRequest'
+import { useAppointmentStore } from 'src/stores/AppointmentStore'
 
 const router = useRouter()
 const route = useRoute()
@@ -127,6 +138,126 @@ async function openMedicalProfileDialog() {
     }
   })
 }
+// Métodos auxiliares para el modal de creación de citas
+const medicalCenterStore = useMedicalCenterStore()
+const specialtyStore = useSpecialtyStore()
+const doctorStore = useDoctorStore()
+const appointmentSlotStore = useAppointmentSlotStore()
+const appointmentStore = useAppointmentStore()
+
+async function getSpecialties(search?: string): Promise<Specialty[]> {
+  let response
+  if (search) {
+    response = await specialtyStore.searchSpecialties(search)
+  } else {
+    response = await specialtyStore.getAllSpecialties(0, 50)
+  }
+
+  if (response.success) {
+    return response.data
+  } else {
+    Notify.create({
+      message: 'Error al cargar las especialidades',
+      color: 'negative',
+    })
+    return []
+  }
+}
+
+async function getMedicalCenters(specialty: Specialty, search?: string): Promise<MedicalCenter[]> {
+  let response
+
+  if (search) {
+    response = await medicalCenterStore.searchAvailableMedicalCenters(search, specialty)
+  } else {
+    response = await medicalCenterStore.getAvailableMedicalCenters(specialty)
+  }
+
+  if (response.success) {
+    return response.data
+  } else {
+    Notify.create({
+      message: 'Error al cargar los centros médicos',
+      color: 'negative',
+    })
+    return []
+  }
+}
+
+async function getDoctors(
+  medicalCenter: MedicalCenter,
+  specialty: Specialty,
+): Promise<MedicalProfile[]> {
+  const response = await doctorStore.getAvailableDoctors(medicalCenter, specialty)
+
+  if (response.success) {
+    return response.data
+  } else {
+    Notify.create({
+      type: 'negative',
+      message: 'Error al cargar los médicos',
+    })
+    return []
+  }
+}
+
+async function getAppointmentSlots(
+  medicalCenter: MedicalCenter,
+  specialty: Specialty,
+  doctor: MedicalProfile,
+): Promise<AppointmentSlot[]> {
+  const response = await appointmentSlotStore.getDoctorAndSpecialtyAvailableAppointmentSlots(
+    medicalCenter,
+    specialty,
+    doctor,
+  )
+
+  if (response.success) {
+    return response.data
+  } else {
+    Notify.create({
+      type: 'negative',
+      message: 'Error al cargar los horarios disponibles',
+    })
+    return []
+  }
+}
+// Fin de métodos auxiliares
+
+async function openCreateAppointmentDialog() {
+  Dialog.create({
+    component: NewAppointmentDialog,
+    componentProps: {
+      getMedicalCenters: getMedicalCenters,
+      getSpecialties: getSpecialties,
+      getDoctors: getDoctors,
+      getAvailableSlots: getAppointmentSlots,
+    },
+  }).onOk(async (request: AppointmentRequest) => {
+    // Asignamos el ID del paciente a la cita
+    request.patient = userId
+
+    const response = await appointmentStore.createAppointment(request)
+
+    if (response.success) {
+      Notify.create({
+        type: 'positive',
+        message: 'Cita creada con éxito',
+      })
+
+      // Redirigir al administrador a los detalles de la cita
+      router.push({
+        name: 'admin-doctor-appointment',
+        params: { id: response.data.slot.doctor.id, appointmentId: response.data.id },
+      })
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: response.error,
+      })
+    }
+  })
+}
 
 onMounted(async () => {
   await getUserData()
@@ -152,6 +283,18 @@ onMounted(async () => {
             rounded
           >
             <q-list>
+              <!-- Crear cita -->
+              <q-item clickable v-close-popup @click="openCreateAppointmentDialog()">
+                <q-item-section avatar>
+                  <q-avatar icon="event" />
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label>Crear cita</q-item-label>
+                  <q-item-label caption>Crear una nueva cita para el usuario</q-item-label>
+                </q-item-section>
+              </q-item>
+
               <!-- Bloqueo de citas -->
               <q-item
                 clickable
