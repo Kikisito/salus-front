@@ -132,7 +132,7 @@ async function newAppointment() {
     } else {
       Notify.create({
         type: 'negative',
-        message: 'Error al crear la cita',
+        message: response.error,
       })
     }
   })

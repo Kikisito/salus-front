@@ -27,8 +27,11 @@ export const useAppointmentStore = defineStore('appointmentStore', {
           return appointment
         },
         (error) => {
-          console.error(error)
-          return 'Ha ocurrido un error al crear la cita'
+          if (error.status === 401) {
+            return 'No se ha podido crear la cita. Por favor, contacta con el centro médico para gestionar tus citas.'
+          } else {
+            return 'Ha ocurrido un error al crear la cita'
+          }
         },
       )
     },
