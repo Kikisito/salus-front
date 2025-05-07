@@ -14,7 +14,7 @@ export const useUsersStore = defineStore('usersStore', {
   }),
 
   actions: {
-    async getAllUsers(page: number = 0, limit: number = 10): Promise<ServiceAnswer<User[] | null>> {
+    async getAllUsers(page: number = 0, limit: number = 10): Promise<ServiceAnswer<User[]>> {
       return handleRequest(
         async () => {
           const response = await api.get('/user/all/' + page + '/' + limit)

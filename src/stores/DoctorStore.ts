@@ -14,10 +14,7 @@ export const useDoctorStore = defineStore('doctorStore', {
   }),
 
   actions: {
-    async getAll(
-      page: number = 0,
-      limit: number = 10,
-    ): Promise<ServiceAnswer<MedicalProfile[] | null>> {
+    async getAll(page: number = 0, limit: number = 10): Promise<ServiceAnswer<MedicalProfile[]>> {
       return handleRequest(
         async () => {
           const response = await api.get('/doctor-profiles/all/' + page + '/' + limit)
@@ -71,7 +68,7 @@ export const useDoctorStore = defineStore('doctorStore', {
       )
     },
 
-    async getDoctorData(id: number): Promise<ServiceAnswer<MedicalProfile | null>> {
+    async getDoctorData(id: number): Promise<ServiceAnswer<MedicalProfile>> {
       return handleRequest(
         async () => {
           const response = await api.get('/doctor-profiles/' + id)
