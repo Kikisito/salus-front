@@ -27,7 +27,14 @@ export const useAppointmentStore = defineStore('appointmentStore', {
           return appointment
         },
         (error) => {
-          if (error.status === 401) {
+          if (
+            error.status === 409 &&
+            // @ts-expect-error errors is a custom interface
+            error.response?.data?.errors[0].code ===
+              'conflict.appointment_slot_cannot_be_booked_by_doctor'
+          ) {
+            return 'No puedes crear una cita contigo mismo.'
+          } else if (error.status === 401) {
             return 'No se ha podido crear la cita. Por favor, contacta con el centro médico para gestionar tus citas.'
           } else {
             return 'Ha ocurrido un error al crear la cita'
