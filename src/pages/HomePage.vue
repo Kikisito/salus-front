@@ -2,6 +2,8 @@
 import { storeToRefs } from 'pinia'
 import PreviaCita from 'src/components/PreviaCita.vue'
 import PreviaMensaje from 'src/components/PreviaMensaje.vue'
+import type { Appointment } from 'src/interfaces/Appointment'
+import type { Chat } from 'src/interfaces/Chat'
 import { useAppointmentStore } from 'src/stores/AppointmentStore'
 import { useChatStore } from 'src/stores/ChatStore'
 import { useUserStore } from 'src/stores/UserStore'
@@ -14,13 +16,19 @@ const { user } = storeToRefs(userStore)
 
 const appointmentStore = useAppointmentStore()
 const { appointments } = storeToRefs(appointmentStore)
+const appointmentsToShow = ref<Appointment[]>([])
 
 const chatStore = useChatStore()
 const { chats } = storeToRefs(chatStore)
+const chatsToShow = ref<Chat[]>([])
 
 onMounted(async () => {
   await appointmentStore.getAppointments()
   await chatStore.getPatientChats(user.value!)
+
+  // Solo vamos a mostrar en el inicio tres citas y tres chats
+  appointmentsToShow.value = appointments.value.slice(0, 3)
+  chatsToShow.value = chats.value.slice(0, 3)
 
   loading.value = false
 })
@@ -36,7 +44,7 @@ onMounted(async () => {
         </div>
         <div class="row justify-evenly">
           <div class="col-12 col-md-6">
-            <q-card flat bordered class="q-mb-md">
+            <q-card flat bordered class="q-mb-md bg-white">
               <q-card-section>
                 <div class="section-header">
                   <div class="text-h6">Próximas citas</div>
@@ -44,7 +52,7 @@ onMounted(async () => {
                 </div>
 
                 <PreviaCita
-                  v-for="appointment in appointments"
+                  v-for="appointment in appointmentsToShow"
                   :key="appointment.id"
                   :appointment="appointment"
                   @appointment:show="
@@ -69,7 +77,7 @@ onMounted(async () => {
           </div>
 
           <div class="col-12 col-md-6">
-            <q-card flat bordered class="q-mb-md">
+            <q-card flat bordered class="q-mb-md bg-white">
               <q-card-section>
                 <div class="section-header">
                   <div class="text-h6">Últimos mensajes</div>
@@ -77,7 +85,7 @@ onMounted(async () => {
                 </div>
 
                 <PreviaMensaje
-                  v-for="chat in chats"
+                  v-for="chat in chatsToShow"
                   :key="chat.id"
                   :chat="chat"
                   :title="`${chat.doctor.user!.sexo === 'Mujer' ? 'Dra.' : 'Dr.'} ${chat.doctor.user!.nombre} ${chat.doctor.user!.apellidos}`"
