@@ -110,6 +110,19 @@ export const useAuthStore = defineStore('authStore', {
       )
     },
 
+    async requestEmailVerification(): Promise<ServiceAnswer<number>> {
+      return handleRequest(
+        async () => {
+          const response = await api.post('/auth/verification/resend', {})
+          return response.status
+        },
+        (error) => {
+          console.error(error)
+          return 'Ha ocurrido un error inesperado'
+        },
+      )
+    },
+
     async verifyEmail(token: string): Promise<ServiceAnswer<number>> {
       return handleRequest(
         async () => {

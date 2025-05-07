@@ -14,4 +14,5 @@ export interface User {
   password: string
   rolesList: string[]
   restricted: boolean
+  accountStatusType: string
 }

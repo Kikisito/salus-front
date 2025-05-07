@@ -11,8 +11,11 @@ import { useUserStore } from 'src/stores/UserStore'
 
 import type { Direccion } from 'src/interfaces/Direccion'
 import type { User } from 'src/interfaces/User'
+import { useAuthStore } from 'src/stores/AuthStore'
 
 const loading = ref(true)
+
+const authStore = useAuthStore()
 
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
@@ -63,12 +66,51 @@ const setDireccion = async (direccion: Direccion) => {
     })
   }
 }
+
+async function requestEmailVerification() {
+  const response = await authStore.requestEmailVerification()
+  if (response.success) {
+    Notify.create({
+      message: 'Correo de verificación enviado correctamente',
+      color: 'positive',
+      icon: 'check',
+    })
+  } else {
+    Notify.create({
+      message: response.error,
+      color: 'negative',
+      icon: 'error',
+    })
+  }
+}
 </script>
 
 <template>
   <q-page padding>
     <div v-if="!loading" class="row justify-evenly">
       <div class="col-12 col-md-6">
+        <!-- Si el usuario no está verificado, mostramos un banner -->
+        <q-banner
+          v-if="user?.accountStatusType === 'NOT_VERIFIED'"
+          class="bg-red text-white"
+          rounded
+          style="margin-bottom: 1rem"
+        >
+          <template v-slot:avatar>
+            <q-icon name="warning" size="2rem" />
+          </template>
+          Tu correo electrónico no ha sido verificado. Por favor, revisa tu bandeja de entrada y haz
+          clic en el enlace de verificación que te hemos enviado.
+          <template v-slot:action>
+            <q-btn
+              class="q-ml-sm"
+              label="Reenviar correo de verificación"
+              @click="requestEmailVerification()"
+              flat
+            />
+          </template>
+        </q-banner>
+
         <div class="section-header row items-center">
           <div class="text-h6">Mi perfil</div>
           <q-space />
