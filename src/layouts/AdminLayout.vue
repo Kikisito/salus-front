@@ -64,8 +64,7 @@ const menuItems = [
   { label: 'Consultas', icon: 'meeting_room', path: '/admin/rooms' },
   { label: 'Especialidades', icon: 'medical_services', path: '/admin/specialties' },
   { label: 'Médicos', icon: 'medical_information', path: '/admin/doctors' },
-  { label: 'Usuarios', icon: 'group', path: '/admin/patients' },
-  { label: 'Configuración', icon: 'settings', path: '/admin/config', separator: true },
+  { label: 'Usuarios', icon: 'group', path: '/admin/patients', separator: true },
   { label: 'Volver a mi área personal', icon: 'arrow_back', path: '/home' },
   { label: 'Cerrar sesión', icon: 'logout', action: () => authStore.logout() },
 ]
