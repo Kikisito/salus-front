@@ -222,6 +222,7 @@ async function editReportDialog(report: Report) {
     if (data) {
       // Especificamos el ID del informe y sus datos asociados
       data.doctor = medicalProfile.value.id
+      data.specialty = report.specialty.id
       data.patient = userId
 
       // Petición API
@@ -318,6 +319,7 @@ async function updatePrescriptionDialog(prescription: Prescription) {
     if (data) {
       // Especificamos el ID del informe y sus datos asociados
       data.doctor = medicalProfile.value.id
+      data.specialty = prescription.specialty.id
       data.patient = userId
 
       // Petición API
