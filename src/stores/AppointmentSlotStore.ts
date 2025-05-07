@@ -78,7 +78,7 @@ export const useAppointmentSlotStore = defineStore('appointmentSlotStore', {
         },
         (error) => {
           if (error.status === 409) {
-            return 'Este hueco colapsa con otro ya existente'
+            return 'Este hueco colapsa con otro ya existente. Comprueba que el médico o la consulta están disponibles en la fecha y hora seleccionadas'
           } else if (error.status === 404) {
             return 'Alguno de los datos introducidos no es correcto. Refresca la página e inténtalo de nuevo'
           }
@@ -102,6 +102,125 @@ export const useAppointmentSlotStore = defineStore('appointmentSlotStore', {
         },
         (error) => {
           throw error
+        },
+      )
+    },
+
+    async generateSlotsByScheduleAndDate(
+      scheduleId: number,
+      date: string,
+    ): Promise<ServiceAnswer<AppointmentSlot[]>> {
+      return handleRequest(
+        async () => {
+          const response = await api.post('/appointment-slots/generate/schedule', {
+            scheduleId: scheduleId,
+            date: date,
+          })
+          const slots = await response.data
+          return slots
+        },
+        (error) => {
+          if (error.status === 409) {
+            // @ts-expect-error errors is a custom interface
+            if (error.response?.data?.errors[0].code === 'conflict.day_mismatch') {
+              return 'La fecha seleccionada no es válida. Elige un día de la semana que coincida con el día del turno.'
+              // @ts-expect-error errors is a custom interface
+            } else if (error.response?.data?.errors[0].code === 'conflict.schedule_conflict') {
+              return 'Ya existe uno o varios huecos de cita en esta fecha'
+            } else {
+              console.error(error)
+              return 'Ha ocurrido un error al generar los huecos de citas'
+            }
+          } else if (
+            error.status === 400 &&
+            // @ts-expect-error errors is a custom interface
+            error.response?.data?.errors[0].code === 'bad_request.invalid_date_or_date_range'
+          ) {
+            return 'La fecha seleccionada no es válida. Recuerda que la fecha debe ser posterior a la actual.'
+          } else {
+            console.error(error)
+            return 'Ha ocurrido un error al generar los huecos de citas'
+          }
+        },
+      )
+    },
+
+    async generateSlotsByDoctorAndDateRange(
+      doctorId: number,
+      startDate: string,
+      endDate: string,
+    ): Promise<ServiceAnswer<AppointmentSlot[]>> {
+      return handleRequest(
+        async () => {
+          const response = await api.post('/appointment-slots/generate/doctor-and-date-range', {
+            doctorId: doctorId,
+            startDate: startDate,
+            endDate: endDate,
+          })
+          const slots = await response.data
+          return slots
+        },
+        (error) => {
+          if (error.status === 409) {
+            // @ts-expect-error errors is a custom interface
+            if (error.response?.data?.errors[0].code === 'conflict.day_mismatch') {
+              return 'La fecha seleccionada no es válida. Elige un día de la semana que coincida con el día del turno.'
+              // @ts-expect-error errors is a custom interface
+            } else if (error.response?.data?.errors[0].code === 'conflict.schedule_conflict') {
+              return 'Ya existe uno o varios huecos de cita en esta fecha'
+            } else {
+              console.error(error)
+              return 'Ha ocurrido un error al generar los huecos de citas'
+            }
+          } else if (
+            error.status === 400 &&
+            // @ts-expect-error errors is a custom interface
+            error.response?.data?.errors[0].code === 'bad_request.invalid_date_or_date_range'
+          ) {
+            return 'La fecha seleccionada no es válida. Recuerda que la fecha debe ser posterior a la actual.'
+          } else {
+            console.error(error)
+            return 'Ha ocurrido un error al generar los huecos de citas'
+          }
+        },
+      )
+    },
+
+    async generateSlotsForAllDoctorsWithDateRange(
+      startDate: string,
+      endDate: string,
+    ): Promise<ServiceAnswer<AppointmentSlot[]>> {
+      return handleRequest(
+        async () => {
+          const response = await api.post('/appointment-slots/generate/date-range', {
+            startDate: startDate,
+            endDate: endDate,
+          })
+          const slots = await response.data
+          return slots
+        },
+        (error) => {
+          if (error.status === 409) {
+            // @ts-expect-error errors is a custom interface
+            if (error.response?.data?.errors[0].code === 'conflict.day_mismatch') {
+              return 'La fecha seleccionada no es válida. Elige un día de la semana que coincida con el día del turno.'
+              // @ts-expect-error errors is a custom interface
+            } else if (error.response?.data?.errors[0].code === 'conflict.schedule_conflict') {
+              return 'Ya existe uno o varios huecos de cita en esta fecha'
+            } else {
+              console.error(error)
+              return 'Ha ocurrido un error al generar los huecos de citas'
+            }
+          } else if (
+            error.status === 400 &&
+            // @ts-expect-error errors is a custom interface
+            error.response?.data?.errors[0].code === 'bad_request.invalid_date_or_date_range'
+          ) {
+            return 'La fecha seleccionada no es válida. Recuerda que la fecha debe ser posterior a la actual.'
+          } else {
+            console.error(error)
+            return 'Ha ocurrido un error al generar los huecos de citas'
+          }
         },
       )
     },

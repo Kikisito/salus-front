@@ -198,7 +198,7 @@ onMounted(async () => {
                 <q-btn
                   v-if="inspectedDoctor.specialties.length > 0"
                   color="primary"
-                  label="Añadir hueco"
+                  label="Añadir hueco individual"
                   icon="add"
                   class="q-mr-sm"
                   size="sm"

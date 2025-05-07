@@ -11,6 +11,9 @@ import { useScheduleStore } from 'src/stores/ScheduleStore'
 import type { MedicalAgenda } from 'src/interfaces/MedicalAgenda'
 import ScheduleEntryForm from 'src/components/admin/doctors/ScheduleEntryForm.vue'
 import { useRoomStore } from 'src/stores/RoomStore'
+import { useAppointmentSlotStore } from 'src/stores/AppointmentSlotStore'
+import GenerateSlotsFromDateRangeDialog from 'src/components/appointments/GenerateSlotsFromDateRangeDialog.vue'
+import type { MedicalProfile } from 'src/interfaces/MedicalProfile'
 
 const route = useRoute()
 const router = useRouter()
@@ -20,6 +23,8 @@ const { inspectedDoctor } = storeToRefs(doctorStore)
 
 const scheduleStore = useScheduleStore()
 const { schedules } = storeToRefs(scheduleStore)
+
+const appointmentSlotStore = useAppointmentSlotStore()
 
 const roomStore = useRoomStore()
 
@@ -229,6 +234,85 @@ async function deleteScheduleEntry(event: MedicalAgenda) {
   })
 }
 
+async function generateSlotsBySchedule(event: MedicalAgenda) {
+  Dialog.create({
+    title: 'Generar citas según un turno',
+    message:
+      'Selecciona la fecha para la que deseas generar las citas. Ten en cuenta que debes seleccionar un día de la semana que coincida con el turno.',
+    prompt: {
+      model: '',
+      type: 'date',
+      label: 'Fecha',
+      isValid: (val: string) => {
+        const date = new Date(val)
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        return date >= today
+      },
+    },
+    cancel: true,
+    persistent: true,
+  }).onOk(async (selectedDate) => {
+    Loading.show({
+      message: 'Generando citas...',
+    })
+
+    const response = await appointmentSlotStore.generateSlotsByScheduleAndDate(
+      event.id,
+      selectedDate,
+    )
+
+    if (response.success) {
+      Notify.create({
+        type: 'positive',
+        message: 'Huecos de cita generados correctamente',
+      })
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: response.error,
+      })
+    }
+
+    Loading.hide()
+  })
+}
+
+async function generateSlotsByDoctorAndDateRange(doctor: MedicalProfile) {
+  Dialog.create({
+    component: GenerateSlotsFromDateRangeDialog,
+    componentProps: {
+      title: 'Generación de citas en un rango de fechas',
+      persistent: true,
+    },
+  }).onOk(async (data) => {
+    Loading.show({
+      message: 'Generando citas...',
+    })
+
+    const response = await appointmentSlotStore.generateSlotsByDoctorAndDateRange(
+      doctor.id,
+      data.startDate,
+      data.endDate,
+    )
+
+    if (response.success) {
+      Notify.create({
+        type: 'positive',
+        message: 'Huecos de cita generados correctamente',
+      })
+    } else {
+      Notify.create({
+        type: 'negative',
+        message: response.error,
+      })
+    }
+
+    Loading.hide()
+  })
+}
+
 async function getData() {
   Loading.show({
     message: 'Cargando información del médico...',
@@ -324,7 +408,9 @@ function calculateHeight(event: MedicalAgenda): string {
             <div class="text-h6">Perfil del médico</div>
             <div class="text-subtitle">Revisa y mantén actualizados los datos de los médicos</div>
           </div>
+
           <q-space />
+
           <q-btn-dropdown label="Acciones" color="primary" icon="settings" rounded>
             <q-list>
               <!-- Agenda -->
@@ -393,12 +479,22 @@ function calculateHeight(event: MedicalAgenda): string {
                 <q-space />
                 <q-btn
                   v-if="inspectedDoctor.specialties.length > 0"
+                  color="green"
+                  label="Generar huecos en un rango de fechas"
+                  icon="add"
+                  class="q-mr-sm"
+                  size="sm"
+                  @click="generateSlotsByDoctorAndDateRange(inspectedDoctor)"
+                />
+
+                <q-btn
+                  v-if="inspectedDoctor.specialties.length > 0"
                   color="primary"
                   label="Añadir turno"
                   icon="add"
-                  @click="addScheduleEntry()"
                   class="q-mr-sm"
                   size="sm"
+                  @click="addScheduleEntry()"
                 />
 
                 <q-badge
@@ -432,8 +528,38 @@ function calculateHeight(event: MedicalAgenda): string {
                         height: calculateHeight(event),
                       }"
                       @click="updateScheduleEntry(event)"
-                      @contextmenu.prevent="deleteScheduleEntry(event)"
                     >
+                      <q-menu touch-position context-menu auto-close>
+                        <q-list dense>
+                          <q-item
+                            class="bg-green text-white"
+                            clickable
+                            v-close-popup
+                            @click="generateSlotsBySchedule(event)"
+                          >
+                            <q-item-section avatar>
+                              <q-icon name="auto_stories" />
+                            </q-item-section>
+                            <q-item-section>
+                              <q-item-label>Generar citas</q-item-label>
+                            </q-item-section>
+                          </q-item>
+
+                          <q-item
+                            class="bg-red text-white"
+                            clickable
+                            v-close-popup
+                            @click="deleteScheduleEntry(event)"
+                          >
+                            <q-item-section avatar>
+                              <q-icon name="delete" />
+                            </q-item-section>
+                            <q-item-section>
+                              <q-item-label>Eliminar turno</q-item-label>
+                            </q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
                       <span>{{ event.specialty.name }}</span>
                       <span>{{ event.room.name }}</span>
                       <span style="font-size: 9px">
@@ -445,7 +571,8 @@ function calculateHeight(event: MedicalAgenda): string {
                 </template>
               </q-calendar-day>
               <span class="calendar-info">
-                Haz click izquierdo para editar un turno, click derecho para eliminarlo
+                Haz click izquierdo para editar un turno, click derecho para abrir el menú
+                contextual.
               </span>
             </div>
           </div>

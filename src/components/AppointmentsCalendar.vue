@@ -180,7 +180,11 @@ function goToNextWeek() {
           @click="$emit('appointment-slot:click', event)"
           @contextmenu.prevent="$emit('appointment-slot:context', event)"
         >
-          <q-tooltip anchor="center right" self="center left" class="bg-primary text-body2">
+          <q-tooltip
+            anchor="center right"
+            self="center left"
+            :class="['text-body2', event.appointmentId ? 'bg-primary' : 'bg-red']"
+          >
             <div>
               <b>{{ event.room.name }}</b>
             </div>
@@ -188,6 +192,9 @@ function goToNextWeek() {
             <div>
               {{ event.startTime.split(':').slice(0, 2).join(':') }} a
               {{ event.endTime.split(':').slice(0, 2).join(':') }}
+            </div>
+            <div v-if="event.appointmentId">
+              <b>Un usuario tiene una cita en este horario</b>
             </div>
           </q-tooltip>
           <template v-if="isEventHeightSmall(event)">
@@ -250,22 +257,22 @@ function goToNextWeek() {
 }
 
 .free-slot {
-  background-color: #4caf50;
-  border: 1px solid #388e3c;
+  background-color: #ff5722;
+  border: 1px solid #e64a19;
 }
 
 .free-slot:hover {
-  background-color: #388e3c;
-  border: 1px solid #2e7d32;
+  background-color: #e64a19;
+  border: 1px solid #d84315;
 }
 
 .locked-slot {
-  background-color: #f44336;
-  border: 1px solid #d32f2f;
+  background-color: #2196f3;
+  border: 1px solid #1976d2;
 }
 
 .locked-slot:hover {
-  background-color: #d32f2f;
-  border: 1px solid #c62828;
+  background-color: #1976d2;
+  border: 1px solid #1565c0;
 }
 </style>
