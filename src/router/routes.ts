@@ -254,6 +254,10 @@ const routes: RouteRecordRaw[] = [
           },
         ],
       },
+      {
+        path: 'verify/:token',
+        component: () => import('pages/VerifyEmailPage.vue'),
+      },
     ],
     meta: { requiresGuest: true },
   },

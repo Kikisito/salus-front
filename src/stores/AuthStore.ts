@@ -110,6 +110,27 @@ export const useAuthStore = defineStore('authStore', {
       )
     },
 
+    async verifyEmail(token: string): Promise<ServiceAnswer<number>> {
+      return handleRequest(
+        async () => {
+          const response = await api.post('/auth/verification/verify', {
+            token: token,
+          })
+          return response.status
+        },
+        (error) => {
+          if (error.status === 409) {
+            return 'Este correo electrónico ya ha sido verificado'
+          } else if (error.status === 400) {
+            return 'El enlace de verificación no es válido, ha expirado o ya ha sido utilizado'
+          } else {
+            console.error(error)
+            return 'Ha ocurrido un error inesperado'
+          }
+        },
+      )
+    },
+
     async checkEmail(email: string): Promise<ServiceAnswer<string | number>> {
       return handleRequest(
         async () => {
