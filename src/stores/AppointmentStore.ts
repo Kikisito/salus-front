@@ -33,7 +33,7 @@ export const useAppointmentStore = defineStore('appointmentStore', {
             error.response?.data?.errors[0].code ===
               'conflict.appointment_slot_cannot_be_booked_by_doctor'
           ) {
-            return 'No puedes crear una cita contigo mismo.'
+            return 'No puedes crear una cita en la que el doctor y el paciente sean la misma persona'
           } else if (error.status === 401) {
             return 'No se ha podido crear la cita. Por favor, contacta con el centro médico para gestionar tus citas.'
           } else {
