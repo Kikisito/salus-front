@@ -4,6 +4,7 @@ import { handleRequest } from 'src/helpers/handleRequest'
 import type { Appointment } from 'src/interfaces/Appointment'
 import type { AppointmentRequest } from 'src/interfaces/AppointmentRequest'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
+import { useNotificationStore } from './NotificationStore'
 
 export const useAppointmentStore = defineStore('appointmentStore', {
   state: () => ({
@@ -18,12 +19,22 @@ export const useAppointmentStore = defineStore('appointmentStore', {
   actions: {
     async createAppointment(
       appointmentRequest: AppointmentRequest,
+      registerReminder: boolean = false,
     ): Promise<ServiceAnswer<Appointment>> {
       return handleRequest(
         async () => {
           const response = await api.post('/appointments/new', appointmentRequest)
           const appointment = await response.data
+
+          // Añadimos la cita a la lista local de citas
           this.appointments.push(appointment)
+
+          // Y añadimos un recordatorio en el dispositivo si se da la condición
+          if (registerReminder) {
+            const notificationStore = useNotificationStore()
+            await notificationStore.scheduleAppointmentNotification(appointment)
+          }
+
           return appointment
         },
         (error) => {
@@ -77,7 +88,14 @@ export const useAppointmentStore = defineStore('appointmentStore', {
         async () => {
           const response = await api.delete(`/appointments/${appointment.id}`)
           const appointmentDeleted = await response.data
+
+          // Eliminamos la cita de la lista local de citas
           this.appointments = this.appointments.filter((a) => a.id !== appointment.id)
+
+          // Y eliminamos el recordatorio del dispositivo
+          const notificationStore = useNotificationStore()
+          await notificationStore.cancelAppointmentNotifications(appointment)
+
           return appointmentDeleted
         },
         (error) => {

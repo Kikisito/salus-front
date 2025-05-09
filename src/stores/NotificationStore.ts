@@ -3,6 +3,7 @@ import { LocalNotifications } from '@capacitor/local-notifications'
 import type { Prescription } from 'src/interfaces/Prescription'
 import type { Medication } from 'src/interfaces/Medication'
 import type { PendingLocalNotificationSchema } from '@capacitor/local-notifications'
+import type { Appointment } from 'src/interfaces/Appointment'
 
 export const useNotificationStore = defineStore('notificationStore', {
   state: () => ({
@@ -25,6 +26,7 @@ export const useNotificationStore = defineStore('notificationStore', {
       })
     },
 
+    // Recordatorios de medicación
     async schedulePrescriptionNotification(
       prescription: Prescription,
       startDate: Date,
@@ -169,6 +171,117 @@ export const useNotificationStore = defineStore('notificationStore', {
       }
 
       return times
+    },
+
+    // Recordatorios de citas
+    async scheduleAppointmentNotification(appointment: Appointment): Promise<boolean> {
+      // Comprobamos si el sistema de notificaciones está habilitado
+      await this.checkNotifications()
+
+      try {
+        // ID con formato XXYYYYYY
+        // XX: tipo de notificación (02 para citas)
+        // YYYYYY: ID de la cita (6 dígitos)
+        const appointmentId = appointment.id.toString().padStart(6, '0').slice(0, 6)
+        const notificationId = Number(`02${appointmentId}`)
+
+        const appointmentDate = new Date(appointment.slot.date)
+        const [hours, minutes] = appointment.slot.startTime.split(':').map(Number)
+        appointmentDate.setHours(hours!, minutes, 0, 0)
+
+        // Creamos las fechas de las notificaciones y las notificaciones
+        // Notificación 1: Un día antes
+        const oneDayBefore = new Date(appointmentDate)
+        oneDayBefore.setDate(oneDayBefore.getDate() - 1)
+        oneDayBefore.setHours(10, 0, 0, 0)
+
+        // Notificación 2: El mismo día por la mañana
+        const sameDayMorning = new Date(appointmentDate)
+        sameDayMorning.setHours(9, 0, 0, 0)
+
+        // Notificación 3: Una hora antes
+        const oneHourBefore = new Date(appointmentDate)
+        oneHourBefore.setHours(oneHourBefore.getHours() - 1)
+
+        const notifications = [
+          {
+            time: oneDayBefore,
+            id: notificationId + 1,
+            message: `Recuerda que mañana tienes cita médica`,
+          },
+          {
+            time: sameDayMorning,
+            id: notificationId + 2,
+            message: `Hoy tienes cita médica`,
+          },
+          {
+            time: oneHourBefore,
+            id: notificationId + 3,
+            message: 'Tu cita médica es dentro de una hora',
+          },
+        ]
+
+        // Programamos cada notificación
+        for (const notification of notifications) {
+          await LocalNotifications.schedule({
+            notifications: [
+              {
+                id: notification.id,
+                title: `Cita con ${appointment.slot.doctor.user.sexo === 'Mujer' ? 'Dra.' : 'Dr.'} ${appointment.slot.doctor.user.nombre} ${appointment.slot.doctor.user.apellidos}`,
+                body: `${notification.message} en ${appointment.slot.room.medicalCenter.name} a las ${appointment.slot.startTime.substring(0, 5)}`,
+                schedule: {
+                  at: notification.time,
+                },
+                extra: {
+                  type: 'appointment',
+                  appointmentId: appointment.id,
+                },
+              },
+            ],
+          })
+        }
+
+        // Actualizamos el estado de las notificaciones pendientes
+        await this.checkNotifications()
+
+        return true
+      } catch (error) {
+        console.error('Error al programar las notificaciones de la cita:', error)
+        return false
+      }
+    },
+
+    async cancelAppointmentNotifications(appointment: Appointment): Promise<boolean> {
+      try {
+        // Comprobamos si el sistema de notificaciones está habilitado
+        await this.checkNotifications()
+
+        // Obtenemos todas las notificaciones pendientes
+        const { notifications } = await LocalNotifications.getPending()
+
+        // Filtramos las notificaciones que pertenecen a la cita
+        const notificationsToCancel = notifications.filter((notification) => {
+          const { appointmentId } = notification.extra
+          return appointmentId === appointment.id
+        })
+
+        // Cancelamos las notificaciones filtradas
+        if (notificationsToCancel.length > 0) {
+          await LocalNotifications.cancel({
+            notifications: notificationsToCancel.map((notification) => ({
+              id: notification.id,
+            })),
+          })
+        }
+
+        // Actualizamos el estado de las notificaciones pendientes
+        await this.checkNotifications()
+
+        return true // Notificaciones canceladas correctamente
+      } catch (error) {
+        console.error('Error al cancelar las notificaciones de la cita:', error)
+        return false // Error al cancelar las notificaciones
+      }
     },
   },
 })
