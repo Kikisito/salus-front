@@ -5,6 +5,12 @@ import { computed, ref } from 'vue'
 import type { Medication } from 'src/interfaces/Medication'
 import type { Prescription } from 'src/interfaces/Prescription'
 import type { PropType } from 'vue'
+import { useNotificationStore } from 'src/stores/NotificationStore'
+import { storeToRefs } from 'pinia'
+import { Dialog, Loading, Notify } from 'quasar'
+
+const notificationStore = useNotificationStore()
+const { pendingNotifications } = storeToRefs(notificationStore)
 
 const props = defineProps({
   prescription: {
@@ -15,7 +21,7 @@ const props = defineProps({
 
 defineEmits(['prescription:download'])
 
-const expanded = ref(false)
+const expanded = ref<boolean>(false)
 
 const fechaInicioReceta = computed(() => {
   if (!props.prescription.medications || props.prescription.medications.length === 0) {
@@ -46,6 +52,71 @@ function isMedicationActive(medication: Medication) {
   const today = new Date()
   const endDate = new Date(medication.endDate)
   return today <= endDate
+}
+
+const notificationsEnabled = computed(() => {
+  return pendingNotifications.value.some((notification) => {
+    const { prescriptionId } = notification.extra
+    return prescriptionId === props.prescription.id
+  })
+})
+
+async function toggleNotification() {
+  try {
+    if (notificationsEnabled.value) {
+      Loading.show({
+        message: 'Desactivando recordatorio...',
+      })
+
+      await notificationStore.cancelPrescriptionNotifications(props.prescription)
+
+      Notify.create({
+        type: 'positive',
+        message: 'Recordatorio desactivado',
+      })
+    } else {
+      Dialog.create({
+        title: 'Activar recordatorio',
+        message: 'Selecciona la hora en la que tomarás el primer medicamento',
+        prompt: {
+          model: '',
+          type: 'time',
+          rules: [
+            (val) => !!val || 'Debes seleccionar una hora',
+            (val) => {
+              const [hours, minutes] = val.split(':').map(Number)
+              return hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60
+                ? true
+                : 'Hora inválida'
+            },
+          ],
+        },
+        cancel: true,
+        persistent: true,
+      }).onOk(async (time) => {
+        Loading.show({
+          message: 'Activando recordatorio...',
+        })
+
+        const selectedTime = new Date()
+        const [hours, minutes] = time.split(':').map(Number)
+        selectedTime.setHours(hours, minutes, 0)
+
+        // En caso de que ya estén activos, cancelamos los recordatorios existentes y programamos los nuevos
+        await notificationStore.cancelPrescriptionNotifications(props.prescription)
+        await notificationStore.schedulePrescriptionNotification(props.prescription, selectedTime)
+
+        Notify.create({
+          type: 'positive',
+          message: 'Recordatorio activado',
+        })
+
+        Loading.hide()
+      })
+    }
+  } finally {
+    Loading.hide()
+  }
 }
 </script>
 
@@ -86,7 +157,9 @@ function isMedicationActive(medication: Medication) {
                   {{ medication.name }}
                 </q-item-label>
                 <q-item-label caption>Dosis: {{ medication.dosage }}</q-item-label>
-                <q-item-label caption>Frecuencia: {{ medication.frequency }}</q-item-label>
+                <q-item-label caption>
+                  Frecuencia: Cada {{ medication.frequency }} horas
+                </q-item-label>
                 <q-item-label v-if="medication.instructions" caption>
                   Instrucciones: {{ medication.instructions }}
                 </q-item-label>
@@ -106,6 +179,14 @@ function isMedicationActive(medication: Medication) {
             color="primary"
             icon="download"
             @click="$emit('prescription:download', props.prescription)"
+          />
+
+          <q-btn
+            class="q-mt-sm capacitor-only"
+            :label="notificationsEnabled ? 'Desactivar recordatorio' : 'Activar recordatorio'"
+            :color="notificationsEnabled ? 'red' : 'green'"
+            :icon="notificationsEnabled ? 'visibility_off' : 'visibility'"
+            @click="toggleNotification()"
           />
         </q-card-actions>
       </q-card-section>

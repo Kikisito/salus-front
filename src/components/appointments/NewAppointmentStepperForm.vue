@@ -207,8 +207,6 @@ async function submitMedicalCenter() {
       medicalCenterError.value = true
       medicalCenterSelect.value.validate()
 
-      console.log('medicalCenterError', medicalCenterError.value)
-
       Notify.create({
         type: 'negative',
         message:
