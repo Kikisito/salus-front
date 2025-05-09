@@ -1,6 +1,9 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { api } from 'src/boot/axios'
 import { handleRequest } from 'src/helpers/handleRequest'
+import { Filesystem, Directory } from '@capacitor/filesystem'
+import blobToBase64 from 'src/helpers/blobToBase64'
+
 import type { Report } from 'src/interfaces/Report'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
 
@@ -118,6 +121,13 @@ export const useReportStore = defineStore('reportStore', {
           link.download = `Report-${report.patient.nif}.pdf`
           link.click()
           window.URL.revokeObjectURL(url)
+
+          Filesystem.writeFile({
+            path: `Report-${report.patient.nif}.pdf`,
+            data: await blobToBase64(pdfBlob),
+            directory: Directory.Documents,
+            recursive: true,
+          })
 
           return pdfBlob
         },

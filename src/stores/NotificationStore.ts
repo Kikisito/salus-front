@@ -107,27 +107,6 @@ export const useNotificationStore = defineStore('notificationStore', {
       }
     },
 
-    async cancelAllNotifications(): Promise<void> {
-      try {
-        // Comprobamos si el sistema de notificaciones está habilitado
-        await this.checkNotifications()
-
-        // Primero obtenemos todas las notificaciones pendientes y luego cancelamos una a una (podría existir un cancelar todos, eh capacitor)
-        await LocalNotifications.getPending().then((result) => {
-          LocalNotifications.cancel({
-            notifications: result.notifications.map((notification) => ({
-              id: notification.id,
-            })),
-          })
-        })
-
-        // Actualizamos el estado de las notificaciones pendientes
-        await this.checkNotifications()
-      } catch (error) {
-        console.error('Error al cancelar todas las notificaciones:', error)
-      }
-    },
-
     async doesPrescriptionHaveNotifications(prescription: Prescription): Promise<boolean> {
       try {
         // Comprobamos si el sistema de notificaciones está habilitado
@@ -146,6 +125,27 @@ export const useNotificationStore = defineStore('notificationStore', {
       } catch (error) {
         console.error('Error al comprobar si una receta tiene notificaciones', error)
         return false
+      }
+    },
+
+    async cancelAllNotifications(): Promise<void> {
+      try {
+        // Comprobamos si el sistema de notificaciones está habilitado
+        await this.checkNotifications()
+
+        // Primero obtenemos todas las notificaciones pendientes y luego cancelamos una a una (podría existir un cancelar todos, eh capacitor)
+        await LocalNotifications.getPending().then((result) => {
+          LocalNotifications.cancel({
+            notifications: result.notifications.map((notification) => ({
+              id: notification.id,
+            })),
+          })
+        })
+
+        // Actualizamos el estado de las notificaciones pendientes
+        await this.checkNotifications()
+      } catch (error) {
+        console.error('Error al cancelar todas las notificaciones:', error)
       }
     },
 
