@@ -6,6 +6,7 @@ import blobToBase64 from 'src/helpers/blobToBase64'
 
 import type { Prescription } from 'src/interfaces/Prescription'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
+import { Notify } from 'quasar'
 
 export const usePrescriptionStore = defineStore('prescriptionStore', {
   state: () => ({
@@ -73,6 +74,11 @@ export const usePrescriptionStore = defineStore('prescriptionStore', {
             data: await blobToBase64(pdfBlob),
             directory: Directory.Documents,
             recursive: true,
+          })
+
+          Notify.create({
+            message: 'Receta descargada correctamente. Revisa tu carpeta de Documentos',
+            type: 'positive',
           })
 
           return pdfBlob

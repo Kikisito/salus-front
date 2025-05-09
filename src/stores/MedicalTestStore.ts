@@ -6,6 +6,7 @@ import blobToBase64 from 'src/helpers/blobToBase64'
 
 import type { MedicalTest } from 'src/interfaces/MedicalTest'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
+import { Notify } from 'quasar'
 
 export const useMedicalTestStore = defineStore('medicalTestStore', {
   state: () => ({
@@ -73,6 +74,11 @@ export const useMedicalTestStore = defineStore('medicalTestStore', {
             data: await blobToBase64(pdfBlob),
             directory: Directory.Documents,
             recursive: true,
+          })
+
+          Notify.create({
+            message: 'Prueba médica descargada correctamente. Revisa tu carpeta de Documentos',
+            type: 'positive',
           })
 
           return pdfBlob

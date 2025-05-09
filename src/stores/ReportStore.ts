@@ -6,6 +6,7 @@ import blobToBase64 from 'src/helpers/blobToBase64'
 
 import type { Report } from 'src/interfaces/Report'
 import { type ServiceAnswer } from 'src/interfaces/ServiceAnswer'
+import { Notify } from 'quasar'
 
 export const useReportStore = defineStore('reportStore', {
   state: () => ({
@@ -127,6 +128,11 @@ export const useReportStore = defineStore('reportStore', {
             data: await blobToBase64(pdfBlob),
             directory: Directory.Documents,
             recursive: true,
+          })
+
+          Notify.create({
+            message: 'Informe descargado correctamente. Revisa tu carpeta de Documentos.',
+            type: 'positive',
           })
 
           return pdfBlob
