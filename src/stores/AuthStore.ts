@@ -37,6 +37,12 @@ export const useAuthStore = defineStore('authStore', {
         (error) => {
           if (error.status === 404) {
             return 'Los datos introducidos no coinciden con ningún usuario'
+          } else if (
+            error.status === 401 &&
+            // @ts-expect-error objeto del servidor
+            error.response?.data.errors[0].code === 'generic.account_locked'
+          ) {
+            return 'Esta cuenta está bloqueada. Restablece la contraseña para desbloquearla.'
           }
         },
       )
