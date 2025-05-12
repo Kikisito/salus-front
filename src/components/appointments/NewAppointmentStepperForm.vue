@@ -310,7 +310,7 @@ async function submitForm() {
         option-label="name"
         label="Especialidad"
         :rules="[
-          (val) => !!val || 'La especialidad es obligatoria',
+          (val: string) => !!val || 'La especialidad es obligatoria',
           () =>
             !specialtyError ||
             'No hay citas disponibles para esta especialidad. Vuelve a intentarlo más tarde',
@@ -352,7 +352,7 @@ async function submitForm() {
     <!-- Paso 2: Selección de centro médico -->
     <q-step :name="2" title="Centro médico" icon="local_hospital" :done="step > 2">
       <div class="text-body1 q-mb-md">
-        Centros médicos disponibles para la especialidad seleccionada
+        Para esa especialidad tenemos los siguientes centros médicos disponibles. ¿Cuál prefieres?
       </div>
 
       <q-select
@@ -363,7 +363,7 @@ async function submitForm() {
         option-label="name"
         label="Centro médico"
         :rules="[
-          (val) => !!val || 'El centro médico es obligatorio',
+          (val: string) => !!val || 'El centro médico es obligatorio',
           () =>
             !medicalCenterError ||
             'No hay citas disponibles para este centro médico. Vuelve a intentarlo más tarde',
@@ -403,17 +403,19 @@ async function submitForm() {
 
     <!-- Paso 3: Selección de médico -->
     <q-step :name="3" title="Doctor" icon="person" :done="step > 3">
-      <div class="text-body1 q-mb-md">Selecciona el médico de tu preferencia</div>
+      <div class="text-body1 q-mb-md">
+        ¡Perfecto! Ahora, ¿con qué profesional deseas realizar la cita?
+      </div>
 
       <q-select
         v-model="selectedDoctor"
         ref="doctorSelect"
         :options="doctors"
         option-value="value"
-        :option-label="(doctor) => doctor.user.nombre + ' ' + doctor.user.apellidos"
+        :option-label="(doctor: MedicalProfile) => doctor.user.nombre + ' ' + doctor.user.apellidos"
         label="Médico"
         :rules="[
-          (val) => !!val || 'El médico es obligatorio',
+          (val: string) => !!val || 'El médico es obligatorio',
           () =>
             !doctorError ||
             'No hay citas disponibles para este médico. Vuelve a intentarlo más tarde',
@@ -467,7 +469,9 @@ async function submitForm() {
 
     <!-- Paso 4: Selección de fecha y hora -->
     <q-step :name="4" title="Fecha y hora" icon="event" :done="step > 4">
-      <div class="text-body1 q-mb-md">¿Cuándo quieres tu cita?</div>
+      <div class="text-body1 q-mb-md">
+        Este médico tiene los siguientes horarios disponibles. ¿Cuál te viene mejor?
+      </div>
 
       <div class="row q-col-gutter-md">
         <div class="col-12 col-md-6">
@@ -475,7 +479,7 @@ async function submitForm() {
             v-model="selectedDate"
             :options="availableDates"
             label="Fecha de la cita"
-            :rules="[(val) => !!val || 'La fecha es obligatoria']"
+            :rules="[(val: string) => !!val || 'La fecha es obligatoria']"
             filled
             :loading="loading"
             @update:model-value="clearSelectedSlot()"
@@ -516,9 +520,9 @@ async function submitForm() {
             v-model="selectedSlot"
             :options="availableSlots"
             option-value="value"
-            :option-label="(slot) => slot.startTime.slice(0, 5)"
+            :option-label="(slot: AppointmentSlot) => slot.startTime.slice(0, 5)"
             label="Hora de la cita"
-            :rules="[(val) => !!val || 'La hora es obligatoria']"
+            :rules="[(val: string) => !!val || 'La hora es obligatoria']"
             emit-value
             map-options
             filled
@@ -572,7 +576,9 @@ async function submitForm() {
 
     <!-- Paso 5: Detalles finales -->
     <q-step :name="5" title="Detalles" icon="info" :done="step > 5">
-      <div class="text-body1 q-mb-md">Detalles de la cita</div>
+      <div class="text-body1 q-mb-md">
+        ¿Quieres especificar algún motivo? ¿Prefieres una cita presencial o telefónica?
+      </div>
 
       <div class="row q-col-gutter-md">
         <div class="col-12">
