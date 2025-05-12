@@ -89,6 +89,7 @@ onMounted(async () => {
                   :key="chat.id"
                   :chat="chat"
                   :title="`${chat.doctor.user!.sexo === 'Mujer' ? 'Dra.' : 'Dr.'} ${chat.doctor.user!.nombre} ${chat.doctor.user!.apellidos}`"
+                  @chat:click="$router.push({ name: 'chat', params: { id: $event.doctor.id } })"
                 />
 
                 <div v-if="chats.length === 0" class="q-mt-md q-ml-md q-mb-md">
