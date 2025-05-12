@@ -117,7 +117,7 @@ async function submitPrescription() {
             <q-item-section>
               <q-item-label>{{ med.name }} - {{ med.dosage }}</q-item-label>
               <q-item-label caption>
-                {{ med.frequency }} | {{ med.startDate }} a {{ med.endDate }}
+                Cada {{ med.frequency }} horas | {{ med.startDate }} a {{ med.endDate }}
               </q-item-label>
               <q-item-label caption v-if="med.instructions">
                 Instrucciones: {{ med.instructions }}
@@ -172,9 +172,17 @@ async function submitPrescription() {
                 <q-input
                   v-model="newMedication.frequency"
                   label="Frecuencia"
-                  :rules="[(val) => !!val || 'La frecuencia es obligatoria']"
-                  hint="Ej: Cada 8 horas"
+                  :rules="[
+                    (val) => !!val || 'La frecuencia es obligatoria',
+                    (val) =>
+                      /^\d+(\.\d{1,2})?$/.test(val) ||
+                      'Solo se permiten valores numéricos con hasta 2 decimales',
+                  ]"
+                  hint='Ejemplos: "8" serán 8 horas; "3,5" serán 3 horas y 30 minutos'
                   filled
+                  type="number"
+                  min="1"
+                  step="0.25"
                 />
               </div>
 

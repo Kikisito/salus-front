@@ -4,7 +4,7 @@ export interface Medication {
   id: number
   name: string
   dosage: string
-  frequency: string
+  frequency: number
   startDate: string
   endDate: string
   instructions: string

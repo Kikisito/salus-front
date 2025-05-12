@@ -121,7 +121,7 @@ async function newAppointment() {
   }).onOk(async (request: AppointmentRequest) => {
     request.patient = user.value!.id!
 
-    const response = await appointmentStore.createAppointment(request)
+    const response = await appointmentStore.createAppointment(request, true)
 
     if (response.success) {
       Notify.create({

@@ -40,67 +40,6 @@ async function openLocation() {
   window.open(url, '_blank')
 }
 
-async function addToCalendar() {
-  if (!appointment.value) return
-
-  const { slot } = appointment.value
-
-  // Construir datos del evento
-  const title = `Cita de ${slot.specialty.name}`
-  const description = `Cita con ${slot.doctor.user.sexo === 'Mujer' ? 'Dra.' : 'Dr.'} ${slot.doctor.user.nombre} ${slot.doctor.user.apellidos}`
-  const location = mapsLocation.value
-  const startDate = new Date(slot.date)
-
-  // Parsear hora de inicio (formato: "HH:MM:SS")
-  const [hours, minutes] = slot.startTime.split(':').map(Number)
-  startDate.setHours(hours!, minutes, 0)
-
-  // Duración cita (fin de la cita)
-  const endDate = new Date(slot.date)
-  const [endHours, endMinutes] = slot.endTime.split(':').map(Number)
-  endDate.setHours(endHours!, endMinutes, 0)
-
-  // Formatear fechas para iCalendar
-  const formatDate = (date: Date) => {
-    return date.toISOString().replace(/-|:|\.\d+/g, '')
-  }
-
-  const start = formatDate(startDate)
-  const end = formatDate(endDate)
-
-  // Crear contenido del archivo iCalendar
-  const icsContent = `BEGIN:VCALENDAR
-                      VERSION:2.0
-                      BEGIN:VEVENT
-                      SUMMARY:${title}
-                      DTSTART:${start}
-                      DTEND:${end}
-                      LOCATION:${location}
-                      DESCRIPTION:${description}
-                      STATUS:CONFIRMED
-                      END:VEVENT
-                      END:VCALENDAR`
-
-  // Crear blob con el contenido
-  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' })
-
-  if (Platform.is.mobile) {
-    // En móviles, intentar abrir la app de calendario
-    const url = URL.createObjectURL(blob)
-    window.open(url, '_blank')
-
-    setTimeout(() => URL.revokeObjectURL(url), 100)
-  } else {
-    // En escritorio, ofrecer archivo para descarga
-    const link = document.createElement('a')
-    link.href = URL.createObjectURL(blob)
-    link.download = `cita_${slot.specialty.name.replace(/\s+/g, '_').toLowerCase()}.ics`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
-}
-
 async function deleteAppointment() {
   if (!appointment.value) return
 
@@ -190,12 +129,6 @@ onMounted(async () => {
                         })
                       }}
                     </q-item-label>
-                  </q-item-section>
-
-                  <q-item-section side top>
-                    <q-btn outline size="sm" @click="addToCalendar()">
-                      <q-icon class="cursor-pointer" name="calendar_month" />
-                    </q-btn>
                   </q-item-section>
                 </q-item>
 
