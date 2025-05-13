@@ -13,9 +13,13 @@ const { doctors, count } = storeToRefs(doctorStore)
 const tableColumns: QTableColumn[] = [
   { name: 'name', label: 'Nombre', field: (row) => row.user.nombre, align: 'left' },
   { name: 'surname', label: 'Apellidos', field: (row) => row.user.apellidos, align: 'left' },
-  { name: 'idcard', label: 'DNI', field: (row) => row.user.nif, align: 'left' },
-  { name: 'email', label: 'Correo', field: (row) => row.user.email, align: 'left' },
-  { name: 'phone', label: 'Teléfono', field: (row) => row.user.telefono, align: 'left' },
+  {
+    name: 'workEmail',
+    label: 'Correo electrónico corporativo',
+    field: (row) => row.workEmail,
+    align: 'left',
+  },
+  { name: 'phone', label: 'Teléfono corporativo', field: (row) => row.workPhone, align: 'left' },
   {
     name: 'numcol',
     label: 'Número de Colegiado',
