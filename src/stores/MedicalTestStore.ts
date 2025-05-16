@@ -13,6 +13,11 @@ export const useMedicalTestStore = defineStore('medicalTestStore', {
     tests: [] as MedicalTest[],
   }),
 
+  persist: {
+    storage: localStorage,
+    pick: ['tests'],
+  },
+
   actions: {
     async getUserMedicalTests(userId: number): Promise<ServiceAnswer<MedicalTest[]>> {
       return handleRequest(

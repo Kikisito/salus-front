@@ -13,6 +13,11 @@ export const usePrescriptionStore = defineStore('prescriptionStore', {
     prescriptions: [] as Prescription[],
   }),
 
+  persist: {
+    storage: localStorage,
+    pick: ['prescriptions'],
+  },
+
   actions: {
     async getUserPrescriptions(userId: number): Promise<ServiceAnswer<Prescription[]>> {
       return handleRequest(

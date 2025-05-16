@@ -16,6 +16,7 @@ import { useAppointmentSlotStore } from 'src/stores/AppointmentSlotStore'
 import { useAppointmentStore } from 'src/stores/AppointmentStore'
 import { useUserStore } from 'src/stores/UserStore'
 import { onMounted, ref } from 'vue'
+import { Network } from '@capacitor/network'
 
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
@@ -151,9 +152,19 @@ async function showPastAppointments() {
 }
 
 onMounted(async () => {
-  await appointmentStore.getAppointments().finally(() => {
-    loading.value = false
-  })
+  const networkStatus = await Network.getStatus()
+
+  if (networkStatus.connected) {
+    await appointmentStore.getAppointments()
+  } else {
+    Notify.create({
+      message:
+        'No tienes conexión a internet. Las citas que se muestran pueden no estar actualizadas.',
+      type: 'negative',
+    })
+  }
+
+  loading.value = false
 })
 </script>
 

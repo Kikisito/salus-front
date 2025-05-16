@@ -13,6 +13,11 @@ export const useReportStore = defineStore('reportStore', {
     reports: [] as Report[],
   }),
 
+  persist: {
+    storage: localStorage,
+    pick: ['reports'],
+  },
+
   actions: {
     async getUserReports(userId: number): Promise<ServiceAnswer<Report[]>> {
       return handleRequest(

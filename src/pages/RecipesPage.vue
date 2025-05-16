@@ -5,6 +5,7 @@ import PreviaReceta from 'src/components/PreviaReceta.vue'
 import { usePrescriptionStore } from 'src/stores/PrescriptionStore'
 import { useUserStore } from 'src/stores/UserStore'
 import { onMounted, ref } from 'vue'
+import { Network } from '@capacitor/network'
 
 const loading = ref(true)
 
@@ -15,13 +16,23 @@ const prescriptionStore = usePrescriptionStore()
 const { prescriptions } = storeToRefs(prescriptionStore)
 
 onMounted(async () => {
-  if (user.value) {
-    await prescriptionStore.getUserPrescriptions(user.value.id)
+  const networkStatus = await Network.getStatus()
+
+  if (networkStatus.connected) {
+    if (user.value) {
+      await prescriptionStore.getUserPrescriptions(user.value.id)
+    } else {
+      console.error('No se pudo obtener el ID del usuario')
+      Notify.create({
+        type: 'negative',
+        message: 'No se han podido cargar las recetas',
+      })
+    }
   } else {
-    console.error('No se pudo obtener el ID del usuario')
     Notify.create({
+      message:
+        'No tienes conexión a internet. Los informes que se muestran pueden no estar actualizados.',
       type: 'negative',
-      message: 'No se han podido cargar las recetas',
     })
   }
 

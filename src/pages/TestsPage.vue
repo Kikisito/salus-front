@@ -5,6 +5,7 @@ import PreviaPrueba from 'src/components/PreviaPrueba.vue'
 import { useMedicalTestStore } from 'src/stores/MedicalTestStore'
 import { useUserStore } from 'src/stores/UserStore'
 import { onMounted, ref } from 'vue'
+import { Network } from '@capacitor/network'
 
 const loading = ref(true)
 
@@ -15,13 +16,23 @@ const medicalTestStore = useMedicalTestStore()
 const { tests } = storeToRefs(medicalTestStore)
 
 onMounted(async () => {
-  if (user.value) {
-    await medicalTestStore.getUserMedicalTests(user.value.id)
+  const networkStatus = await Network.getStatus()
+
+  if (networkStatus.connected) {
+    if (user.value) {
+      await medicalTestStore.getUserMedicalTests(user.value.id)
+    } else {
+      console.error('No se pudo obtener el ID del usuario')
+      Notify.create({
+        type: 'negative',
+        message: 'No se han podido cargar las pruebas médicas',
+      })
+    }
   } else {
-    console.error('No se pudo obtener el ID del usuario')
     Notify.create({
+      message:
+        'No tienes conexión a internet. Los informes que se muestran pueden no estar actualizados.',
       type: 'negative',
-      message: 'No se han podido cargar las pruebas médicas',
     })
   }
 
