@@ -237,8 +237,18 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/AuthLayout.vue'),
     children: [
       { path: '', redirect: { name: 'login' } },
-      { name: 'login', path: 'login', component: () => import('pages/LoginPage.vue') },
-      { name: 'register', path: 'register', component: () => import('pages/RegisterPage.vue') },
+      {
+        name: 'login',
+        path: 'login',
+        component: () => import('pages/LoginPage.vue'),
+        meta: { requiresGuest: true },
+      },
+      {
+        name: 'register',
+        path: 'register',
+        component: () => import('pages/RegisterPage.vue'),
+        meta: { requiresGuest: true },
+      },
       {
         path: 'forgot-password',
         children: [
@@ -253,13 +263,13 @@ const routes: RouteRecordRaw[] = [
             component: () => import('pages/ForgotPasswordRecoverPage.vue'),
           },
         ],
+        meta: { requiresGuest: true },
       },
       {
         path: 'verify/:token',
         component: () => import('pages/VerifyEmailPage.vue'),
       },
     ],
-    meta: { requiresGuest: true },
   },
 
   // Always leave this as last one,
