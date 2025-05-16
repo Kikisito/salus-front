@@ -145,8 +145,7 @@ async function showPastAppointments() {
   } else {
     Notify.create({
       message: 'Error al cargar las citas pasadas',
-      color: 'negative',
-      position: 'top',
+      type: 'negative',
     })
   }
 }
