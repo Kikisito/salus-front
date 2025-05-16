@@ -45,6 +45,7 @@ const formattedDate = computed(() => {
           <span class="text-weight-medium">Médico:</span>
           {{ props.appointment.slot.doctor.user.sexo === 'Mujer' ? 'Dra.' : 'Dr.' }}
           {{ props.appointment.slot.doctor.user.nombre }}
+          {{ props.appointment.slot.doctor.user.apellidos }}
         </q-item-label>
 
         <q-item-label caption class="text-subtitle1 q-mt-sm">
