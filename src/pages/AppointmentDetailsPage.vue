@@ -5,10 +5,14 @@ import type { Appointment } from 'src/interfaces/Appointment'
 import { useAppointmentStore } from 'src/stores/AppointmentStore'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { Network } from '@capacitor/network'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const route = useRoute()
 const appointmentId = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
+
+const deviceHasNetwork = ref(false)
 
 const appointmentStore = useAppointmentStore()
 
@@ -73,19 +77,45 @@ async function deleteAppointment() {
 }
 
 onMounted(async () => {
-  try {
-    const response = await appointmentStore.getAppointment(Number.parseInt(appointmentId!))
+  const networkStatus = await Network.getStatus()
+  deviceHasNetwork.value = networkStatus.connected
 
-    if (response.success) {
-      appointment.value = response.data
-    } else {
+  if (networkStatus.connected) {
+    try {
+      const response = await appointmentStore.getAppointment(Number.parseInt(appointmentId!))
+
+      if (response.success) {
+        appointment.value = response.data
+      } else {
+        Notify.create({
+          type: 'negative',
+          message: 'Error al cargar la cita',
+        })
+      }
+    } finally {
+      loading.value = false
+    }
+  } else {
+    // Cargamos los datos de la cita desde el store (los almacenamos en el store cuando tenía internet)
+    const { appointments } = storeToRefs(appointmentStore)
+    appointment.value = appointments.value.find(
+      (appointment) => appointment.id === Number.parseInt(appointmentId!),
+    )
+
+    if (!appointment.value) {
       Notify.create({
         type: 'negative',
-        message: 'Error al cargar la cita',
+        message: 'No se ha podido cargar la cita. Por favor, inténtalo con conexión a internet.',
       })
+      router.push({ name: 'appointments' })
     }
-  } finally {
+
     loading.value = false
+
+    Notify.create({
+      message: 'No tienes conexión a internet. Los datos de la cita pueden no estar actualizados.',
+      type: 'negative',
+    })
   }
 })
 </script>
@@ -259,13 +289,21 @@ onMounted(async () => {
                 <q-item>
                   <q-item-section>
                     <iframe
+                      v-if="deviceHasNetwork"
                       :src="`https://www.google.com/maps?q=${mapsLocation}&output=embed`"
                       style="border: 0; width: 100%; aspect-ratio: 1 / 1"
                       allowfullscreen
                       loading="lazy"
                       referrerpolicy="no-referrer-when-downgrade"
-                    >
-                    </iframe>
+                    />
+
+                    <q-card-section v-else class="text-center">
+                      <q-icon name="signal_wifi_off" size="4em" color="grey-5" />
+                      <div class="text-h6">Sin conexión a internet</div>
+                      <div class="text-subtitle2">
+                        No se puede mostrar el mapa sin conexión a internet.
+                      </div>
+                    </q-card-section>
                   </q-item-section>
                 </q-item>
               </q-list>
